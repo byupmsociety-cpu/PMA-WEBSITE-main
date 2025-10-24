@@ -1,26 +1,189 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import AnimatedSection from '@/components/AnimatedSection';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Card, CardContent } from '@/components/ui/card';
-import Navigation from '@/components/Navigation';
-import Footer from '@/components/Footer';
+import { Input } from '@/components/ui/input';
+import { FileText, Linkedin, Building2, Coffee, Briefcase, Cpu, ArrowLeft, Search } from 'lucide-react';
 
-const resources = [
+interface Resource {
+  title: string;
+  description: string;
+  url: string;
+  tips?: string[];
+}
+
+interface Category {
+  id: string;
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  color: string;
+  resources: Resource[];
+}
+
+const categories: Category[] = [
   {
-    category: 'Resume & Interview Guides',
-    items: [
-      { title: 'ResumeGenius', description: 'Access professional resume templates and tips.', url: 'https://www.resumegenius.com' },
-      { title: 'Vmock', description: 'Get instant feedback on your resume with Vmock.', url: 'https://www.vmock.com' },
-      { title: 'IGotAnOffer', description: 'Learn how to craft a standout product manager resume.', url: 'https://igotanoffer.com/blogs/product-manager/product-manager-resume' },
-      { title: "LinkedIn's Official Guide", description: "Explore LinkedIn's tips and best practices for optimizing your profile.", url: 'https://www.linkedin.com/help/linkedin/answer/4443' },
-      { title: "HubSpot's LinkedIn Tips", description: "Learn how to optimize your LinkedIn profile with HubSpot's comprehensive guide.", url: 'https://blog.hubspot.com/marketing/linkedin-profile-tips' },
-      { title: 'Coffee Chat Guide', description: 'Learn how to conduct effective coffee chats and informational interviews.', url: '#' },
-      { title: 'PMF Labs', description: 'Use AI tools to practice and improve your interview skills.', url: 'https://www.pmflabs.ai' }
+    id: 'resume-interview',
+    title: 'Resume & Interview Guide',
+    description: 'Build a standout resume and ace your interviews',
+    icon: <FileText className="w-6 h-6" />,
+    color: 'from-blue-500 to-cyan-500',
+    resources: [
+      { 
+        title: 'ResumeGenius', 
+        description: 'Access professional resume templates and tips.', 
+        url: 'https://www.resumegenius.com',
+        tips: [
+          'Make sure each line in your resume goes all the way across the page',
+          'Each bullet point should be a powerful one liner showcasing PM skills',
+          'Tailor your resume to PM skills - showcase creative projects, leadership, passion for building',
+          'Focus on quantifiable achievements and business impact',
+          'Use action verbs'
+        ]
+      },
+      { 
+        title: 'Vmock', 
+        description: 'Get instant feedback on your resume with AI-powered analysis.', 
+        url: 'https://www.vmock.com' 
+      },
+      { 
+        title: 'IGotAnOffer', 
+        description: 'Learn how to craft a standout product manager resume.', 
+        url: 'https://igotanoffer.com/blogs/product-manager/product-manager-resume' 
+      },
+      { 
+        title: 'PMF Labs', 
+        description: 'Use AI tools to practice and improve your interview skills.', 
+        url: 'https://www.pmflabs.ai',
+        tips: [
+          'Practice, practice, practice',
+          'Find common interview questions and write out concise stories',
+          'Practice at least once a week with a friend or tool'
+        ]
+      },
+      { 
+        title: 'Product Haven Slack', 
+        description: 'Join aspiring PMs for interview prep and job listings.', 
+        url: 'https://producthaven.slack.com/archives/C05SRL7THV2' 
+      }
     ]
   },
   {
-    category: 'AI Tools to Build',
-    items: [
+    id: 'linkedin',
+    title: 'LinkedIn Optimization',
+    description: 'Perfect your LinkedIn profile to attract recruiters',
+    icon: <Linkedin className="w-6 h-6" />,
+    color: 'from-blue-600 to-blue-400',
+    resources: [
+      { 
+        title: "LinkedIn's Official Guide", 
+        description: "Explore LinkedIn's tips and best practices for optimizing your profile.", 
+        url: 'https://www.linkedin.com/help/linkedin/answer/4443',
+        tips: [
+          'Show your personality - recruiters assess cultural fit',
+          'Be involved - make posts, share updates, comment to increase visibility',
+          'Follow people and companies you\'re interested in'
+        ]
+      },
+      { 
+        title: "HubSpot's LinkedIn Tips", 
+        description: "Learn how to optimize your LinkedIn profile with HubSpot's comprehensive guide.", 
+        url: 'https://blog.hubspot.com/marketing/linkedin-profile-tips' 
+      }
+    ]
+  },
+  {
+    id: 'company-research',
+    title: 'Company Research',
+    description: 'Research companies and understand their culture',
+    icon: <Building2 className="w-6 h-6" />,
+    color: 'from-purple-500 to-pink-500',
+    resources: [
+      { 
+        title: 'Glassdoor', 
+        description: 'Read company reviews and learn about their culture.', 
+        url: 'https://www.glassdoor.com',
+        tips: [
+          'Create a list of your top 10 target companies',
+          'Explore company websites and news articles',
+          'Consider locations, reviews, and salary insights',
+          'Ensure it\'s a company or product you\'re excited about'
+        ]
+      },
+      { 
+        title: 'Levels.fyi', 
+        description: 'Get insights on salary levels. These tend to be pretty accurate!', 
+        url: 'https://www.levels.fyi' 
+      }
+    ]
+  },
+  {
+    id: 'networking',
+    title: 'Networking & Coffee Chats',
+    description: 'Connect with industry professionals and build relationships',
+    icon: <Coffee className="w-6 h-6" />,
+    color: 'from-amber-500 to-orange-500',
+    resources: [
+      { 
+        title: 'Coffee Chat Guide', 
+        description: 'Learn how to conduct effective coffee chats and informational interviews.', 
+        url: '#',
+        tips: [
+          'Connect with BYU alumni and conduct informational interviews',
+          'Learn about their company, projects, and culture',
+          'Make it friendly and get to know them personally',
+          'Ask if they would be willing to provide a referral',
+          'Get insider tips on how to stand out as an applicant'
+        ]
+      }
+    ]
+  },
+  {
+    id: 'job-search',
+    title: 'Job Search Tools',
+    description: 'Find and apply for PM positions and internships',
+    icon: <Briefcase className="w-6 h-6" />,
+    color: 'from-green-500 to-emerald-500',
+    resources: [
+      { 
+        title: 'NewGrad Jobs', 
+        description: 'Explore entry-level job opportunities for new graduates.', 
+        url: 'https://www.newgrad-jobs.com',
+        tips: [
+          'Use job search engines and company career pages',
+          'Set alerts for positions matching your criteria',
+          'Customize your resume and cover letter for each application',
+          'Try to get a referral before applying'
+        ]
+      },
+      { 
+        title: 'Intern List', 
+        description: 'Find internships and entry-level positions across various industries.', 
+        url: 'https://www.intern-list.com' 
+      },
+      { 
+        title: 'LinkedIn Jobs', 
+        description: 'Find job openings and connect with recruiters on LinkedIn.', 
+        url: 'https://www.linkedin.com/jobs/' 
+      },
+      { 
+        title: 'APM Season', 
+        description: 'Stay up-to-date on the latest APM programs and internships for aspiring product managers.', 
+        url: 'https://www.apmseason.com' 
+      },
+      { 
+        title: 'Jobright', 
+        description: 'Utilize AI to find job matches and streamline your job search process.', 
+        url: 'https://jobright.ai' 
+      }
+    ]
+  },
+  {
+    id: 'ai-tools',
+    title: 'AI Tools to Build',
+    description: 'Build projects with cutting-edge AI tools',
+    icon: <Cpu className="w-6 h-6" />,
+    color: 'from-violet-500 to-purple-500',
+    resources: [
       { title: 'Lovable.dev', description: 'Create apps and websites by chatting with AI.', url: 'https://lovable.dev' },
       { title: 'Azure AI', description: 'Explore AI solutions with Azure.', url: 'https://ai.azure.com' },
       { title: 'Hugging Face', description: 'Collaborate on models, datasets, and applications.', url: 'https://huggingface.co' },
@@ -30,123 +193,147 @@ const resources = [
       { title: 'Cursor', description: 'AI code editor with a free year subscription for students.', url: 'https://cursor.com/en' },
       { title: 'Relay.app', description: 'Create AI agents that work for you with Relay.app.', url: 'https://www.relay.app' }
     ]
-  },
-  {
-    category: 'Job Search Tools',
-    items: [
-      { title: 'NewGrad Jobs', description: 'Explore entry-level job opportunities for new graduates.', url: 'https://www.newgrad-jobs.com' },
-      { title: 'Intern List', description: 'Find internships and entry-level positions across various industries.', url: 'https://www.intern-list.com' },
-      { title: 'LinkedIn Jobs', description: 'Find job openings and connect with recruiters on LinkedIn.', url: 'https://www.linkedin.com/jobs/' },
-      { title: 'APM Season', description: 'Stay up-to-date on the latest APM programs and internships for aspiring product managers.', url: 'https://www.apmseason.com' },
-      { title: 'Jobright', description: 'Utilize AI to find job matches and streamline your job search process.', url: 'https://jobright.ai' }
-    ]
-  },
-  {
-    category: 'Additional Tools',
-    items: [
-      { title: 'Glassdoor', description: 'Read company reviews and about their culture.', url: 'https://www.glassdoor.com' },
-      { title: 'Levels.fyi', description: 'Get insights on salary levels. These tend to be pretty accurate!', url: 'https://www.levels.fyi' }
-    ]
   }
 ];
 
 const ResourcesPage = () => {
-  const [openCategories, setOpenCategories] = useState<string[]>(['Resume & Interview Guides']);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  const toggleCategory = (category: string) => {
-    setOpenCategories((prev) => 
-      prev.includes(category)
-        ? prev.filter(cat => cat !== category)
-        : [...prev, category]
+  const filteredCategories = categories.filter(category => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      category.title.toLowerCase().includes(query) ||
+      category.description.toLowerCase().includes(query) ||
+      category.resources.some(resource => 
+        resource.title.toLowerCase().includes(query) ||
+        resource.description.toLowerCase().includes(query)
+      )
     );
-  };
+  });
 
-  const isCategoryOpen = (category: string) => openCategories.includes(category);
+  const selectedCategoryData = selectedCategory 
+    ? categories.find(c => c.id === selectedCategory) 
+    : null;
 
   return (
     <div className="min-h-screen pt-24 pb-20 bg-background text-foreground">
       <div className="container mx-auto px-4 md:px-6">
         <AnimatedSection animation="slide-up">
-          <div className="max-w-3xl mx-auto text-center mb-16">
+          <div className="max-w-3xl mx-auto text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              PM <span className="text-gradient">Resources</span>
+              PM <span className="text-gradient bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">Content Library</span>
             </h1>
-            <p className="text-lg text-muted-foreground">
-              Access valuable resources to help you excel in your product management journey.
+            <p className="text-lg text-muted-foreground mb-8">
+              Everything you need to excel in your product management journey
             </p>
+            
+            {!selectedCategory && (
+              <div className="relative max-w-xl mx-auto">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
+                <Input
+                  type="text"
+                  placeholder="Search resources..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 py-6 text-base"
+                />
+              </div>
+            )}
           </div>
         </AnimatedSection>
-        
-        <div className="max-w-4xl mx-auto space-y-6">
-          {resources.map((category, categoryIndex) => (
-            <AnimatedSection 
-              key={categoryIndex} 
-              animation="slide-up" 
-              delay={categoryIndex * 100}
+
+        {selectedCategory ? (
+          // Detail View
+          <div className="max-w-6xl mx-auto">
+            <button
+              onClick={() => setSelectedCategory(null)}
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-8"
             >
-              <Collapsible 
-                open={isCategoryOpen(category.category)} 
-                onOpenChange={() => toggleCategory(category.category)}
-                className="border border-border rounded-lg overflow-hidden bg-card/80 backdrop-blur-sm"
-              >
-                <CollapsibleTrigger className="flex items-center justify-between w-full p-6 text-left">
-                  <div className="flex items-center">
-                    <div className="h-10 w-10 rounded-full bg-gradient-to-r from-[#215096] to-[#4299E1] flex items-center justify-center mr-4">
-                      {categoryIndex === 0 && (
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V19.5a2.25 2.25 0 0 0 2.25 2.25h.75m0 0h15m0 0v-8.25a2.25 2.25 0 0 0-.75-1.5h-1.376c.35.854.535 1.07.66 1.3.057.102.05.254-.055.354l-1.213 1.212a.25.25 0 0 1-.354 0l-1.213-1.212a.25.25 0 0 1-.055-.357.5.5 0 0 0-.115-.285A10.975 10.975 0 0 1 18 6.75c0-.071 0-.143-.004-.215A14.903 14.903 0 0 1 15 5.25" />
-                        </svg>
-                      )}
-                      {categoryIndex === 1 && (
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                        </svg>
-                      )}
-                      {categoryIndex === 2 && (
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75a4.5 4.5 0 0 1-4.884 4.484c-1.076-.091-2.264.071-2.95.904l-7.152 8.684a2.548 2.548 0 1 1-3.586-3.586l8.684-7.152c.833-.686.995-1.874.904-2.95a4.5 4.5 0 0 1 6.336-4.486l-3.276 3.276a3.004 3.004 0 0 0 2.25 2.25l3.276-3.276c.256.565.398 1.192.398 1.852Z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M4.867 19.125h.008v.008h-.008v-.008Z" />
-                        </svg>
-                      )}
-                    </div>
-                    <h2 className="text-xl font-semibold">{category.category}</h2>
+              <ArrowLeft className="w-5 h-5" />
+              Back to all categories
+            </button>
+
+            {selectedCategoryData && (
+              <AnimatedSection animation="fade-in">
+                <div className="mb-8">
+                  <div className={`inline-flex items-center gap-3 bg-gradient-to-r ${selectedCategoryData.color} p-4 rounded-lg text-white mb-4`}>
+                    {selectedCategoryData.icon}
+                    <h2 className="text-2xl font-bold">{selectedCategoryData.title}</h2>
                   </div>
-                  <svg 
-                    xmlns="http://www.w3.org/2000/svg" 
-                    fill="none" 
-                    viewBox="0 0 24 24" 
-                    strokeWidth={2} 
-                    stroke="currentColor" 
-                    className={`w-5 h-5 transition-transform ${isCategoryOpen(category.category) ? 'rotate-180' : ''}`}
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                  </svg>
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  <div className="p-6 pt-0 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {category.items.map((item, itemIndex) => (
-                      <Card key={itemIndex} className="bg-muted/50 border border-border hover:bg-muted/70 transition-colors">
-                        <CardContent className="p-4">
-                          <h3 className="font-medium mb-1 text-card-foreground">{item.title}</h3>
-                          <p className="text-sm text-muted-foreground mb-3">{item.description}</p>
+                  <p className="text-lg text-muted-foreground">{selectedCategoryData.description}</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {selectedCategoryData.resources.map((resource, idx) => (
+                    <AnimatedSection key={idx} animation="slide-up" delay={idx * 100}>
+                      <Card className="h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                        <CardContent className="p-6">
+                          <h3 className="text-xl font-semibold mb-3 text-card-foreground">{resource.title}</h3>
+                          <p className="text-sm text-muted-foreground mb-4">{resource.description}</p>
+                          
+                          {resource.tips && (
+                            <div className="mb-4 p-4 bg-muted/50 rounded-lg">
+                              <h4 className="text-sm font-semibold mb-2 text-foreground">Pro Tips:</h4>
+                              <ul className="list-disc list-inside space-y-1">
+                                {resource.tips.map((tip, tipIdx) => (
+                                  <li key={tipIdx} className="text-xs text-muted-foreground">{tip}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                          
                           <a 
-                            href={item.url} 
-                            className="text-sm text-primary hover:text-primary/80 transition-colors flex items-center"
+                            href={resource.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors font-medium"
                           >
                             View Resource
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 ml-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
                               <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
                             </svg>
                           </a>
                         </CardContent>
                       </Card>
-                    ))}
-                  </div>
-                </CollapsibleContent>
-              </Collapsible>
-            </AnimatedSection>
-          ))}
-        </div>
+                    </AnimatedSection>
+                  ))}
+                </div>
+              </AnimatedSection>
+            )}
+          </div>
+        ) : (
+          // Category Grid View
+          <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredCategories.map((category, idx) => (
+              <AnimatedSection key={category.id} animation="slide-up" delay={idx * 100}>
+                <Card 
+                  className="h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer group"
+                  onClick={() => setSelectedCategory(category.id)}
+                >
+                  <CardContent className="p-6">
+                    <div className={`w-14 h-14 rounded-lg bg-gradient-to-r ${category.color} flex items-center justify-center mb-4 text-white group-hover:scale-110 transition-transform`}>
+                      {category.icon}
+                    </div>
+                    <h3 className="text-xl font-semibold mb-3 text-card-foreground group-hover:text-primary transition-colors">
+                      {category.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-4">{category.description}</p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-muted-foreground">
+                        {category.resources.length} resources
+                      </span>
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 text-primary group-hover:translate-x-1 transition-transform">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                      </svg>
+                    </div>
+                  </CardContent>
+                </Card>
+              </AnimatedSection>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

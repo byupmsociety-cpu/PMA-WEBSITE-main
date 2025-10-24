@@ -14,7 +14,6 @@ import DiscoverPage from "./pages/DiscoverPage";
 import NotFound from "./pages/NotFound";
 import Navigation from "./components/Navigation";
 import Footer from "./components/Footer";
-import RecruitingPage from './pages/RecruitingPage';
 import GamePage from './pages/GamePage';
 
 const queryClient = new QueryClient();
@@ -34,7 +33,6 @@ const App = () => (
             <Route path="/resources" element={<ResourcesPage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/discover" element={<DiscoverPage />} />
-            <Route path="/recruiting" element={<RecruitingPage />} />
             <Route path="/game" element={<GamePage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

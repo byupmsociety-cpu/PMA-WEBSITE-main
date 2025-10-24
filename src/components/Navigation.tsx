@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import ThemeToggle from './ThemeToggle';
 
@@ -34,7 +34,6 @@ const Navigation = () => {
   const links = [
     { name: 'Home', path: '/' },
     { name: 'Events', path: '/events' },
-    { name: 'Recruiting', path: '/recruiting' },
     { name: 'Resources', path: '/resources' },
     { name: 'Discover PM', path: '/discover' },
     { name: 'Contact', path: '/contact' }
