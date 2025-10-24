@@ -248,10 +248,10 @@ const HomePage = () => {
                 <React.Fragment key={i}>
                   
                   
-                  <div className="h-24 w-48 bg-gray-100 dark:bg-gray-700/20 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
+                  <div className="h-24 w-48 bg-gray-700/20 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
                     <img src="/img/amazon-logo.jpg" alt="Amazon" className="h-full w-full object-cover" />
                   </div>
-                  <div className="h-24 w-48 bg-gray-100 dark:bg-gray-700/20 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
+                  <div className="h-24 w-48 bg-gray-700/20 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
                     <img src="/img/salesforce-logo.png" alt="Salesforce" className="h-full w-full object-cover" />
                   </div>
                   <div className="h-24 w-48 bg-gray-700/20 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
