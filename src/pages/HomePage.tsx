@@ -53,7 +53,6 @@ const HomePage = () => {
   const [showEventBanner, setShowEventBanner] = useState(false);
   const [upcomingEvent, setUpcomingEvent] = useState<Event | null>(null);
   const [isLoadingEvents, setIsLoadingEvents] = useState(true);
-  const [apiError, setApiError] = useState(false);
 
   // Fallback event for when API fails
   const fallbackEvent: Event = {
@@ -69,7 +68,6 @@ const HomePage = () => {
   const fetchUpcomingEvents = useCallback(async () => {
     try {
       setIsLoadingEvents(true);
-      setApiError(false);
       
       // Get events that are upcoming (date >= today)
       const response = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${EVENTS_TABLE_ID}`, {
@@ -112,13 +110,11 @@ const HomePage = () => {
         // API error (403, 404, etc.), use fallback
         console.warn(`Airtable API error: ${response.status} ${response.statusText}`);
         setUpcomingEvent(fallbackEvent);
-        setApiError(true);
       }
     } catch (error) {
       console.error('Error fetching events:', error);
       // Network error, use fallback
       setUpcomingEvent(fallbackEvent);
-      setApiError(true);
     } finally {
       setIsLoadingEvents(false);
     }
@@ -338,7 +334,7 @@ const HomePage = () => {
                   Product Management Pays Off
                 </h2>
                 <p className="text-base text-muted-foreground">
-                  Real outcomes from our community
+                  Real outcomes from BYU
                 </p>
               </div>
               
@@ -606,53 +602,60 @@ const HomePage = () => {
       <AnimatePresence>
         {showEventBanner && upcomingEvent && !isLoadingEvents && (
           <motion.div
-            initial={{ y: 100, opacity: 0 }}
+            initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 100, opacity: 0 }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-            className="fixed bottom-4 left-4 right-4 z-50 mx-auto max-w-4xl"
+            exit={{ y: 20, opacity: 0 }}
+            transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+            className="fixed bottom-6 left-6 right-6 z-50 mx-auto max-w-2xl"
           >
-            <div className="bg-gradient-to-r from-[#215096] to-[#4299E1] rounded-lg shadow-2xl border border-white/20 backdrop-blur-sm overflow-hidden">
-              <div className="p-4 flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <div className="flex-shrink-0">
-                    <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-white">
+            <div className="bg-card/95 backdrop-blur-md rounded-xl shadow-lg border border-border overflow-hidden">
+              <div className="p-4 flex items-start justify-between gap-4">
+                <div className="flex items-start gap-3 flex-1">
+                  <div className="flex-shrink-0 mt-0.5">
+                    <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-primary">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5a2.25 2.25 0 0 0 2.25-2.25m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5a2.25 2.25 0 0 1 2.25 2.25v7.5" />
                       </svg>
                     </div>
                   </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-bold text-white mb-1">
-                      🎉 {upcomingEvent.title}
-                      {apiError && <span className="text-xs text-blue-200 ml-2">(Demo Event)</span>}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm font-semibold text-foreground mb-1">
+                      {upcomingEvent.title}
                     </h3>
-                    <p className="text-blue-100 text-sm">{upcomingEvent.description}</p>
-                    <p className="text-blue-200 text-xs mt-1">
-                      📅 {new Date(upcomingEvent.date).toLocaleDateString('en-US', { 
-                        weekday: 'long', 
-                        year: 'numeric', 
-                        month: 'long', 
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })} | 📍 {upcomingEvent.location}
-                    </p>
+                    <p className="text-xs text-muted-foreground line-clamp-2 mb-2">{upcomingEvent.description}</p>
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3.5 h-3.5">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5a2.25 2.25 0 0 0 2.25-2.25m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5a2.25 2.25 0 0 1 2.25 2.25v7.5" />
+                        </svg>
+                        {new Date(upcomingEvent.date).toLocaleDateString('en-US', { 
+                          month: 'short', 
+                          day: 'numeric'
+                        })}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3.5 h-3.5">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                        </svg>
+                        {upcomingEvent.location}
+                      </span>
+                    </div>
                   </div>
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-start gap-2 flex-shrink-0">
                   <Link 
                     to="/events"
-                    className="px-4 py-2 bg-white text-[#215096] rounded-lg font-semibold text-sm hover:bg-blue-50 transition-colors"
+                    className="px-3 py-1.5 bg-primary text-primary-foreground rounded-lg font-medium text-xs hover:bg-primary/90 transition-colors whitespace-nowrap"
                   >
-                    Learn More
+                    Details
                   </Link>
                   <button
                     onClick={() => setShowEventBanner(false)}
-                    className="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                    className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg transition-colors"
                     aria-label="Dismiss banner"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
