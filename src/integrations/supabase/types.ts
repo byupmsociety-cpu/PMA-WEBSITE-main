@@ -14,7 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      resource_clicks: {
+        Row: {
+          category_id: string
+          clicked_at: string
+          id: string
+          resource_title: string
+        }
+        Insert: {
+          category_id: string
+          clicked_at?: string
+          id?: string
+          resource_title: string
+        }
+        Update: {
+          category_id?: string
+          clicked_at?: string
+          id?: string
+          resource_title?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

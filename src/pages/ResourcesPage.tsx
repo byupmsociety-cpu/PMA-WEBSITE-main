@@ -1,8 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AnimatedSection from '@/components/AnimatedSection';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { FileText, Linkedin, Building2, Coffee, Briefcase, Cpu, ArrowLeft, Search } from 'lucide-react';
+import { FileText, Linkedin, Building2, Coffee, Briefcase, Cpu, ArrowLeft, Search, TrendingUp } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 import resumegeniusImg from '@/assets/resumegenius.jpg';
 import vmockImg from '@/assets/vmock.jpg';
 import igotanofferImg from '@/assets/igotanoffer.jpg';
@@ -238,6 +246,73 @@ const categories: Category[] = [
 const ResourcesPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [topResources, setTopResources] = useState<Array<{resource: Resource, category: Category, clicks: number}>>([]);
+
+  useEffect(() => {
+    fetchTopResources();
+  }, []);
+
+  const fetchTopResources = async () => {
+    // Get click counts from the database
+    const { data: clickData } = await supabase
+      .from('resource_clicks')
+      .select('resource_title, category_id');
+
+    // Count clicks per resource
+    const clickCounts: Record<string, { count: number; categoryId: string }> = {};
+    clickData?.forEach((click) => {
+      const key = click.resource_title;
+      if (!clickCounts[key]) {
+        clickCounts[key] = { count: 0, categoryId: click.category_id };
+      }
+      clickCounts[key].count++;
+    });
+
+    // Always include PMF Labs and Lovable
+    const mustInclude = ['PMF Labs', 'Lovable.dev'];
+    
+    // Get top clicked resources
+    const sortedResources = Object.entries(clickCounts)
+      .sort(([, a], [, b]) => b.count - a.count)
+      .filter(([title]) => !mustInclude.includes(title))
+      .slice(0, 3)
+      .map(([title, data]) => ({ title, ...data }));
+
+    // Find the must-include resources and add them
+    const finalResources: Array<{resource: Resource, category: Category, clicks: number}> = [];
+    
+    categories.forEach(category => {
+      category.resources.forEach(resource => {
+        if (mustInclude.includes(resource.title)) {
+          finalResources.push({
+            resource,
+            category,
+            clicks: clickCounts[resource.title]?.count || 0
+          });
+        }
+      });
+    });
+
+    // Add top clicked resources
+    sortedResources.forEach(({ title, categoryId, count }) => {
+      const category = categories.find(c => c.id === categoryId);
+      const resource = category?.resources.find(r => r.title === title);
+      if (resource && category) {
+        finalResources.push({ resource, category, clicks: count });
+      }
+    });
+
+    setTopResources(finalResources.slice(0, 5));
+  };
+
+  const trackResourceClick = async (resource: Resource, categoryId: string) => {
+    await supabase.from('resource_clicks').insert({
+      resource_title: resource.title,
+      resource_url: resource.url,
+      category_id: categoryId
+    });
+    fetchTopResources();
+  };
 
   const searchResults = searchQuery ? categories.flatMap(category => 
     category.resources
@@ -292,6 +367,66 @@ const ResourcesPage = () => {
           </div>
         </AnimatedSection>
 
+        {/* Most Used Resources Carousel */}
+        {!selectedCategory && !searchQuery && topResources.length > 0 && (
+          <AnimatedSection animation="fade-in">
+            <div className="max-w-4xl mx-auto mb-16">
+              <div className="flex items-center gap-2 mb-6">
+                <TrendingUp className="w-5 h-5 text-primary" />
+                <h2 className="text-2xl font-bold">Most Used by Students</h2>
+              </div>
+              <Carousel className="w-full">
+                <CarouselContent>
+                  {topResources.map(({ resource, category, clicks }, idx) => (
+                    <CarouselItem key={idx} className="md:basis-1/2 lg:basis-1/3">
+                      <Card className="h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                        <CardContent className="p-4">
+                          <div className="flex items-center gap-2 mb-3">
+                            <div className={`w-6 h-6 rounded bg-gradient-to-r ${category.color} flex items-center justify-center text-white`}>
+                              <div className="scale-75">{category.icon}</div>
+                            </div>
+                            <span className="text-xs text-muted-foreground">{category.title}</span>
+                          </div>
+                          
+                          <div className="mb-3">
+                            <div className="w-full aspect-video rounded-md overflow-hidden bg-muted mb-3">
+                              <img 
+                                src={resource.image} 
+                                alt={resource.title}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <h3 className="text-base font-semibold mb-2 text-card-foreground">{resource.title}</h3>
+                            <p className="text-sm text-muted-foreground mb-2">{resource.description}</p>
+                            {clicks > 0 && (
+                              <p className="text-xs text-primary font-medium">{clicks} clicks</p>
+                            )}
+                          </div>
+                          
+                          <a 
+                            href={resource.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={() => trackResourceClick(resource, category.id)}
+                            className="inline-flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors font-medium"
+                          >
+                            Visit Resource
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                            </svg>
+                          </a>
+                        </CardContent>
+                      </Card>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious />
+                <CarouselNext />
+              </Carousel>
+            </div>
+          </AnimatedSection>
+        )}
+
         {selectedCategory ? (
           // Detail View
           <div className="max-w-6xl mx-auto">
@@ -341,17 +476,18 @@ const ResourcesPage = () => {
                             </div>
                           )}
                           
-                          <a 
-                            href={resource.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 text-[10px] text-primary hover:text-primary/80 transition-colors font-medium"
-                          >
-                            View
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-2.5 h-2.5">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                            </svg>
-                          </a>
+                      <a 
+                        href={resource.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => selectedCategoryData && trackResourceClick(resource, selectedCategoryData.id)}
+                        className="inline-flex items-center gap-1 text-[10px] text-primary hover:text-primary/80 transition-colors font-medium"
+                      >
+                        View
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-2.5 h-2.5">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                        </svg>
+                      </a>
                         </CardContent>
                       </Card>
                     </AnimatedSection>
@@ -401,17 +537,18 @@ const ResourcesPage = () => {
                         </div>
                       )}
                       
-                      <a 
-                        href={resource.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-[10px] text-primary hover:text-primary/80 transition-colors font-medium"
-                      >
-                        View
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-2.5 h-2.5">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                        </svg>
-                      </a>
+                          <a 
+                            href={resource.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={() => trackResourceClick(resource, category.id)}
+                            className="inline-flex items-center gap-1 text-[10px] text-primary hover:text-primary/80 transition-colors font-medium"
+                          >
+                            View
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-2.5 h-2.5">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                            </svg>
+                          </a>
                     </CardContent>
                   </Card>
                 </AnimatedSection>
