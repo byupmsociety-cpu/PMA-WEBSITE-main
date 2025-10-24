@@ -3,6 +3,29 @@ import AnimatedSection from '@/components/AnimatedSection';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { FileText, Linkedin, Building2, Coffee, Briefcase, Cpu, ArrowLeft, Search } from 'lucide-react';
+import resumegeniusImg from '@/assets/resumegenius.jpg';
+import vmockImg from '@/assets/vmock.jpg';
+import igotanofferImg from '@/assets/igotanoffer.jpg';
+import pmflabsImg from '@/assets/pmflabs.jpg';
+import productHavenImg from '@/assets/product-haven.jpg';
+import linkedinGuideImg from '@/assets/linkedin-guide.jpg';
+import hubspotLinkedinImg from '@/assets/hubspot-linkedin.jpg';
+import glassdoorImg from '@/assets/glassdoor.jpg';
+import levelsFyiImg from '@/assets/levels-fyi.jpg';
+import coffeeChatImg from '@/assets/coffee-chat.jpg';
+import newgradJobsImg from '@/assets/newgrad-jobs.jpg';
+import internListImg from '@/assets/intern-list.jpg';
+import linkedinJobsImg from '@/assets/linkedin-jobs.jpg';
+import apmSeasonImg from '@/assets/apm-season.jpg';
+import jobrightImg from '@/assets/jobright.jpg';
+import lovableImg from '@/assets/lovable.jpg';
+import azureAiImg from '@/assets/azure-ai.jpg';
+import huggingfaceImg from '@/assets/huggingface.jpg';
+import vertexAiImg from '@/assets/vertex-ai.jpg';
+import aiStudioImg from '@/assets/ai-studio.jpg';
+import firebaseStudioImg from '@/assets/firebase-studio.jpg';
+import cursorImg from '@/assets/cursor.jpg';
+import relayImg from '@/assets/relay.jpg';
 
 interface Resource {
   title: string;
@@ -33,7 +56,7 @@ const categories: Category[] = [
         title: 'ResumeGenius', 
         description: 'Access professional resume templates and tips.', 
         url: 'https://www.resumegenius.com',
-        image: '/img/computer.png',
+        image: resumegeniusImg,
         tips: [
           'Make sure each line in your resume goes all the way across the page',
           'Each bullet point should be a powerful one liner showcasing PM skills',
@@ -46,19 +69,19 @@ const categories: Category[] = [
         title: 'Vmock', 
         description: 'Get instant feedback on your resume with AI-powered analysis.', 
         url: 'https://www.vmock.com',
-        image: '/img/ai-agent.png'
+        image: vmockImg
       },
       { 
         title: 'IGotAnOffer', 
         description: 'Learn how to craft a standout product manager resume.', 
         url: 'https://igotanoffer.com/blogs/product-manager/product-manager-resume',
-        image: '/img/data.png'
+        image: igotanofferImg
       },
       { 
         title: 'PMF Labs', 
         description: 'Use AI tools to practice and improve your interview skills.', 
         url: 'https://www.pmflabs.ai',
-        image: '/img/tech.png',
+        image: pmflabsImg,
         tips: [
           'Practice, practice, practice',
           'Find common interview questions and write out concise stories',
@@ -69,7 +92,7 @@ const categories: Category[] = [
         title: 'Product Haven Slack', 
         description: 'Join aspiring PMs for interview prep and job listings.', 
         url: 'https://producthaven.slack.com/archives/C05SRL7THV2',
-        image: '/img/network.png'
+        image: productHavenImg
       }
     ]
   },
@@ -84,7 +107,7 @@ const categories: Category[] = [
         title: "LinkedIn's Official Guide", 
         description: "Explore LinkedIn's tips and best practices for optimizing your profile.", 
         url: 'https://www.linkedin.com/help/linkedin/answer/4443',
-        image: '/img/network.png',
+        image: linkedinGuideImg,
         tips: [
           'Show your personality - recruiters assess cultural fit',
           'Be involved - make posts, share updates, comment to increase visibility',
@@ -95,7 +118,7 @@ const categories: Category[] = [
         title: "HubSpot's LinkedIn Tips", 
         description: "Learn how to optimize your LinkedIn profile with HubSpot's comprehensive guide.", 
         url: 'https://blog.hubspot.com/marketing/linkedin-profile-tips',
-        image: '/img/tech.png'
+        image: hubspotLinkedinImg
       }
     ]
   },
@@ -110,7 +133,7 @@ const categories: Category[] = [
         title: 'Glassdoor', 
         description: 'Read company reviews and learn about their culture.', 
         url: 'https://www.glassdoor.com',
-        image: '/img/data.png',
+        image: glassdoorImg,
         tips: [
           'Create a list of your top 10 target companies',
           'Explore company websites and news articles',
@@ -122,7 +145,7 @@ const categories: Category[] = [
         title: 'Levels.fyi', 
         description: 'Get insights on salary levels. These tend to be pretty accurate!', 
         url: 'https://www.levels.fyi',
-        image: '/img/computer.png'
+        image: levelsFyiImg
       }
     ]
   },
@@ -137,7 +160,7 @@ const categories: Category[] = [
         title: 'Coffee Chat Guide', 
         description: 'Learn how to conduct effective coffee chats and informational interviews.', 
         url: '#',
-        image: '/img/network.png',
+        image: coffeeChatImg,
         tips: [
           'Connect with BYU alumni and conduct informational interviews',
           'Learn about their company, projects, and culture',
@@ -159,7 +182,7 @@ const categories: Category[] = [
         title: 'NewGrad Jobs', 
         description: 'Explore entry-level job opportunities for new graduates.', 
         url: 'https://www.newgrad-jobs.com',
-        image: '/img/computer.png',
+        image: newgradJobsImg,
         tips: [
           'Use job search engines and company career pages',
           'Set alerts for positions matching your criteria',
@@ -171,25 +194,25 @@ const categories: Category[] = [
         title: 'Intern List', 
         description: 'Find internships and entry-level positions across various industries.', 
         url: 'https://www.intern-list.com',
-        image: '/img/data.png'
+        image: internListImg
       },
       { 
         title: 'LinkedIn Jobs', 
         description: 'Find job openings and connect with recruiters on LinkedIn.', 
         url: 'https://www.linkedin.com/jobs/',
-        image: '/img/network.png'
+        image: linkedinJobsImg
       },
       { 
         title: 'APM Season', 
         description: 'Stay up-to-date on the latest APM programs and internships for aspiring product managers.', 
         url: 'https://www.apmseason.com',
-        image: '/img/tech.png'
+        image: apmSeasonImg
       },
       { 
         title: 'Jobright', 
         description: 'Utilize AI to find job matches and streamline your job search process.', 
         url: 'https://jobright.ai',
-        image: '/img/ai-agent.png'
+        image: jobrightImg
       }
     ]
   },
@@ -200,14 +223,14 @@ const categories: Category[] = [
     icon: <Cpu className="w-6 h-6" />,
     color: 'from-violet-500 to-purple-500',
     resources: [
-      { title: 'Lovable.dev', description: 'Create apps and websites by chatting with AI.', url: 'https://lovable.dev', image: '/img/ai-agent.png' },
-      { title: 'Azure AI', description: 'Explore AI solutions with Azure.', url: 'https://ai.azure.com', image: '/img/tech.png' },
-      { title: 'Hugging Face', description: 'Collaborate on models, datasets, and applications.', url: 'https://huggingface.co', image: '/img/ai-agent.png' },
-      { title: 'Google Vertex AI', description: 'Build and deploy AI models on Google Cloud.', url: 'https://console.cloud.google.com/vertex-ai/studio', image: '/img/tech.png' },
-      { title: 'AI Studio', description: 'Create AI-driven applications with Google.', url: 'https://aistudio.google.com/prompts/new_chat', image: '/img/ai-agent.png' },
-      { title: 'Firebase Studio', description: 'Accelerate development with AI agents.', url: 'https://firebase.studio', image: '/img/tech.png' },
-      { title: 'Cursor', description: 'AI code editor with a free year subscription for students.', url: 'https://cursor.com/en', image: '/img/computer.png' },
-      { title: 'Relay.app', description: 'Create AI agents that work for you with Relay.app.', url: 'https://www.relay.app', image: '/img/ai-agent.png' }
+      { title: 'Lovable.dev', description: 'Create apps and websites by chatting with AI.', url: 'https://lovable.dev', image: lovableImg },
+      { title: 'Azure AI', description: 'Explore AI solutions with Azure.', url: 'https://ai.azure.com', image: azureAiImg },
+      { title: 'Hugging Face', description: 'Collaborate on models, datasets, and applications.', url: 'https://huggingface.co', image: huggingfaceImg },
+      { title: 'Google Vertex AI', description: 'Build and deploy AI models on Google Cloud.', url: 'https://console.cloud.google.com/vertex-ai/studio', image: vertexAiImg },
+      { title: 'AI Studio', description: 'Create AI-driven applications with Google.', url: 'https://aistudio.google.com/prompts/new_chat', image: aiStudioImg },
+      { title: 'Firebase Studio', description: 'Accelerate development with AI agents.', url: 'https://firebase.studio', image: firebaseStudioImg },
+      { title: 'Cursor', description: 'AI code editor with a free year subscription for students.', url: 'https://cursor.com/en', image: cursorImg },
+      { title: 'Relay.app', description: 'Create AI agents that work for you with Relay.app.', url: 'https://www.relay.app', image: relayImg }
     ]
   }
 ];
