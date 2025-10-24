@@ -316,17 +316,21 @@ const ResourcesPage = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {selectedCategoryData.resources.map((resource, idx) => (
                     <AnimatedSection key={idx} animation="slide-up" delay={idx * 100}>
-                      <Card className="h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden">
-                        <div className="aspect-video w-full overflow-hidden bg-muted">
-                          <img 
-                            src={resource.image} 
-                            alt={resource.title}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
+                      <Card className="h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                         <CardContent className="p-6">
-                          <h3 className="text-xl font-semibold mb-3 text-card-foreground">{resource.title}</h3>
-                          <p className="text-sm text-muted-foreground mb-4">{resource.description}</p>
+                          <div className="flex items-start gap-4 mb-4">
+                            <div className="w-16 h-16 rounded-lg overflow-hidden bg-muted flex-shrink-0">
+                              <img 
+                                src={resource.image} 
+                                alt={resource.title}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="text-xl font-semibold mb-2 text-card-foreground">{resource.title}</h3>
+                              <p className="text-sm text-muted-foreground">{resource.description}</p>
+                            </div>
+                          </div>
                           
                           {resource.tips && (
                             <div className="mb-4 p-4 bg-muted/50 rounded-lg">
@@ -367,23 +371,28 @@ const ResourcesPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {searchResults.map(({ resource, category }, idx) => (
                 <AnimatedSection key={idx} animation="slide-up" delay={idx * 50}>
-                  <Card className="h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden">
-                    <div className="aspect-video w-full overflow-hidden bg-muted">
-                      <img 
-                        src={resource.image} 
-                        alt={resource.title}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
+                  <Card className="h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                     <CardContent className="p-6">
-                      <div className="flex items-center gap-2 mb-3">
+                      <div className="flex items-center gap-2 mb-4">
                         <div className={`w-8 h-8 rounded bg-gradient-to-r ${category.color} flex items-center justify-center text-white text-xs`}>
                           {category.icon}
                         </div>
                         <span className="text-xs text-muted-foreground">{category.title}</span>
                       </div>
-                      <h3 className="text-xl font-semibold mb-3 text-card-foreground">{resource.title}</h3>
-                      <p className="text-sm text-muted-foreground mb-4">{resource.description}</p>
+                      
+                      <div className="flex items-start gap-4 mb-4">
+                        <div className="w-16 h-16 rounded-lg overflow-hidden bg-muted flex-shrink-0">
+                          <img 
+                            src={resource.image} 
+                            alt={resource.title}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-xl font-semibold mb-2 text-card-foreground">{resource.title}</h3>
+                          <p className="text-sm text-muted-foreground">{resource.description}</p>
+                        </div>
+                      </div>
                       
                       {resource.tips && (
                         <div className="mb-4 p-4 bg-muted/50 rounded-lg">
