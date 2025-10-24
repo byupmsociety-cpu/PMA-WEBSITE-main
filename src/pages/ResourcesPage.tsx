@@ -313,31 +313,29 @@ const ResourcesPage = () => {
                   <p className="text-lg text-muted-foreground">{selectedCategoryData.description}</p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                   {selectedCategoryData.resources.map((resource, idx) => (
                     <AnimatedSection key={idx} animation="slide-up" delay={idx * 100}>
                       <Card className="h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-                        <CardContent className="p-6">
-                          <div className="flex items-start gap-4 mb-4">
-                            <div className="w-16 h-16 rounded-lg overflow-hidden bg-muted flex-shrink-0">
+                        <CardContent className="p-4">
+                          <div className="mb-3">
+                            <div className="w-full aspect-square rounded-lg overflow-hidden bg-muted mb-3">
                               <img 
                                 src={resource.image} 
                                 alt={resource.title}
                                 className="w-full h-full object-cover"
                               />
                             </div>
-                            <div className="flex-1 min-w-0">
-                              <h3 className="text-xl font-semibold mb-2 text-card-foreground">{resource.title}</h3>
-                              <p className="text-sm text-muted-foreground">{resource.description}</p>
-                            </div>
+                            <h3 className="text-base font-semibold mb-1.5 text-card-foreground line-clamp-2">{resource.title}</h3>
+                            <p className="text-xs text-muted-foreground line-clamp-3">{resource.description}</p>
                           </div>
                           
                           {resource.tips && (
-                            <div className="mb-4 p-4 bg-muted/50 rounded-lg">
-                              <h4 className="text-sm font-semibold mb-2 text-foreground">Pro Tips:</h4>
-                              <ul className="list-disc list-inside space-y-1">
-                                {resource.tips.map((tip, tipIdx) => (
-                                  <li key={tipIdx} className="text-xs text-muted-foreground">{tip}</li>
+                            <div className="mb-3 p-3 bg-muted/50 rounded-lg">
+                              <h4 className="text-xs font-semibold mb-1.5 text-foreground">Pro Tips:</h4>
+                              <ul className="list-disc list-inside space-y-0.5">
+                                {resource.tips.slice(0, 3).map((tip, tipIdx) => (
+                                  <li key={tipIdx} className="text-[10px] leading-tight text-muted-foreground">{tip}</li>
                                 ))}
                               </ul>
                             </div>
@@ -347,10 +345,10 @@ const ResourcesPage = () => {
                             href={resource.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors font-medium"
+                            className="inline-flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 transition-colors font-medium"
                           >
                             View Resource
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3 h-3">
                               <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
                             </svg>
                           </a>
@@ -368,38 +366,36 @@ const ResourcesPage = () => {
             <p className="text-sm text-muted-foreground mb-6">
               Found {searchResults.length} result{searchResults.length !== 1 ? 's' : ''}
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {searchResults.map(({ resource, category }, idx) => (
                 <AnimatedSection key={idx} animation="slide-up" delay={idx * 50}>
                   <Card className="h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-                    <CardContent className="p-6">
-                      <div className="flex items-center gap-2 mb-4">
-                        <div className={`w-8 h-8 rounded bg-gradient-to-r ${category.color} flex items-center justify-center text-white text-xs`}>
-                          {category.icon}
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className={`w-6 h-6 rounded bg-gradient-to-r ${category.color} flex items-center justify-center text-white`}>
+                          <div className="scale-75">{category.icon}</div>
                         </div>
-                        <span className="text-xs text-muted-foreground">{category.title}</span>
+                        <span className="text-[10px] text-muted-foreground">{category.title}</span>
                       </div>
                       
-                      <div className="flex items-start gap-4 mb-4">
-                        <div className="w-16 h-16 rounded-lg overflow-hidden bg-muted flex-shrink-0">
+                      <div className="mb-3">
+                        <div className="w-full aspect-square rounded-lg overflow-hidden bg-muted mb-3">
                           <img 
                             src={resource.image} 
                             alt={resource.title}
                             className="w-full h-full object-cover"
                           />
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <h3 className="text-xl font-semibold mb-2 text-card-foreground">{resource.title}</h3>
-                          <p className="text-sm text-muted-foreground">{resource.description}</p>
-                        </div>
+                        <h3 className="text-base font-semibold mb-1.5 text-card-foreground line-clamp-2">{resource.title}</h3>
+                        <p className="text-xs text-muted-foreground line-clamp-3">{resource.description}</p>
                       </div>
                       
                       {resource.tips && (
-                        <div className="mb-4 p-4 bg-muted/50 rounded-lg">
-                          <h4 className="text-sm font-semibold mb-2 text-foreground">Pro Tips:</h4>
-                          <ul className="list-disc list-inside space-y-1">
-                            {resource.tips.map((tip, tipIdx) => (
-                              <li key={tipIdx} className="text-xs text-muted-foreground">{tip}</li>
+                        <div className="mb-3 p-3 bg-muted/50 rounded-lg">
+                          <h4 className="text-xs font-semibold mb-1.5 text-foreground">Pro Tips:</h4>
+                          <ul className="list-disc list-inside space-y-0.5">
+                            {resource.tips.slice(0, 3).map((tip, tipIdx) => (
+                              <li key={tipIdx} className="text-[10px] leading-tight text-muted-foreground">{tip}</li>
                             ))}
                           </ul>
                         </div>
@@ -409,10 +405,10 @@ const ResourcesPage = () => {
                         href={resource.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors font-medium"
+                        className="inline-flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 transition-colors font-medium"
                       >
                         View Resource
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3 h-3">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
                         </svg>
                       </a>
