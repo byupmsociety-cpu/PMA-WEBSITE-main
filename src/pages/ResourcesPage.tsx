@@ -8,6 +8,7 @@ interface Resource {
   title: string;
   description: string;
   url: string;
+  image: string;
   tips?: string[];
 }
 
@@ -32,6 +33,7 @@ const categories: Category[] = [
         title: 'ResumeGenius', 
         description: 'Access professional resume templates and tips.', 
         url: 'https://www.resumegenius.com',
+        image: '/img/computer.png',
         tips: [
           'Make sure each line in your resume goes all the way across the page',
           'Each bullet point should be a powerful one liner showcasing PM skills',
@@ -43,17 +45,20 @@ const categories: Category[] = [
       { 
         title: 'Vmock', 
         description: 'Get instant feedback on your resume with AI-powered analysis.', 
-        url: 'https://www.vmock.com' 
+        url: 'https://www.vmock.com',
+        image: '/img/ai-agent.png'
       },
       { 
         title: 'IGotAnOffer', 
         description: 'Learn how to craft a standout product manager resume.', 
-        url: 'https://igotanoffer.com/blogs/product-manager/product-manager-resume' 
+        url: 'https://igotanoffer.com/blogs/product-manager/product-manager-resume',
+        image: '/img/data.png'
       },
       { 
         title: 'PMF Labs', 
         description: 'Use AI tools to practice and improve your interview skills.', 
         url: 'https://www.pmflabs.ai',
+        image: '/img/tech.png',
         tips: [
           'Practice, practice, practice',
           'Find common interview questions and write out concise stories',
@@ -63,7 +68,8 @@ const categories: Category[] = [
       { 
         title: 'Product Haven Slack', 
         description: 'Join aspiring PMs for interview prep and job listings.', 
-        url: 'https://producthaven.slack.com/archives/C05SRL7THV2' 
+        url: 'https://producthaven.slack.com/archives/C05SRL7THV2',
+        image: '/img/network.png'
       }
     ]
   },
@@ -78,6 +84,7 @@ const categories: Category[] = [
         title: "LinkedIn's Official Guide", 
         description: "Explore LinkedIn's tips and best practices for optimizing your profile.", 
         url: 'https://www.linkedin.com/help/linkedin/answer/4443',
+        image: '/img/network.png',
         tips: [
           'Show your personality - recruiters assess cultural fit',
           'Be involved - make posts, share updates, comment to increase visibility',
@@ -87,7 +94,8 @@ const categories: Category[] = [
       { 
         title: "HubSpot's LinkedIn Tips", 
         description: "Learn how to optimize your LinkedIn profile with HubSpot's comprehensive guide.", 
-        url: 'https://blog.hubspot.com/marketing/linkedin-profile-tips' 
+        url: 'https://blog.hubspot.com/marketing/linkedin-profile-tips',
+        image: '/img/tech.png'
       }
     ]
   },
@@ -102,6 +110,7 @@ const categories: Category[] = [
         title: 'Glassdoor', 
         description: 'Read company reviews and learn about their culture.', 
         url: 'https://www.glassdoor.com',
+        image: '/img/data.png',
         tips: [
           'Create a list of your top 10 target companies',
           'Explore company websites and news articles',
@@ -112,7 +121,8 @@ const categories: Category[] = [
       { 
         title: 'Levels.fyi', 
         description: 'Get insights on salary levels. These tend to be pretty accurate!', 
-        url: 'https://www.levels.fyi' 
+        url: 'https://www.levels.fyi',
+        image: '/img/computer.png'
       }
     ]
   },
@@ -127,6 +137,7 @@ const categories: Category[] = [
         title: 'Coffee Chat Guide', 
         description: 'Learn how to conduct effective coffee chats and informational interviews.', 
         url: '#',
+        image: '/img/network.png',
         tips: [
           'Connect with BYU alumni and conduct informational interviews',
           'Learn about their company, projects, and culture',
@@ -148,6 +159,7 @@ const categories: Category[] = [
         title: 'NewGrad Jobs', 
         description: 'Explore entry-level job opportunities for new graduates.', 
         url: 'https://www.newgrad-jobs.com',
+        image: '/img/computer.png',
         tips: [
           'Use job search engines and company career pages',
           'Set alerts for positions matching your criteria',
@@ -158,22 +170,26 @@ const categories: Category[] = [
       { 
         title: 'Intern List', 
         description: 'Find internships and entry-level positions across various industries.', 
-        url: 'https://www.intern-list.com' 
+        url: 'https://www.intern-list.com',
+        image: '/img/data.png'
       },
       { 
         title: 'LinkedIn Jobs', 
         description: 'Find job openings and connect with recruiters on LinkedIn.', 
-        url: 'https://www.linkedin.com/jobs/' 
+        url: 'https://www.linkedin.com/jobs/',
+        image: '/img/network.png'
       },
       { 
         title: 'APM Season', 
         description: 'Stay up-to-date on the latest APM programs and internships for aspiring product managers.', 
-        url: 'https://www.apmseason.com' 
+        url: 'https://www.apmseason.com',
+        image: '/img/tech.png'
       },
       { 
         title: 'Jobright', 
         description: 'Utilize AI to find job matches and streamline your job search process.', 
-        url: 'https://jobright.ai' 
+        url: 'https://jobright.ai',
+        image: '/img/ai-agent.png'
       }
     ]
   },
@@ -184,14 +200,14 @@ const categories: Category[] = [
     icon: <Cpu className="w-6 h-6" />,
     color: 'from-violet-500 to-purple-500',
     resources: [
-      { title: 'Lovable.dev', description: 'Create apps and websites by chatting with AI.', url: 'https://lovable.dev' },
-      { title: 'Azure AI', description: 'Explore AI solutions with Azure.', url: 'https://ai.azure.com' },
-      { title: 'Hugging Face', description: 'Collaborate on models, datasets, and applications.', url: 'https://huggingface.co' },
-      { title: 'Google Vertex AI', description: 'Build and deploy AI models on Google Cloud.', url: 'https://console.cloud.google.com/vertex-ai/studio' },
-      { title: 'AI Studio', description: 'Create AI-driven applications with Google.', url: 'https://aistudio.google.com/prompts/new_chat' },
-      { title: 'Firebase Studio', description: 'Accelerate development with AI agents.', url: 'https://firebase.studio' },
-      { title: 'Cursor', description: 'AI code editor with a free year subscription for students.', url: 'https://cursor.com/en' },
-      { title: 'Relay.app', description: 'Create AI agents that work for you with Relay.app.', url: 'https://www.relay.app' }
+      { title: 'Lovable.dev', description: 'Create apps and websites by chatting with AI.', url: 'https://lovable.dev', image: '/img/ai-agent.png' },
+      { title: 'Azure AI', description: 'Explore AI solutions with Azure.', url: 'https://ai.azure.com', image: '/img/tech.png' },
+      { title: 'Hugging Face', description: 'Collaborate on models, datasets, and applications.', url: 'https://huggingface.co', image: '/img/ai-agent.png' },
+      { title: 'Google Vertex AI', description: 'Build and deploy AI models on Google Cloud.', url: 'https://console.cloud.google.com/vertex-ai/studio', image: '/img/tech.png' },
+      { title: 'AI Studio', description: 'Create AI-driven applications with Google.', url: 'https://aistudio.google.com/prompts/new_chat', image: '/img/ai-agent.png' },
+      { title: 'Firebase Studio', description: 'Accelerate development with AI agents.', url: 'https://firebase.studio', image: '/img/tech.png' },
+      { title: 'Cursor', description: 'AI code editor with a free year subscription for students.', url: 'https://cursor.com/en', image: '/img/computer.png' },
+      { title: 'Relay.app', description: 'Create AI agents that work for you with Relay.app.', url: 'https://www.relay.app', image: '/img/ai-agent.png' }
     ]
   }
 ];
@@ -199,6 +215,15 @@ const categories: Category[] = [
 const ResourcesPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  const searchResults = searchQuery ? categories.flatMap(category => 
+    category.resources
+      .filter(resource => 
+        resource.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        resource.description.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+      .map(resource => ({ resource, category }))
+  ) : [];
 
   const filteredCategories = categories.filter(category => {
     if (!searchQuery) return true;
@@ -268,7 +293,14 @@ const ResourcesPage = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {selectedCategoryData.resources.map((resource, idx) => (
                     <AnimatedSection key={idx} animation="slide-up" delay={idx * 100}>
-                      <Card className="h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                      <Card className="h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+                        <div className="aspect-video w-full overflow-hidden bg-muted">
+                          <img 
+                            src={resource.image} 
+                            alt={resource.title}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
                         <CardContent className="p-6">
                           <h3 className="text-xl font-semibold mb-3 text-card-foreground">{resource.title}</h3>
                           <p className="text-sm text-muted-foreground mb-4">{resource.description}</p>
@@ -302,6 +334,66 @@ const ResourcesPage = () => {
                 </div>
               </AnimatedSection>
             )}
+          </div>
+        ) : searchQuery && searchResults.length > 0 ? (
+          // Search Results View
+          <div className="max-w-6xl mx-auto">
+            <p className="text-sm text-muted-foreground mb-6">
+              Found {searchResults.length} result{searchResults.length !== 1 ? 's' : ''}
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {searchResults.map(({ resource, category }, idx) => (
+                <AnimatedSection key={idx} animation="slide-up" delay={idx * 50}>
+                  <Card className="h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+                    <div className="aspect-video w-full overflow-hidden bg-muted">
+                      <img 
+                        src={resource.image} 
+                        alt={resource.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className={`w-8 h-8 rounded bg-gradient-to-r ${category.color} flex items-center justify-center text-white text-xs`}>
+                          {category.icon}
+                        </div>
+                        <span className="text-xs text-muted-foreground">{category.title}</span>
+                      </div>
+                      <h3 className="text-xl font-semibold mb-3 text-card-foreground">{resource.title}</h3>
+                      <p className="text-sm text-muted-foreground mb-4">{resource.description}</p>
+                      
+                      {resource.tips && (
+                        <div className="mb-4 p-4 bg-muted/50 rounded-lg">
+                          <h4 className="text-sm font-semibold mb-2 text-foreground">Pro Tips:</h4>
+                          <ul className="list-disc list-inside space-y-1">
+                            {resource.tips.map((tip, tipIdx) => (
+                              <li key={tipIdx} className="text-xs text-muted-foreground">{tip}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      
+                      <a 
+                        href={resource.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors font-medium"
+                      >
+                        View Resource
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                        </svg>
+                      </a>
+                    </CardContent>
+                  </Card>
+                </AnimatedSection>
+              ))}
+            </div>
+          </div>
+        ) : searchQuery ? (
+          // No Results
+          <div className="max-w-6xl mx-auto text-center py-12">
+            <p className="text-muted-foreground">No resources found matching "{searchQuery}"</p>
           </div>
         ) : (
           // Category Grid View
