@@ -36,7 +36,7 @@ const GamePage = () => {
   const [showPlayerForm, setShowPlayerForm] = useState(false);
   const [currentPlayer, setCurrentPlayer] = useState<{firstName: string, lastName: string, email: string}>({firstName: '', lastName: '', email: ''});
   const [formErrors, setFormErrors] = useState<{firstName?: string, lastName?: string, email?: string}>({});
-  const [loading, setLoading] = useState(false);
+  // const [, setLoading] = useState(false);
   const [cougarImage, setCougarImage] = useState<HTMLImageElement | null>(null);
 
   // Airtable configuration
@@ -316,15 +316,15 @@ const GamePage = () => {
   }, [gameState.isPlaying, gameState.isGameOver, gameOver]);
 
   // Handle touch/click with double-tap prevention
-  const handleInput = useCallback((e: React.MouseEvent | React.TouchEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    // Prevent double jumps by checking if we're already jumping
-    if (gameState.birdVelocity > -3) { // Only allow jump if not already jumping hard
-      jump();
-    }
-  }, [jump, gameState.birdVelocity]);
+  // const handleInput = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+  //   e.preventDefault();
+  //   e.stopPropagation();
+  //   
+  //   // Prevent double jumps by checking if we're already jumping
+  //   if (gameState.birdVelocity > -3) { // Only allow jump if not already jumping hard
+  //     jump();
+  //   }
+  // }, [jump, gameState.birdVelocity]);
 
   // Handle mouse clicks (desktop only)
   const handleMouseClick = useCallback((e: React.MouseEvent) => {

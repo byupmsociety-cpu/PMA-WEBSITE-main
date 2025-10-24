@@ -94,8 +94,8 @@ const HomePage = () => {
           // Find the next upcoming event
           const now = new Date();
           const upcomingEvents = transformedEvents
-            .filter(event => new Date(event.date) >= now)
-            .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+            .filter((event: Event) => new Date(event.date) >= now)
+            .sort((a: Event, b: Event) => new Date(a.date).getTime() - new Date(b.date).getTime());
           
           if (upcomingEvents.length > 0) {
             setUpcomingEvent(upcomingEvents[0]);
@@ -605,11 +605,11 @@ const HomePage = () => {
 };
 
 export function RecruitingTimeline() {
-  const containerRef = useRef(null);
+  const containerRef = useRef<HTMLElement | null>(null);
   const { ref: inViewRef, inView } = useInView({ threshold: 0.3, triggerOnce: true });
 
   // Combine refs for both intersection observer and container
-  function setRefs(node) {
+  function setRefs(node: HTMLElement | null) {
     containerRef.current = node;
     inViewRef(node);
   }
@@ -634,12 +634,10 @@ export function RecruitingTimeline() {
       <div className="relative w-full max-w-xl flex flex-col items-center">
         {/* Vertical line */}
         <div className="absolute left-6 top-0 bottom-0 w-1 bg-gradient-to-b from-[#4A90E2] to-[#87CEEB] rounded-full opacity-40" />
-        {recruitingMilestones.map((milestone, idx) => (
+        {recruitingMilestones.map((milestone) => (
           <Milestone
             key={milestone.title}
             milestone={milestone}
-            idx={idx}
-            total={recruitingMilestones.length}
           />
         ))}
       </div>
@@ -647,7 +645,7 @@ export function RecruitingTimeline() {
   );
 }
 
-function Milestone({ milestone, idx, total }) {
+function Milestone({ milestone }: { milestone: { title: string; description: string } }) {
   const { ref, inView } = useInView({
     threshold: 0.6,
     triggerOnce: false,

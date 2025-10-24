@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import AnimatedSection from '@/components/AnimatedSection';
@@ -226,7 +226,7 @@ const generateRoadmap = (answers: QuizAnswers): Roadmap => {
 };
 
 const DiscoverPage = () => {
-  const [showQuiz, setShowQuiz] = useState(false);
+  // const [, setShowQuiz] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [answers, setAnswers] = useState<QuizAnswers>({
     yearInSchool: 'Freshman',
