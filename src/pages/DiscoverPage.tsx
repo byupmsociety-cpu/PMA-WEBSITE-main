@@ -652,15 +652,6 @@ const DiscoverPage = () => {
                 </div>
               </DialogContent>
             </Dialog>
-              <Button
-                onClick={() => {
-                  const gamesSection = document.getElementById('games-section');
-                  gamesSection?.scrollIntoView({ behavior: 'smooth' });
-                }}
-                className="absolute right-8 top-56 bg-gradient-to-r from-[#215096] to-[#4299E1] text-white px-6 py-2 rounded-full text-lg font-medium hover:opacity-90 transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
-              >
-                Gamify PM 🎮
-              </Button>
             </div>
           </div>
         </div>
