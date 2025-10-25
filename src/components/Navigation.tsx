@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import ThemeToggle from './ThemeToggle';
+import { Button } from './ui/button';
+import { supabase } from '@/integrations/supabase/client';
+import AuthModal from './AuthModal';
+import { User } from '@supabase/supabase-js';
 
 const Navigation = () => {
   const location = useLocation();
@@ -8,6 +12,8 @@ const Navigation = () => {
   const [visible, setVisible] = useState(true);
   const [activeLink, setActiveLink] = useState('/');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
   
   // Handle scroll behavior to hide/show navbar
   useEffect(() => {
@@ -25,6 +31,23 @@ const Navigation = () => {
   useEffect(() => {
     setActiveLink(location.pathname);
   }, [location.pathname]);
+
+  // Check auth status
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+  };
 
   // Close mobile menu when clicking on a link
   const handleLinkClick = (path: string) => {
@@ -80,7 +103,25 @@ const Navigation = () => {
             
             <div className="flex items-center space-x-2">
               <ThemeToggle />
-              <button 
+              {user ? (
+                <Button 
+                  onClick={handleSignOut}
+                  variant="outline"
+                  size="sm"
+                  className="hidden md:flex"
+                >
+                  Sign Out
+                </Button>
+              ) : (
+                <Button 
+                  onClick={() => setAuthModalOpen(true)}
+                  size="sm"
+                  className="hidden md:flex"
+                >
+                  Sign In
+                </Button>
+              )}
+              <button
                 className="md:hidden text-gray-700 dark:text-white p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 aria-label="Toggle mobile menu"
@@ -119,11 +160,33 @@ const Navigation = () => {
                     </Link>
                   </li>
                 ))}
+                <li>
+                  {user ? (
+                    <button
+                      onClick={handleSignOut}
+                      className="block w-full text-left px-4 py-3 text-base font-medium rounded-md transition-colors text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                    >
+                      Sign Out
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => setAuthModalOpen(true)}
+                      className="block w-full text-left px-4 py-3 text-base font-medium rounded-md transition-colors text-primary dark:text-white bg-blue-50 dark:bg-blue-900/20"
+                    >
+                      Sign In
+                    </button>
+                  )}
+                </li>
               </ul>
             </nav>
           </div>
         </div>
       </div>
+      
+      <AuthModal 
+        isOpen={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+      />
     </header>
   );
 };

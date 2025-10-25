@@ -1,8 +1,9 @@
+import { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useNavigate } from "react-router-dom";
+import AuthModal from "./AuthModal";
 
 interface PaidResourceModalProps {
   isOpen: boolean;
@@ -13,11 +14,7 @@ interface PaidResourceModalProps {
 }
 
 const PaidResourceModal = ({ isOpen, onClose, resourceTitle, resourceUrl, isAuthenticated }: PaidResourceModalProps) => {
-  const navigate = useNavigate();
-
-  const handleSignIn = () => {
-    navigate(`/auth?resource=${encodeURIComponent(resourceTitle)}`);
-  };
+  const [authModalOpen, setAuthModalOpen] = useState(false);
 
   const getResourceContent = () => {
     if (resourceTitle === "PMF Labs") {
@@ -97,7 +94,7 @@ const PaidResourceModal = ({ isOpen, onClose, resourceTitle, resourceUrl, isAuth
                     <p className="text-xs text-muted-foreground text-center">
                       Sign in to access your exclusive discount code
                     </p>
-                    <Button onClick={handleSignIn} className="w-full" size="default">
+                    <Button onClick={() => setAuthModalOpen(true)} className="w-full" size="default">
                       Sign In to Access
                     </Button>
                   </div>
@@ -120,6 +117,11 @@ const PaidResourceModal = ({ isOpen, onClose, resourceTitle, resourceUrl, isAuth
           </div>
         </ScrollArea>
       </DialogContent>
+      
+      <AuthModal 
+        isOpen={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+      />
     </Dialog>
   );
 };
