@@ -16,7 +16,7 @@ import pmflabsImg from "@/assets/pmflabs.jpg";
 import linkedinGuideImg from "@/assets/linkedin-guide.jpg";
 import hubspotLinkedinImg from "@/assets/hubspot-linkedin.jpg";
 import glassdoorImg from "@/assets/glassdoor.jpg";
-import levelsFyiImg from "@/assets/levels-fyi.jpg";
+import levelsFyiImg from "@/assets/levels-fyi.png";
 import coffeeChatImg from "@/assets/coffee-chat.jpg";
 import newgradJobsImg from "@/assets/newgrad-jobs.jpg";
 import internListImg from "@/assets/intern-list.jpg";
