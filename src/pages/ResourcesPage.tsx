@@ -23,7 +23,7 @@ import internListImg from "@/assets/intern-list.jpg";
 import linkedinJobsImg from "@/assets/linkedin-jobs.jpg";
 import apmSeasonImg from "@/assets/apm-season.jpg";
 import jobrightImg from "@/assets/jobright.jpg";
-import lovableImg from "@/assets/lovable.jpg";
+import lovableImg from "@/assets/lovable.png";
 import azureAiImg from "@/assets/azure-ai.jpg";
 import huggingfaceImg from "@/assets/huggingface.jpg";
 import vertexAiImg from "@/assets/vertex-ai.jpg";
