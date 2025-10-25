@@ -1,6 +1,7 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useNavigate } from "react-router-dom";
 
 interface PaidResourceModalProps {
@@ -46,74 +47,78 @@ const PaidResourceModal = ({ isOpen, onClose, resourceTitle, resourceUrl, isAuth
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[650px]">
-        <DialogHeader className="space-y-3">
-          <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground">
-              Premium Partner
-            </Badge>
-          </div>
-          <DialogTitle className="text-2xl font-bold">{resourceTitle}</DialogTitle>
-          <DialogDescription className="text-base">
-            Exclusive benefits for PMA members
-          </DialogDescription>
-        </DialogHeader>
-        
-        <div className="space-y-6 pt-2">
-          {/* Video placeholder */}
-          {content.videoUrl && (
-            <div className="aspect-video bg-muted rounded-lg flex items-center justify-center overflow-hidden">
-              <p className="text-muted-foreground">Demo Video</p>
-            </div>
-          )}
-          
-          {!content.videoUrl && (
-            <div className="aspect-video bg-gradient-to-br from-primary/10 via-primary/5 to-background rounded-lg flex items-center justify-center border border-border">
-              <p className="text-sm text-muted-foreground">Demo video coming soon</p>
-            </div>
-          )}
-
-          <div className="space-y-4">
-            <p className="text-foreground leading-relaxed">{content.description}</p>
+      <DialogContent className="sm:max-w-[500px] max-h-[85vh] p-0">
+        <ScrollArea className="max-h-[85vh]">
+          <div className="p-6">
+            <DialogHeader className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Badge variant="secondary" className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground">
+                  Premium Partner
+                </Badge>
+              </div>
+              <DialogTitle className="text-xl font-bold">{resourceTitle}</DialogTitle>
+              <DialogDescription className="text-sm">
+                Exclusive benefits for PMA members
+              </DialogDescription>
+            </DialogHeader>
             
-            <div className="bg-gradient-to-br from-primary/5 to-primary/10 p-6 rounded-lg border border-primary/20 space-y-3">
-              <p className="font-semibold text-foreground">{content.benefit}</p>
-              <p className="text-sm text-muted-foreground">Just make sure you create your account with your BYU email!</p>
-              {isAuthenticated && (
-                <div className="flex items-center gap-3 pt-2">
-                  <span className="text-sm text-muted-foreground">Your Code:</span>
-                  <Badge variant="outline" className="font-mono text-base px-4 py-2 bg-background border-primary/30">
-                    {content.code}
-                  </Badge>
+            <div className="space-y-4 pt-4">
+              {/* Video placeholder */}
+              {content.videoUrl && (
+                <div className="aspect-video bg-muted rounded-lg flex items-center justify-center overflow-hidden">
+                  <p className="text-muted-foreground">Demo Video</p>
                 </div>
               )}
-            </div>
+              
+              {!content.videoUrl && (
+                <div className="aspect-video bg-gradient-to-br from-primary/10 via-primary/5 to-background rounded-lg flex items-center justify-center border border-border">
+                  <p className="text-xs text-muted-foreground">Demo video coming soon</p>
+                </div>
+              )}
 
-            {!isAuthenticated ? (
-              <div className="space-y-3 pt-2">
-                <p className="text-muted-foreground text-center">
-                  Sign in to access your exclusive discount code
-                </p>
-                <Button onClick={handleSignIn} className="w-full h-11" size="lg">
-                  Sign In to Access
-                </Button>
+              <div className="space-y-4">
+                <p className="text-sm text-foreground leading-relaxed">{content.description}</p>
+                
+                <div className="bg-gradient-to-br from-primary/5 to-primary/10 p-4 rounded-lg border border-primary/20 space-y-2">
+                  <p className="font-semibold text-sm text-foreground">{content.benefit}</p>
+                  <p className="text-xs text-muted-foreground">Just make sure you create your account with your BYU email!</p>
+                  {isAuthenticated && (
+                    <div className="flex items-center gap-3 pt-2">
+                      <span className="text-xs text-muted-foreground">Your Code:</span>
+                      <Badge variant="outline" className="font-mono text-sm px-3 py-1 bg-background border-primary/30">
+                        {content.code}
+                      </Badge>
+                    </div>
+                  )}
+                </div>
+
+                {!isAuthenticated ? (
+                  <div className="space-y-3 pt-2">
+                    <p className="text-xs text-muted-foreground text-center">
+                      Sign in to access your exclusive discount code
+                    </p>
+                    <Button onClick={handleSignIn} className="w-full" size="default">
+                      Sign In to Access
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex gap-3 pt-2">
+                    <Button 
+                      onClick={() => window.open(resourceUrl, '_blank')}
+                      className="flex-1"
+                      size="default"
+                    >
+                      Visit {resourceTitle}
+                    </Button>
+                    <Button onClick={onClose} variant="outline" size="default">
+                      Close
+                    </Button>
+                  </div>
+                )}
               </div>
-            ) : (
-              <div className="flex gap-3 pt-2">
-                <Button 
-                  onClick={() => window.open(resourceUrl, '_blank')}
-                  className="flex-1 h-11"
-                  size="lg"
-                >
-                  Visit {resourceTitle}
-                </Button>
-                <Button onClick={onClose} variant="outline" className="h-11" size="lg">
-                  Close
-                </Button>
-              </div>
-            )}
+            </div>
           </div>
-        </div>
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );
