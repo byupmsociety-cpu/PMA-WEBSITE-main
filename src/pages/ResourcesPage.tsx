@@ -345,11 +345,11 @@ const ResourcesPage = () => {
     <div className="min-h-screen pt-24 pb-20 bg-background text-foreground">
       <div className="container mx-auto px-4 md:px-6">
         <AnimatedSection animation="slide-up">
-          <div className="max-w-3xl mx-auto text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
+          <div className="max-w-3xl mx-auto text-center mb-8">
+            <h1 className="text-3xl md:text-4xl font-bold mb-4">
               PM <span className="text-gradient bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">Content Library</span>
             </h1>
-            <p className="text-lg text-muted-foreground mb-8">
+            <p className="text-base text-muted-foreground mb-6">
               Everything you need to excel in your product management journey
             </p>
             
@@ -371,36 +371,36 @@ const ResourcesPage = () => {
         {/* Most Used Resources Carousel */}
         {!selectedCategory && !searchQuery && topResources.length > 0 && (
           <AnimatedSection animation="fade-in">
-            <div className="max-w-4xl mx-auto mb-16">
-              <div className="flex items-center gap-2 mb-6">
-                <TrendingUp className="w-5 h-5 text-primary" />
-                <h2 className="text-2xl font-bold">Most Used by Students</h2>
+            <div className="max-w-6xl mx-auto mb-12">
+              <div className="flex items-center gap-2 mb-4">
+                <TrendingUp className="w-4 h-4 text-primary" />
+                <h2 className="text-lg font-bold">Most Used by Students</h2>
               </div>
               <Carousel className="w-full">
                 <CarouselContent>
                   {topResources.map(({ resource, category, clicks }, idx) => (
-                    <CarouselItem key={idx} className="md:basis-1/2 lg:basis-1/3">
+                    <CarouselItem key={idx} className="basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5">
                       <Card className="h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-                        <CardContent className="p-4">
-                          <div className="flex items-center gap-2 mb-3">
-                            <div className={`w-6 h-6 rounded bg-gradient-to-r ${category.color} flex items-center justify-center text-white`}>
+                        <CardContent className="p-2.5">
+                          <div className="flex items-center gap-1.5 mb-2">
+                            <div className={`w-5 h-5 rounded bg-gradient-to-r ${category.color} flex items-center justify-center text-white`}>
                               <div className="scale-75">{category.icon}</div>
                             </div>
-                            <span className="text-xs text-muted-foreground">{category.title}</span>
+                            <span className="text-[9px] text-muted-foreground line-clamp-1">{category.title}</span>
                           </div>
                           
-                          <div className="mb-3">
-                            <div className="w-full aspect-video rounded-md overflow-hidden bg-muted mb-3">
+                          <div className="mb-2">
+                            <div className="w-full aspect-square rounded-md overflow-hidden bg-muted mb-2">
                               <img 
                                 src={resource.image} 
                                 alt={resource.title}
                                 className="w-full h-full object-cover"
                               />
                             </div>
-                            <h3 className="text-base font-semibold mb-2 text-card-foreground">{resource.title}</h3>
-                            <p className="text-sm text-muted-foreground mb-2">{resource.description}</p>
+                            <h3 className="text-xs font-semibold mb-1 text-card-foreground line-clamp-2">{resource.title}</h3>
+                            <p className="text-[10px] text-muted-foreground line-clamp-2 mb-1">{resource.description}</p>
                             {clicks > 0 && (
-                              <p className="text-xs text-primary font-medium">{clicks} clicks</p>
+                              <p className="text-[9px] text-primary font-medium">{clicks} clicks</p>
                             )}
                           </div>
                           
@@ -409,10 +409,10 @@ const ResourcesPage = () => {
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={() => trackResourceClick(resource, category.id)}
-                            className="inline-flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors font-medium"
+                            className="inline-flex items-center gap-1 text-[10px] text-primary hover:text-primary/80 transition-colors font-medium"
                           >
-                            Visit Resource
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                            View
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-2.5 h-2.5">
                               <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
                             </svg>
                           </a>
@@ -563,26 +563,26 @@ const ResourcesPage = () => {
           </div>
         ) : (
           // Category Grid View
-          <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {filteredCategories.map((category, idx) => (
               <AnimatedSection key={category.id} animation="slide-up" delay={idx * 100}>
                 <Card 
                   className="h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer group"
                   onClick={() => setSelectedCategory(category.id)}
                 >
-                  <CardContent className="p-6">
-                    <div className={`w-14 h-14 rounded-lg bg-gradient-to-r ${category.color} flex items-center justify-center mb-4 text-white group-hover:scale-110 transition-transform`}>
-                      {category.icon}
+                  <CardContent className="p-4">
+                    <div className={`w-10 h-10 rounded-lg bg-gradient-to-r ${category.color} flex items-center justify-center mb-3 text-white group-hover:scale-110 transition-transform`}>
+                      <div className="scale-75">{category.icon}</div>
                     </div>
-                    <h3 className="text-xl font-semibold mb-3 text-card-foreground group-hover:text-primary transition-colors">
+                    <h3 className="text-base font-semibold mb-2 text-card-foreground group-hover:text-primary transition-colors line-clamp-2">
                       {category.title}
                     </h3>
-                    <p className="text-sm text-muted-foreground mb-4">{category.description}</p>
+                    <p className="text-xs text-muted-foreground mb-3 line-clamp-2">{category.description}</p>
                     <div className="flex items-center justify-between">
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-[10px] text-muted-foreground">
                         {category.resources.length} resources
                       </span>
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 text-primary group-hover:translate-x-1 transition-transform">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4 text-primary group-hover:translate-x-1 transition-transform">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                       </svg>
                     </div>
