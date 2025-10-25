@@ -78,6 +78,7 @@ const PaidResourceModal = ({ isOpen, onClose, resourceTitle, resourceUrl, isAuth
             
             <div className="bg-gradient-to-br from-primary/5 to-primary/10 p-6 rounded-lg border border-primary/20 space-y-3">
               <p className="font-semibold text-foreground">{content.benefit}</p>
+              <p className="text-sm text-muted-foreground">Just make sure you create your account with your BYU email!</p>
               {isAuthenticated && (
                 <div className="flex items-center gap-3 pt-2">
                   <span className="text-sm text-muted-foreground">Your Code:</span>
