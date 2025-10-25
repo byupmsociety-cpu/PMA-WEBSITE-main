@@ -78,14 +78,16 @@ const PaidResourceModal = ({ isOpen, onClose, resourceTitle, resourceUrl, isAuth
                 
                 <div className="bg-gradient-to-br from-primary/5 to-primary/10 p-4 rounded-lg border border-primary/20 space-y-2">
                   <p className="font-semibold text-sm text-foreground">{content.benefit}</p>
-                  <p className="text-xs text-muted-foreground">Just make sure you create your account with your BYU email!</p>
                   {isAuthenticated && (
-                    <div className="flex items-center gap-3 pt-2">
-                      <span className="text-xs text-muted-foreground">Your Code:</span>
-                      <Badge variant="outline" className="font-mono text-sm px-3 py-1 bg-background border-primary/30">
-                        {content.code}
-                      </Badge>
-                    </div>
+                    <>
+                      <p className="text-xs text-muted-foreground">Just make sure you create your account with your BYU email!</p>
+                      <div className="flex items-center gap-3 pt-2">
+                        <span className="text-xs text-muted-foreground">Your Code:</span>
+                        <Badge variant="outline" className="font-mono text-sm px-3 py-1 bg-background border-primary/30">
+                          {content.code}
+                        </Badge>
+                      </div>
+                    </>
                   )}
                 </div>
 
