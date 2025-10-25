@@ -291,7 +291,7 @@ const ResourcesPage = () => {
     [],
   );
   const [user, setUser] = useState<User | null>(null);
-  const [selectedPaidResource, setSelectedPaidResource] = useState<string | null>(null);
+  const [selectedPaidResource, setSelectedPaidResource] = useState<{ title: string; url: string } | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
@@ -310,7 +310,11 @@ const ResourcesPage = () => {
     // Check if we need to open a modal for a paid resource after auth
     const resourceParam = searchParams.get("resource");
     if (resourceParam) {
-      setSelectedPaidResource(resourceParam);
+      const allResources = categories.flatMap(cat => cat.resources);
+      const matchedResource = allResources.find(r => r.title === resourceParam);
+      if (matchedResource?.isPaid) {
+        setSelectedPaidResource({ title: matchedResource.title, url: matchedResource.url });
+      }
       // Clear the param
       setSearchParams({});
     }
@@ -375,7 +379,7 @@ const ResourcesPage = () => {
     // Handle paid resources
     if (resource.isPaid) {
       e?.preventDefault();
-      setSelectedPaidResource(resource.title);
+      setSelectedPaidResource({ title: resource.title, url: resource.url });
       return;
     }
 
@@ -740,7 +744,8 @@ const ResourcesPage = () => {
       <PaidResourceModal
         isOpen={!!selectedPaidResource}
         onClose={() => setSelectedPaidResource(null)}
-        resourceTitle={selectedPaidResource || ""}
+        resourceTitle={selectedPaidResource?.title || ""}
+        resourceUrl={selectedPaidResource?.url || ""}
         isAuthenticated={!!user}
       />
     </div>

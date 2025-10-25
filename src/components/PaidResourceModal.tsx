@@ -7,10 +7,11 @@ interface PaidResourceModalProps {
   isOpen: boolean;
   onClose: () => void;
   resourceTitle: string;
+  resourceUrl: string;
   isAuthenticated: boolean;
 }
 
-const PaidResourceModal = ({ isOpen, onClose, resourceTitle, isAuthenticated }: PaidResourceModalProps) => {
+const PaidResourceModal = ({ isOpen, onClose, resourceTitle, resourceUrl, isAuthenticated }: PaidResourceModalProps) => {
   const navigate = useNavigate();
 
   const handleSignIn = () => {
@@ -45,59 +46,67 @@ const PaidResourceModal = ({ isOpen, onClose, resourceTitle, isAuthenticated }: 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px]">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Badge variant="secondary" className="bg-gradient-to-r from-primary to-blue-500">
-              Partnership
+      <DialogContent className="sm:max-w-[650px]">
+        <DialogHeader className="space-y-3">
+          <div className="flex items-center gap-2">
+            <Badge variant="secondary" className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground">
+              Premium Partner
             </Badge>
-            {resourceTitle}
-          </DialogTitle>
-          <DialogDescription>Premium resource for PMA members</DialogDescription>
+          </div>
+          <DialogTitle className="text-2xl font-bold">{resourceTitle}</DialogTitle>
+          <DialogDescription className="text-base">
+            Exclusive benefits for PMA members
+          </DialogDescription>
         </DialogHeader>
         
-        <div className="space-y-4">
-          {/* Video placeholder - replace with actual video when available */}
+        <div className="space-y-6 pt-2">
+          {/* Video placeholder */}
           {content.videoUrl && (
-            <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
+            <div className="aspect-video bg-muted rounded-lg flex items-center justify-center overflow-hidden">
               <p className="text-muted-foreground">Demo Video</p>
             </div>
           )}
           
           {!content.videoUrl && (
-            <div className="aspect-video bg-gradient-to-br from-primary/20 to-blue-500/20 rounded-lg flex items-center justify-center border border-primary/20">
-              <p className="text-muted-foreground">Demo video coming soon</p>
+            <div className="aspect-video bg-gradient-to-br from-primary/10 via-primary/5 to-background rounded-lg flex items-center justify-center border border-border">
+              <p className="text-sm text-muted-foreground">Demo video coming soon</p>
             </div>
           )}
 
-          <div className="space-y-3">
-            <p className="text-sm text-foreground">{content.description}</p>
+          <div className="space-y-4">
+            <p className="text-foreground leading-relaxed">{content.description}</p>
             
-            <div className="bg-muted/50 p-4 rounded-lg space-y-2">
-              <p className="text-sm font-medium">{content.benefit}</p>
+            <div className="bg-gradient-to-br from-primary/5 to-primary/10 p-6 rounded-lg border border-primary/20 space-y-3">
+              <p className="font-semibold text-foreground">{content.benefit}</p>
               {isAuthenticated && (
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="font-mono text-lg px-4 py-2 bg-background">
+                <div className="flex items-center gap-3 pt-2">
+                  <span className="text-sm text-muted-foreground">Your Code:</span>
+                  <Badge variant="outline" className="font-mono text-base px-4 py-2 bg-background border-primary/30">
                     {content.code}
                   </Badge>
                 </div>
               )}
             </div>
 
-            {!isAuthenticated && (
-              <div className="pt-2">
-                <p className="text-sm text-muted-foreground mb-3">
+            {!isAuthenticated ? (
+              <div className="space-y-3 pt-2">
+                <p className="text-muted-foreground text-center">
                   Sign in to access your exclusive discount code
                 </p>
-                <Button onClick={handleSignIn} className="w-full">
+                <Button onClick={handleSignIn} className="w-full h-11" size="lg">
                   Sign In to Access
                 </Button>
               </div>
-            )}
-
-            {isAuthenticated && (
-              <div className="pt-2">
-                <Button onClick={onClose} variant="outline" className="w-full">
+            ) : (
+              <div className="flex gap-3 pt-2">
+                <Button 
+                  onClick={() => window.open(resourceUrl, '_blank')}
+                  className="flex-1 h-11"
+                  size="lg"
+                >
+                  Visit {resourceTitle}
+                </Button>
+                <Button onClick={onClose} variant="outline" className="h-11" size="lg">
                   Close
                 </Button>
               </div>
