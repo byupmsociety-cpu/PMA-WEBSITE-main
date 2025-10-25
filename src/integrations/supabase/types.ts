@@ -20,6 +20,8 @@ export type Database = {
           email: string | null
           full_name: string | null
           id: string
+          is_pma_member: boolean | null
+          membership_verified_at: string | null
           updated_at: string
           user_id: string
         }
@@ -28,6 +30,8 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
+          is_pma_member?: boolean | null
+          membership_verified_at?: string | null
           updated_at?: string
           user_id: string
         }
@@ -36,6 +40,8 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
+          is_pma_member?: boolean | null
+          membership_verified_at?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -67,7 +73,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_approved_pma_member: {
+        Args: { email_address: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
