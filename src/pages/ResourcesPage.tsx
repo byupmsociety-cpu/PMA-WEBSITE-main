@@ -269,22 +269,23 @@ const ResourcesPage = () => {
       clickCounts[key].count++;
     });
 
-    // Always include PMF Labs and Lovable
-    const mustInclude = ['PMF Labs', 'Lovable.dev'];
+    // Default resources to always show (3 defaults)
+    const defaultResources = ['PMF Labs', 'Lovable.dev', 'Product Haven Slack'];
     
-    // Get top clicked resources
-    const sortedResources = Object.entries(clickCounts)
+    // Get top 5 clicked resources (excluding defaults)
+    const topClicked = Object.entries(clickCounts)
       .sort(([, a], [, b]) => b.count - a.count)
-      .filter(([title]) => !mustInclude.includes(title))
-      .slice(0, 3)
+      .filter(([title]) => !defaultResources.includes(title))
+      .slice(0, 5)
       .map(([title, data]) => ({ title, ...data }));
 
-    // Find the must-include resources and add them
+    // Build final list: defaults first, then top clicked
     const finalResources: Array<{resource: Resource, category: Category, clicks: number}> = [];
     
+    // Add default resources
     categories.forEach(category => {
       category.resources.forEach(resource => {
-        if (mustInclude.includes(resource.title)) {
+        if (defaultResources.includes(resource.title)) {
           finalResources.push({
             resource,
             category,
@@ -295,7 +296,7 @@ const ResourcesPage = () => {
     });
 
     // Add top clicked resources
-    sortedResources.forEach(({ title, categoryId, count }) => {
+    topClicked.forEach(({ title, categoryId, count }) => {
       const category = categories.find(c => c.id === categoryId);
       const resource = category?.resources.find(r => r.title === title);
       if (resource && category) {
@@ -303,15 +304,16 @@ const ResourcesPage = () => {
       }
     });
 
-    setTopResources(finalResources.slice(0, 5));
+    // Show up to 8 resources total (3 defaults + 5 top clicked)
+    setTopResources(finalResources);
   };
 
   const trackResourceClick = async (resource: Resource, categoryId: string) => {
     await supabase.from('resource_clicks').insert({
       resource_title: resource.title,
-      resource_url: resource.url,
       category_id: categoryId
     });
+    // Refresh top resources after tracking click
     fetchTopResources();
   };
 
