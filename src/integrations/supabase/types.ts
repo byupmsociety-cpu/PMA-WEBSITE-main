@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      approved_pma_members: {
+        Row: {
+          added_at: string
+          email: string
+          id: string
+        }
+        Insert: {
+          added_at?: string
+          email: string
+          id?: string
+        }
+        Update: {
+          added_at?: string
+          email?: string
+          id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
