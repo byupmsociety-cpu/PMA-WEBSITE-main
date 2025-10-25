@@ -2,9 +2,13 @@ import { useState, useEffect } from "react";
 import AnimatedSection from "@/components/AnimatedSection";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { FileText, Linkedin, Building2, Coffee, Briefcase, Cpu, ArrowLeft, Search, TrendingUp } from "lucide-react";
+import { FileText, Linkedin, Building2, Coffee, Briefcase, Cpu, ArrowLeft, Search, TrendingUp, Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { Badge } from "@/components/ui/badge";
+import { useSearchParams } from "react-router-dom";
+import { User } from "@supabase/supabase-js";
+import PaidResourceModal from "@/components/PaidResourceModal";
 import resumegeniusImg from "@/assets/resumegenius.jpg";
 import vmockImg from "@/assets/vmock.jpg";
 import igotanofferImg from "@/assets/igotanoffer.jpg";
@@ -35,6 +39,7 @@ interface Resource {
   url: string;
   image: string;
   tips?: string[];
+  isPaid?: boolean;
 }
 
 interface Category {
@@ -84,6 +89,7 @@ const categories: Category[] = [
         description: "Use AI tools to practice and improve your interview skills.",
         url: "https://www.pmflabs.ai",
         image: pmflabsImg,
+        isPaid: true,
         tips: [
           "Practice, practice, practice",
           "Find common interview questions and write out concise stories",
@@ -95,6 +101,7 @@ const categories: Category[] = [
         description: "Access to recruiting resources created by industry professionals",
         url: "https://start.joinleland.com/campus-race?utm_source=amb-byu-dylan-mattern&utm_campaign=leland_plus_student",
         image: lelandImg,
+        isPaid: true,
       },
     ],
   },
@@ -283,10 +290,32 @@ const ResourcesPage = () => {
   const [topResources, setTopResources] = useState<Array<{ resource: Resource; category: Category; clicks: number }>>(
     [],
   );
+  const [user, setUser] = useState<User | null>(null);
+  const [selectedPaidResource, setSelectedPaidResource] = useState<string | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
     window.scrollTo(0, 0);
     fetchTopResources();
+
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    // Check if we need to open a modal for a paid resource after auth
+    const resourceParam = searchParams.get("resource");
+    if (resourceParam) {
+      setSelectedPaidResource(resourceParam);
+      // Clear the param
+      setSearchParams({});
+    }
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const fetchTopResources = async () => {
@@ -342,7 +371,14 @@ const ResourcesPage = () => {
     setTopResources(finalResources);
   };
 
-  const trackResourceClick = async (resource: Resource, categoryId: string) => {
+  const trackResourceClick = async (resource: Resource, categoryId: string, e?: React.MouseEvent) => {
+    // Handle paid resources
+    if (resource.isPaid) {
+      e?.preventDefault();
+      setSelectedPaidResource(resource.title);
+      return;
+    }
+
     await supabase.from("resource_clicks").insert({
       resource_title: resource.title,
       category_id: categoryId,
@@ -432,8 +468,14 @@ const ResourcesPage = () => {
                           </div>
 
                           <div className="mb-1.5">
-                            <div className="w-full aspect-square rounded-md overflow-hidden bg-muted mb-1.5">
+                            <div className="w-full aspect-square rounded-md overflow-hidden bg-muted mb-1.5 relative">
                               <img src={resource.image} alt={resource.title} className="w-full h-full object-cover" />
+                              {resource.isPaid && (
+                                <Badge className="absolute top-1 right-1 bg-gradient-to-r from-primary to-blue-500 text-white text-[7px] px-1 py-0">
+                                  <Star className="w-2 h-2 mr-0.5 fill-current" />
+                                  Partner
+                                </Badge>
+                              )}
                             </div>
                             <h3 className="text-[10px] font-semibold mb-0.5 text-card-foreground line-clamp-2">
                               {resource.title}
@@ -448,7 +490,7 @@ const ResourcesPage = () => {
                             href={resource.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            onClick={() => trackResourceClick(resource, category.id)}
+                            onClick={(e) => trackResourceClick(resource, category.id, e)}
                             className="inline-flex items-center gap-0.5 text-[9px] text-primary hover:text-primary/80 transition-colors font-medium"
                           >
                             View
@@ -508,8 +550,14 @@ const ResourcesPage = () => {
                       <Card className="h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                         <CardContent className="p-2">
                           <div className="mb-1.5">
-                            <div className="w-full aspect-square rounded-md overflow-hidden bg-muted mb-1.5">
+                            <div className="w-full aspect-square rounded-md overflow-hidden bg-muted mb-1.5 relative">
                               <img src={resource.image} alt={resource.title} className="w-full h-full object-cover" />
+                              {resource.isPaid && (
+                                <Badge className="absolute top-1 right-1 bg-gradient-to-r from-primary to-blue-500 text-white text-[7px] px-1 py-0">
+                                  <Star className="w-2 h-2 mr-0.5 fill-current" />
+                                  Partner
+                                </Badge>
+                              )}
                             </div>
                             <h3 className="text-[10px] font-semibold mb-0.5 text-card-foreground line-clamp-2">
                               {resource.title}
@@ -537,8 +585,8 @@ const ResourcesPage = () => {
                             href={resource.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            onClick={() =>
-                              selectedCategoryData && trackResourceClick(resource, selectedCategoryData.id)
+                            onClick={(e) =>
+                              selectedCategoryData && trackResourceClick(resource, selectedCategoryData.id, e)
                             }
                             className="inline-flex items-center gap-0.5 text-[9px] text-primary hover:text-primary/80 transition-colors font-medium"
                           >
@@ -587,8 +635,14 @@ const ResourcesPage = () => {
                       </div>
 
                       <div className="mb-1.5">
-                        <div className="w-full aspect-square rounded-md overflow-hidden bg-muted mb-1.5">
+                        <div className="w-full aspect-square rounded-md overflow-hidden bg-muted mb-1.5 relative">
                           <img src={resource.image} alt={resource.title} className="w-full h-full object-cover" />
+                          {resource.isPaid && (
+                            <Badge className="absolute top-1 right-1 bg-gradient-to-r from-primary to-blue-500 text-white text-[7px] px-1 py-0">
+                              <Star className="w-2 h-2 mr-0.5 fill-current" />
+                              Partner
+                            </Badge>
+                          )}
                         </div>
                         <h3 className="text-[10px] font-semibold mb-0.5 text-card-foreground line-clamp-2">
                           {resource.title}
@@ -613,7 +667,7 @@ const ResourcesPage = () => {
                         href={resource.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        onClick={() => trackResourceClick(resource, category.id)}
+                        onClick={(e) => trackResourceClick(resource, category.id, e)}
                         className="inline-flex items-center gap-0.5 text-[9px] text-primary hover:text-primary/80 transition-colors font-medium"
                       >
                         View
@@ -682,6 +736,14 @@ const ResourcesPage = () => {
           </div>
         )}
       </div>
+
+      {/* Paid Resource Modal */}
+      <PaidResourceModal
+        isOpen={!!selectedPaidResource}
+        onClose={() => setSelectedPaidResource(null)}
+        resourceTitle={selectedPaidResource || ""}
+        isAuthenticated={!!user}
+      />
     </div>
   );
 };
