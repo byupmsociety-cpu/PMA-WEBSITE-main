@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import ThemeToggle from './ThemeToggle';
 
 const Navigation = () => {
+  const location = useLocation();
   const [prevScrollPos, setPrevScrollPos] = useState(0);
   const [visible, setVisible] = useState(true);
   const [activeLink, setActiveLink] = useState('/');
@@ -22,8 +23,8 @@ const Navigation = () => {
   
   // Set active link based on current path
   useEffect(() => {
-    setActiveLink(window.location.pathname);
-  }, []);
+    setActiveLink(location.pathname);
+  }, [location.pathname]);
 
   // Close mobile menu when clicking on a link
   const handleLinkClick = (path: string) => {

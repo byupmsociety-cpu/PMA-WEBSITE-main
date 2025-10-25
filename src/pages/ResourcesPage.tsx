@@ -249,6 +249,7 @@ const ResourcesPage = () => {
   const [topResources, setTopResources] = useState<Array<{resource: Resource, category: Category, clicks: number}>>([]);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     fetchTopResources();
   }, []);
 
