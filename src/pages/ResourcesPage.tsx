@@ -15,7 +15,6 @@ import resumegeniusImg from '@/assets/resumegenius.jpg';
 import vmockImg from '@/assets/vmock.jpg';
 import igotanofferImg from '@/assets/igotanoffer.jpg';
 import pmflabsImg from '@/assets/pmflabs.jpg';
-import productHavenImg from '@/assets/product-haven.jpg';
 import linkedinGuideImg from '@/assets/linkedin-guide.jpg';
 import hubspotLinkedinImg from '@/assets/hubspot-linkedin.jpg';
 import glassdoorImg from '@/assets/glassdoor.jpg';
@@ -34,6 +33,7 @@ import aiStudioImg from '@/assets/ai-studio.jpg';
 import firebaseStudioImg from '@/assets/firebase-studio.jpg';
 import cursorImg from '@/assets/cursor.jpg';
 import relayImg from '@/assets/relay.jpg';
+import lelandImg from '@/assets/leland.png';
 
 interface Resource {
   title: string;
@@ -97,10 +97,10 @@ const categories: Category[] = [
         ]
       },
       { 
-        title: 'Product Haven Slack', 
-        description: 'Join aspiring PMs for interview prep and job listings.', 
-        url: 'https://producthaven.slack.com/archives/C05SRL7THV2',
-        image: productHavenImg
+        title: 'Leland+', 
+        description: 'Access to recruiting resources created by industry professionals', 
+        url: 'https://start.joinleland.com/campus-race?utm_source=amb-byu-dylan-mattern&utm_campaign=leland_plus_student',
+        image: lelandImg
       }
     ]
   },
@@ -270,7 +270,7 @@ const ResourcesPage = () => {
     });
 
     // Default resources to always show (3 defaults)
-    const defaultResources = ['PMF Labs', 'Lovable.dev', 'Product Haven Slack'];
+    const defaultResources = ['PMF Labs', 'Lovable.dev', 'Leland+'];
     
     // Get top 5 clicked resources (excluding defaults)
     const topClicked = Object.entries(clickCounts)
