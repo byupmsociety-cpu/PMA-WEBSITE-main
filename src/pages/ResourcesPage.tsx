@@ -460,7 +460,18 @@ const ResourcesPage = () => {
                 <CarouselContent>
                   {topResources.map(({ resource, category }, idx) => (
                     <CarouselItem key={idx} className="basis-1/3 md:basis-1/4 lg:basis-1/5 xl:basis-1/6">
-                      <Card className="h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                      <Card 
+                        className="h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+                        onClick={(e) => {
+                          if (resource.isPaid) {
+                            e.preventDefault();
+                            setSelectedPaidResource({ title: resource.title, url: resource.url });
+                          } else {
+                            trackResourceClick(resource, category.id);
+                            window.open(resource.url, '_blank', 'noopener,noreferrer');
+                          }
+                        }}
+                      >
                         <CardContent className="p-2">
                           <div className="flex items-center gap-1 mb-1.5">
                             <div
@@ -488,30 +499,6 @@ const ResourcesPage = () => {
                               {resource.description}
                             </p>
                           </div>
-
-                          <a
-                            href={resource.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={(e) => trackResourceClick(resource, category.id, e)}
-                            className="inline-flex items-center gap-0.5 text-[9px] text-primary hover:text-primary/80 transition-colors font-medium"
-                          >
-                            View
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              strokeWidth={1.5}
-                              stroke="currentColor"
-                              className="w-2 h-2"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
-                              />
-                            </svg>
-                          </a>
                         </CardContent>
                       </Card>
                     </CarouselItem>
@@ -550,7 +537,18 @@ const ResourcesPage = () => {
                 <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2.5">
                   {selectedCategoryData.resources.map((resource, idx) => (
                     <AnimatedSection key={idx} animation="slide-up" delay={idx * 100}>
-                      <Card className="h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                      <Card 
+                        className="h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+                        onClick={(e) => {
+                          if (resource.isPaid) {
+                            e.preventDefault();
+                            setSelectedPaidResource({ title: resource.title, url: resource.url });
+                          } else {
+                            selectedCategoryData && trackResourceClick(resource, selectedCategoryData.id);
+                            window.open(resource.url, '_blank', 'noopener,noreferrer');
+                          }
+                        }}
+                      >
                         <CardContent className="p-2">
                           <div className="mb-1.5">
                             <div className="w-full aspect-square rounded-md overflow-hidden bg-muted mb-1.5 relative">
@@ -583,32 +581,6 @@ const ResourcesPage = () => {
                               </ul>
                             </div>
                           )}
-
-                          <a
-                            href={resource.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={(e) =>
-                              selectedCategoryData && trackResourceClick(resource, selectedCategoryData.id, e)
-                            }
-                            className="inline-flex items-center gap-0.5 text-[9px] text-primary hover:text-primary/80 transition-colors font-medium"
-                          >
-                            View
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              strokeWidth={1.5}
-                              stroke="currentColor"
-                              className="w-2 h-2"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
-                              />
-                            </svg>
-                          </a>
                         </CardContent>
                       </Card>
                     </AnimatedSection>
@@ -626,7 +598,18 @@ const ResourcesPage = () => {
             <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2.5">
               {searchResults.map(({ resource, category }, idx) => (
                 <AnimatedSection key={idx} animation="slide-up" delay={idx * 50}>
-                  <Card className="h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                  <Card 
+                    className="h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+                    onClick={(e) => {
+                      if (resource.isPaid) {
+                        e.preventDefault();
+                        setSelectedPaidResource({ title: resource.title, url: resource.url });
+                      } else {
+                        trackResourceClick(resource, category.id);
+                        window.open(resource.url, '_blank', 'noopener,noreferrer');
+                      }
+                    }}
+                  >
                     <CardContent className="p-2">
                       <div className="flex items-center gap-1 mb-1.5">
                         <div
@@ -665,30 +648,6 @@ const ResourcesPage = () => {
                           </ul>
                         </div>
                       )}
-
-                      <a
-                        href={resource.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => trackResourceClick(resource, category.id, e)}
-                        className="inline-flex items-center gap-0.5 text-[9px] text-primary hover:text-primary/80 transition-colors font-medium"
-                      >
-                        View
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth={1.5}
-                          stroke="currentColor"
-                          className="w-2 h-2"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
-                          />
-                        </svg>
-                      </a>
                     </CardContent>
                   </Card>
                 </AnimatedSection>
