@@ -454,7 +454,7 @@ const ResourcesPage = () => {
               </div>
               <Carousel className="w-full">
                 <CarouselContent>
-                  {topResources.map(({ resource, category, clicks }, idx) => (
+                  {topResources.map(({ resource, category }, idx) => (
                     <CarouselItem key={idx} className="basis-1/3 md:basis-1/4 lg:basis-1/5 xl:basis-1/6">
                       <Card className="h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                         <CardContent className="p-2">
@@ -480,10 +480,9 @@ const ResourcesPage = () => {
                             <h3 className="text-[10px] font-semibold mb-0.5 text-card-foreground line-clamp-2">
                               {resource.title}
                             </h3>
-                            <p className="text-[9px] text-muted-foreground line-clamp-2 mb-0.5">
+                            <p className="text-[9px] text-muted-foreground line-clamp-2">
                               {resource.description}
                             </p>
-                            {clicks > 0 && <p className="text-[8px] text-primary font-medium">{clicks} clicks</p>}
                           </div>
 
                           <a
