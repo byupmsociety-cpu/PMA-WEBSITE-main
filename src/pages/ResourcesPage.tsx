@@ -484,7 +484,7 @@ const ResourcesPage = () => {
 
                           <div className="mb-1.5">
                             <div className="w-full aspect-square rounded-md overflow-hidden bg-muted mb-1.5 relative">
-                              <img src={resource.image} alt={resource.title} className={`w-full h-full ${resource.image === lovableImg ? 'object-contain p-2' : 'object-cover'}`} />
+                              <img src={resource.image} alt={resource.title} className={`w-full h-full ${resource.image === lovableImg ? 'object-contain scale-125' : 'object-cover'}`} />
                               {resource.isPaid && (
                                 <Badge className="absolute top-1 right-1 bg-gradient-to-r from-primary to-blue-500 text-white text-[7px] px-1 py-0">
                                   <Star className="w-2 h-2 mr-0.5 fill-current" />
@@ -552,7 +552,7 @@ const ResourcesPage = () => {
                         <CardContent className="p-2">
                           <div className="mb-1.5">
                             <div className="w-full aspect-square rounded-md overflow-hidden bg-muted mb-1.5 relative">
-                              <img src={resource.image} alt={resource.title} className={`w-full h-full ${resource.image === lovableImg ? 'object-contain p-2' : 'object-cover'}`} />
+                              <img src={resource.image} alt={resource.title} className={`w-full h-full ${resource.image === lovableImg ? 'object-contain scale-125' : 'object-cover'}`} />
                               {resource.isPaid && (
                                 <Badge className="absolute top-1 right-1 bg-gradient-to-r from-primary to-blue-500 text-white text-[7px] px-1 py-0">
                                   <Star className="w-2 h-2 mr-0.5 fill-current" />
@@ -622,7 +622,7 @@ const ResourcesPage = () => {
 
                       <div className="mb-1.5">
                         <div className="w-full aspect-square rounded-md overflow-hidden bg-muted mb-1.5 relative">
-                          <img src={resource.image} alt={resource.title} className={`w-full h-full ${resource.image === lovableImg ? 'object-contain p-2' : 'object-cover'}`} />
+                          <img src={resource.image} alt={resource.title} className={`w-full h-full ${resource.image === lovableImg ? 'object-contain scale-125' : 'object-cover'}`} />
                           {resource.isPaid && (
                             <Badge className="absolute top-1 right-1 bg-gradient-to-r from-primary to-blue-500 text-white text-[7px] px-1 py-0">
                               <Star className="w-2 h-2 mr-0.5 fill-current" />
