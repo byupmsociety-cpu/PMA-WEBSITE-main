@@ -21,10 +21,12 @@ import internListImg from "@/assets/intern-list.jpg";
 import linkedinJobsImg from "@/assets/linkedin-jobs.jpg";
 import apmSeasonImg from "@/assets/apm-season.jpg";
 import lovableImg from "@/assets/lovable.png";
+import replitImg from "@/assets/replit.jpg";
+import base44Img from "@/assets/base44.jpg";
+import claudeCodeImg from "@/assets/claude-code.jpg";
 import azureAiImg from "@/assets/azure-ai.jpg";
 import huggingfaceImg from "@/assets/huggingface.jpg";
 import vertexAiImg from "@/assets/vertex-ai.jpg";
-import aiStudioImg from "@/assets/ai-studio.jpg";
 import firebaseStudioImg from "@/assets/firebase-studio.jpg";
 import cursorImg from "@/assets/cursor.jpg";
 import relayImg from "@/assets/relay.jpg";
@@ -39,16 +41,116 @@ interface Resource {
   isPaid?: boolean;
 }
 
+interface Subcategory {
+  id: string;
+  title: string;
+  resources: Resource[];
+}
+
 interface Category {
   id: string;
   title: string;
   description: string;
   icon: React.ReactNode;
   color: string;
-  resources: Resource[];
+  resources?: Resource[];
+  subcategories?: Subcategory[];
 }
 
 const categories: Category[] = [
+  {
+    id: "ai-tools",
+    title: "AI Tools to Build",
+    description: "Build projects with cutting-edge AI tools",
+    icon: <Cpu className="w-6 h-6" />,
+    color: "from-violet-500 to-purple-500",
+    subcategories: [
+      {
+        id: "low-no-code",
+        title: "Low - No Code",
+        resources: [
+          {
+            title: "Lovable.dev",
+            description: "Create apps and websites by chatting with AI.",
+            url: "https://lovable.dev",
+            image: lovableImg,
+          },
+          {
+            title: "Replit",
+            description: "Collaborative coding platform with AI assistance.",
+            url: "https://replit.com",
+            image: replitImg,
+          },
+          {
+            title: "Base44",
+            description: "No-code platform for building modern applications.",
+            url: "https://base44.com",
+            image: base44Img,
+          },
+          {
+            title: "Firebase Studio",
+            description: "Accelerate development with AI agents.",
+            url: "https://firebase.studio",
+            image: firebaseStudioImg,
+          },
+        ],
+      },
+      {
+        id: "ai-llm",
+        title: "AI and LLM",
+        resources: [
+          {
+            title: "Azure AI",
+            description: "Explore AI solutions with Azure.",
+            url: "https://ai.azure.com",
+            image: azureAiImg,
+          },
+          {
+            title: "Hugging Face",
+            description: "Collaborate on models, datasets, and applications.",
+            url: "https://huggingface.co",
+            image: huggingfaceImg,
+          },
+          {
+            title: "Google Vertex AI",
+            description: "Build and deploy AI models on Google Cloud.",
+            url: "https://console.cloud.google.com/vertex-ai/studio",
+            image: vertexAiImg,
+          },
+        ],
+      },
+      {
+        id: "code-with-ai",
+        title: "Code With AI",
+        resources: [
+          {
+            title: "Cursor",
+            description: "AI code editor with a free year subscription for students.",
+            url: "https://cursor.com/students",
+            image: cursorImg,
+          },
+          {
+            title: "Claude Code",
+            description: "AI-powered coding assistant by Anthropic.",
+            url: "https://claude.ai",
+            image: claudeCodeImg,
+          },
+        ],
+      },
+      {
+        id: "automation",
+        title: "Automation",
+        resources: [
+          {
+            title: "Relay.app",
+            description: "Create AI agents that work for you with Relay.app.",
+            url: "https://www.relay.app",
+            image: relayImg,
+          },
+        ],
+      },
+    ],
+  },
   {
     id: "resume-interview",
     title: "Resume & Interview Guide",
@@ -203,63 +305,6 @@ const categories: Category[] = [
       },
     ],
   },
-  {
-    id: "ai-tools",
-    title: "AI Tools to Build",
-    description: "Build projects with cutting-edge AI tools",
-    icon: <Cpu className="w-6 h-6" />,
-    color: "from-violet-500 to-purple-500",
-    resources: [
-      {
-        title: "Lovable.dev",
-        description: "Create apps and websites by chatting with AI.",
-        url: "https://lovable.dev",
-        image: lovableImg,
-      },
-      {
-        title: "Azure AI",
-        description: "Explore AI solutions with Azure.",
-        url: "https://ai.azure.com",
-        image: azureAiImg,
-      },
-      {
-        title: "Hugging Face",
-        description: "Collaborate on models, datasets, and applications.",
-        url: "https://huggingface.co",
-        image: huggingfaceImg,
-      },
-      {
-        title: "Google Vertex AI",
-        description: "Build and deploy AI models on Google Cloud.",
-        url: "https://console.cloud.google.com/vertex-ai/studio",
-        image: vertexAiImg,
-      },
-      {
-        title: "AI Studio",
-        description: "Create AI-driven applications with Google.",
-        url: "https://aistudio.google.com/prompts/new_chat",
-        image: aiStudioImg,
-      },
-      {
-        title: "Firebase Studio",
-        description: "Accelerate development with AI agents.",
-        url: "https://firebase.studio",
-        image: firebaseStudioImg,
-      },
-      {
-        title: "Cursor",
-        description: "AI code editor with a free year subscription for students.",
-        url: "https://cursor.com/students",
-        image: cursorImg,
-      },
-      {
-        title: "Relay.app",
-        description: "Create AI agents that work for you with Relay.app.",
-        url: "https://www.relay.app",
-        image: relayImg,
-      },
-    ],
-  },
 ];
 
 const ResourcesPage = () => {
@@ -288,8 +333,24 @@ const ResourcesPage = () => {
     // Check if we need to open a modal for a paid resource after auth
     const resourceParam = searchParams.get("resource");
     if (resourceParam) {
-      const allResources = categories.flatMap(cat => cat.resources);
-      const matchedResource = allResources.find(r => r.title === resourceParam);
+      let matchedResource: Resource | undefined;
+      
+      // Search through all categories
+      for (const cat of categories) {
+        // Check direct resources
+        matchedResource = cat.resources?.find(r => r.title === resourceParam);
+        if (matchedResource) break;
+        
+        // Check subcategory resources
+        if (cat.subcategories) {
+          for (const sub of cat.subcategories) {
+            matchedResource = sub.resources.find(r => r.title === resourceParam);
+            if (matchedResource) break;
+          }
+        }
+        if (matchedResource) break;
+      }
+      
       if (matchedResource?.isPaid) {
         setSelectedPaidResource({ title: matchedResource.title, url: matchedResource.url });
       }
@@ -329,7 +390,8 @@ const ResourcesPage = () => {
 
     // Add default resources
     categories.forEach((category) => {
-      category.resources.forEach((resource) => {
+      // Check resources directly on category
+      category.resources?.forEach((resource) => {
         if (defaultResources.includes(resource.title)) {
           finalResources.push({
             resource,
@@ -338,12 +400,37 @@ const ResourcesPage = () => {
           });
         }
       });
+      
+      // Check resources in subcategories
+      category.subcategories?.forEach((subcategory) => {
+        subcategory.resources.forEach((resource) => {
+          if (defaultResources.includes(resource.title)) {
+            finalResources.push({
+              resource,
+              category,
+              clicks: clickCounts[resource.title]?.count || 0,
+            });
+          }
+        });
+      });
     });
 
     // Add top clicked resources
     topClicked.forEach(({ title, categoryId, count }) => {
       const category = categories.find((c) => c.id === categoryId);
-      const resource = category?.resources.find((r) => r.title === title);
+      let resource: Resource | undefined;
+      
+      // Check resources directly on category
+      resource = category?.resources?.find((r) => r.title === title);
+      
+      // If not found, check subcategories
+      if (!resource && category?.subcategories) {
+        for (const subcategory of category.subcategories) {
+          resource = subcategory.resources.find((r) => r.title === title);
+          if (resource) break;
+        }
+      }
+      
       if (resource && category) {
         finalResources.push({ resource, category, clicks: count });
       }
@@ -370,28 +457,55 @@ const ResourcesPage = () => {
   };
 
   const searchResults = searchQuery
-    ? categories.flatMap((category) =>
-        category.resources
-          .filter(
-            (resource) =>
+    ? categories.flatMap((category) => {
+        const results: Array<{ resource: Resource; category: Category }> = [];
+        
+        // Search in direct resources
+        category.resources?.forEach((resource) => {
+          if (
+            resource.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            resource.description.toLowerCase().includes(searchQuery.toLowerCase())
+          ) {
+            results.push({ resource, category });
+          }
+        });
+        
+        // Search in subcategory resources
+        category.subcategories?.forEach((subcategory) => {
+          subcategory.resources.forEach((resource) => {
+            if (
               resource.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-              resource.description.toLowerCase().includes(searchQuery.toLowerCase()),
-          )
-          .map((resource) => ({ resource, category })),
-      )
+              resource.description.toLowerCase().includes(searchQuery.toLowerCase())
+            ) {
+              results.push({ resource, category });
+            }
+          });
+        });
+        
+        return results;
+      })
     : [];
 
   const filteredCategories = categories.filter((category) => {
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
-    return (
-      category.title.toLowerCase().includes(query) ||
-      category.description.toLowerCase().includes(query) ||
-      category.resources.some(
+    
+    const titleMatch = category.title.toLowerCase().includes(query);
+    const descMatch = category.description.toLowerCase().includes(query);
+    
+    const resourceMatch = category.resources?.some(
+      (resource) =>
+        resource.title.toLowerCase().includes(query) || resource.description.toLowerCase().includes(query),
+    ) || false;
+    
+    const subcategoryMatch = category.subcategories?.some((subcategory) =>
+      subcategory.resources.some(
         (resource) =>
           resource.title.toLowerCase().includes(query) || resource.description.toLowerCase().includes(query),
-      )
-    );
+      ),
+    ) || false;
+    
+    return titleMatch || descMatch || resourceMatch || subcategoryMatch;
   });
 
   const selectedCategoryData = selectedCategory ? categories.find((c) => c.id === selectedCategory) : null;
@@ -512,58 +626,110 @@ const ResourcesPage = () => {
                   <p className="text-lg text-muted-foreground">{selectedCategoryData.description}</p>
                 </div>
 
-                <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2.5">
-                  {selectedCategoryData.resources.map((resource, idx) => (
-                    <AnimatedSection key={idx} animation="slide-up" delay={idx * 100}>
-                      <Card 
-                        className="h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer"
-                        onClick={(e) => {
-                          if (resource.isPaid) {
-                            e.preventDefault();
-                            setSelectedPaidResource({ title: resource.title, url: resource.url });
-                          } else {
-                            selectedCategoryData && trackResourceClick(resource, selectedCategoryData.id);
-                            window.open(resource.url, '_blank', 'noopener,noreferrer');
-                          }
-                        }}
-                      >
-                        <CardContent className="p-2">
-                          <div className="mb-1.5">
-                            <div className="w-full aspect-square rounded-md overflow-hidden bg-muted mb-1.5 relative">
-                              <img src={resource.image} alt={resource.title} className={`w-full h-full ${resource.image === lovableImg ? 'object-contain scale-150' : 'object-cover'}`} />
-                              {resource.isPaid && (
-                                <Badge className="absolute top-1 right-1 bg-gradient-to-r from-primary to-blue-500 text-white text-[7px] px-1 py-0">
-                                  <Star className="w-2 h-2 mr-0.5 fill-current" />
-                                  Partner
-                                </Badge>
-                              )}
+                {selectedCategoryData.subcategories ? (
+                  // Show subcategories in horizontal carousel for AI Tools
+                  <div className="space-y-8">
+                    {selectedCategoryData.subcategories.map((subcategory, subIdx) => (
+                      <div key={subIdx}>
+                        <h3 className="text-xl font-bold mb-4">{subcategory.title}</h3>
+                        <Carousel className="w-full">
+                          <CarouselContent>
+                            {subcategory.resources.map((resource, idx) => (
+                              <CarouselItem key={idx} className="basis-1/3 md:basis-1/4 lg:basis-1/5 xl:basis-1/6">
+                                <Card 
+                                  className="h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+                                  onClick={(e) => {
+                                    if (resource.isPaid) {
+                                      e.preventDefault();
+                                      setSelectedPaidResource({ title: resource.title, url: resource.url });
+                                    } else {
+                                      trackResourceClick(resource, selectedCategoryData.id);
+                                      window.open(resource.url, '_blank', 'noopener,noreferrer');
+                                    }
+                                  }}
+                                >
+                                  <CardContent className="p-2">
+                                    <div className="mb-1.5">
+                                      <div className="w-full aspect-square rounded-md overflow-hidden bg-muted mb-1.5 relative">
+                                        <img src={resource.image} alt={resource.title} className={`w-full h-full ${resource.image === lovableImg ? 'object-contain scale-150' : 'object-cover'}`} />
+                                        {resource.isPaid && (
+                                          <Badge className="absolute top-1 right-1 bg-gradient-to-r from-primary to-blue-500 text-white text-[7px] px-1 py-0">
+                                            <Star className="w-2 h-2 mr-0.5 fill-current" />
+                                            Partner
+                                          </Badge>
+                                        )}
+                                      </div>
+                                      <h3 className="text-[10px] font-semibold mb-0.5 text-card-foreground line-clamp-2">
+                                        {resource.title}
+                                      </h3>
+                                      <p className="text-[9px] text-muted-foreground line-clamp-2">{resource.description}</p>
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              </CarouselItem>
+                            ))}
+                          </CarouselContent>
+                          <CarouselPrevious />
+                          <CarouselNext />
+                        </Carousel>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  // Regular grid view for other categories
+                  <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2.5">
+                    {selectedCategoryData.resources?.map((resource, idx) => (
+                      <AnimatedSection key={idx} animation="slide-up" delay={idx * 100}>
+                        <Card 
+                          className="h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+                          onClick={(e) => {
+                            if (resource.isPaid) {
+                              e.preventDefault();
+                              setSelectedPaidResource({ title: resource.title, url: resource.url });
+                            } else {
+                              selectedCategoryData && trackResourceClick(resource, selectedCategoryData.id);
+                              window.open(resource.url, '_blank', 'noopener,noreferrer');
+                            }
+                          }}
+                        >
+                          <CardContent className="p-2">
+                            <div className="mb-1.5">
+                              <div className="w-full aspect-square rounded-md overflow-hidden bg-muted mb-1.5 relative">
+                                <img src={resource.image} alt={resource.title} className={`w-full h-full ${resource.image === lovableImg ? 'object-contain scale-150' : 'object-cover'}`} />
+                                {resource.isPaid && (
+                                  <Badge className="absolute top-1 right-1 bg-gradient-to-r from-primary to-blue-500 text-white text-[7px] px-1 py-0">
+                                    <Star className="w-2 h-2 mr-0.5 fill-current" />
+                                    Partner
+                                  </Badge>
+                                )}
+                              </div>
+                              <h3 className="text-[10px] font-semibold mb-0.5 text-card-foreground line-clamp-2">
+                                {resource.title}
+                              </h3>
+                              <p className="text-[9px] text-muted-foreground line-clamp-2">{resource.description}</p>
                             </div>
-                            <h3 className="text-[10px] font-semibold mb-0.5 text-card-foreground line-clamp-2">
-                              {resource.title}
-                            </h3>
-                            <p className="text-[9px] text-muted-foreground line-clamp-2">{resource.description}</p>
-                          </div>
 
-                          {resource.tips && (
-                            <div className="mb-1.5 p-1.5 bg-muted/50 rounded-md">
-                              <h4 className="text-[9px] font-semibold mb-0.5 text-foreground">Tips:</h4>
-                              <ul className="list-disc list-inside space-y-0.5">
-                                {resource.tips.slice(0, 1).map((tip, tipIdx) => (
-                                  <li
-                                    key={tipIdx}
-                                    className="text-[8px] leading-tight text-muted-foreground line-clamp-1"
-                                  >
-                                    {tip}
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-                        </CardContent>
-                      </Card>
-                    </AnimatedSection>
-                  ))}
-                </div>
+                            {resource.tips && (
+                              <div className="mb-1.5 p-1.5 bg-muted/50 rounded-md">
+                                <h4 className="text-[9px] font-semibold mb-0.5 text-foreground">Tips:</h4>
+                                <ul className="list-disc list-inside space-y-0.5">
+                                  {resource.tips.slice(0, 1).map((tip, tipIdx) => (
+                                    <li
+                                      key={tipIdx}
+                                      className="text-[8px] leading-tight text-muted-foreground line-clamp-1"
+                                    >
+                                      {tip}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                          </CardContent>
+                        </Card>
+                      </AnimatedSection>
+                    ))}
+                  </div>
+                )}
               </AnimatedSection>
             )}
           </div>
@@ -657,7 +823,11 @@ const ResourcesPage = () => {
                     </h3>
                     <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{category.description}</p>
                     <div className="flex items-center justify-between">
-                      <span className="text-xs text-muted-foreground">{category.resources.length} resources</span>
+                      <span className="text-xs text-muted-foreground">
+                        {category.resources?.length || 
+                         category.subcategories?.reduce((acc, sub) => acc + sub.resources.length, 0) || 
+                         0} resources
+                      </span>
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
