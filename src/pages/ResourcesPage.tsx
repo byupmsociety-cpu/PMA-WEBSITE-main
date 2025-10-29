@@ -9,9 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { useSearchParams } from "react-router-dom";
 import { User } from "@supabase/supabase-js";
 import PaidResourceModal from "@/components/PaidResourceModal";
-import resumegeniusImg from "@/assets/resumegenius.jpg";
-import vmockImg from "@/assets/vmock.jpg";
-import igotanofferImg from "@/assets/igotanoffer.jpg";
+import jobrightImg from "@/assets/jobright.jpg";
 import pmflabsImg from "@/assets/pmflabs.jpg";
 import linkedinGuideImg from "@/assets/linkedin-guide.jpg";
 import hubspotLinkedinImg from "@/assets/hubspot-linkedin.jpg";
@@ -22,7 +20,6 @@ import newgradJobsImg from "@/assets/newgrad-jobs.jpg";
 import internListImg from "@/assets/intern-list.jpg";
 import linkedinJobsImg from "@/assets/linkedin-jobs.jpg";
 import apmSeasonImg from "@/assets/apm-season.jpg";
-import jobrightImg from "@/assets/jobright.jpg";
 import lovableImg from "@/assets/lovable.png";
 import azureAiImg from "@/assets/azure-ai.jpg";
 import huggingfaceImg from "@/assets/huggingface.jpg";
@@ -60,29 +57,10 @@ const categories: Category[] = [
     color: "from-blue-500 to-cyan-500",
     resources: [
       {
-        title: "ResumeGenius",
-        description: "Access professional resume templates and tips.",
-        url: "https://www.resumegenius.com",
-        image: resumegeniusImg,
-        tips: [
-          "Make sure each line in your resume goes all the way across the page",
-          "Each bullet point should be a powerful one liner showcasing PM skills",
-          "Tailor your resume to PM skills - showcase creative projects, leadership, passion for building",
-          "Focus on quantifiable achievements and business impact",
-          "Use action verbs",
-        ],
-      },
-      {
-        title: "Vmock",
-        description: "Get instant feedback on your resume with AI-powered analysis.",
-        url: "https://www.vmock.com",
-        image: vmockImg,
-      },
-      {
-        title: "IGotAnOffer",
-        description: "Learn how to craft a standout product manager resume.",
-        url: "https://igotanoffer.com/blogs/product-manager/product-manager-resume",
-        image: igotanofferImg,
+        title: "Jobright.ai",
+        description: "AI-powered job search copilot for more interviews with less effort.",
+        url: "https://jobright.ai/jobs/resume",
+        image: jobrightImg,
       },
       {
         title: "PMF Labs",
