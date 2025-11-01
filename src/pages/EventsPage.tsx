@@ -74,6 +74,26 @@ const EventsPage = () => {
   //   return new Date(dateString).toLocaleDateString('en-US', options);
   // };
 
+  // Generate Google Calendar URL
+  const generateCalendarUrl = (event: Event) => {
+    const startDate = new Date(event.date);
+    const endDate = new Date(startDate.getTime() + 60 * 60 * 1000); // 1 hour duration
+    
+    const formatDateForCalendar = (date: Date) => {
+      return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+    };
+    
+    const params = new URLSearchParams({
+      action: 'TEMPLATE',
+      text: event.title,
+      dates: `${formatDateForCalendar(startDate)}/${formatDateForCalendar(endDate)}`,
+      details: event.description,
+      location: event.location,
+    });
+    
+    return `https://calendar.google.com/calendar/render?${params.toString()}`;
+  };
+
   // Filter and sort events
   const getFilteredEvents = () => {
     const now = new Date();
@@ -210,13 +230,24 @@ const EventsPage = () => {
                         <div className="flex-1 p-6">
                           <h3 className="text-xl font-bold mb-2">{event.title}</h3>
                           <p className="text-muted-foreground mb-3">{event.description}</p>
-                          <div className="flex items-center text-sm text-muted-foreground">
+                          <div className="flex items-center text-sm text-muted-foreground mb-4">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 mr-1">
                               <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                               <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
                             </svg>
                             {event.location}
                           </div>
+                          <a
+                            href={generateCalendarUrl(event)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#215096] to-[#4299E1] text-white rounded-lg hover:opacity-90 transition-opacity text-sm font-medium"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+                            </svg>
+                            Add to Calendar
+                          </a>
                         </div>
                         
                         {/* Event Image/Attachment - Right Side */}
