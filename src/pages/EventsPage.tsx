@@ -94,13 +94,20 @@ const EventsPage = () => {
       return date.toISOString();
     };
     
+    // Extract Google Meet link from description if present
+    const meetLinkMatch = event.description.match(/(https:\/\/meet\.google\.com\/[a-z\-]+)/i);
+    const meetLink = meetLinkMatch ? meetLinkMatch[1] : '';
+    
+    // Combine physical location and online meeting link
+    const fullLocation = meetLink ? `${event.location} | Online: ${meetLink}` : event.location;
+    
     // Google Calendar
     const googleParams = new URLSearchParams({
       action: 'TEMPLATE',
       text: event.title,
       dates: `${formatDateForCalendar(startDate)}/${formatDateForCalendar(endDate)}`,
       details: event.description,
-      location: event.location,
+      location: fullLocation,
     });
     
     // Outlook Calendar
@@ -111,7 +118,7 @@ const EventsPage = () => {
       startdt: formatDateForOutlook(startDate),
       enddt: formatDateForOutlook(endDate),
       body: event.description,
-      location: event.location,
+      location: fullLocation,
     });
     
     // Yahoo Calendar
@@ -121,7 +128,7 @@ const EventsPage = () => {
       st: formatDateForCalendar(startDate),
       et: formatDateForCalendar(endDate),
       desc: event.description,
-      in_loc: event.location,
+      in_loc: fullLocation,
     });
     
     // ICS file for Apple Calendar and others
@@ -133,7 +140,7 @@ const EventsPage = () => {
       `DTEND:${formatDateForCalendar(endDate)}`,
       `SUMMARY:${event.title}`,
       `DESCRIPTION:${event.description}`,
-      `LOCATION:${event.location}`,
+      `LOCATION:${fullLocation}`,
       'END:VEVENT',
       'END:VCALENDAR',
     ].join('\n');
