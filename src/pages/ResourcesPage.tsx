@@ -93,6 +93,12 @@ const categories: Category[] = [
             url: "https://firebase.studio",
             image: firebaseStudioImg,
           },
+          {
+            title: "Kiro.dev",
+            description: "AI-powered no-code platform for building applications.",
+            url: "https://kiro.dev",
+            image: lovableImg,
+          },
         ],
       },
       {
