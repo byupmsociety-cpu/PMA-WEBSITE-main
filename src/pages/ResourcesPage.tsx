@@ -31,6 +31,7 @@ import firebaseStudioImg from "@/assets/firebase-studio.jpg";
 import cursorImg from "@/assets/cursor.jpg";
 import relayImg from "@/assets/relay.jpg";
 import lelandImg from "@/assets/leland.png";
+import kiroImg from "@/assets/kiro.jpg";
 
 interface Resource {
   title: string;
@@ -97,7 +98,7 @@ const categories: Category[] = [
             title: "Kiro.dev",
             description: "AI-powered no-code platform for building applications.",
             url: "https://kiro.dev",
-            image: lovableImg,
+            image: kiroImg,
           },
         ],
       },
