@@ -1,6 +1,13 @@
 import { useState, useEffect } from 'react';
 import AnimatedSection from '@/components/AnimatedSection';
 import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface Event {
   id: string;
@@ -74,8 +81,8 @@ const EventsPage = () => {
   //   return new Date(dateString).toLocaleDateString('en-US', options);
   // };
 
-  // Generate Google Calendar URL
-  const generateCalendarUrl = (event: Event) => {
+  // Generate calendar URLs for different platforms
+  const generateCalendarUrls = (event: Event) => {
     const startDate = new Date(event.date);
     const endDate = new Date(startDate.getTime() + 60 * 60 * 1000); // 1 hour duration
     
@@ -83,7 +90,12 @@ const EventsPage = () => {
       return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
     };
     
-    const params = new URLSearchParams({
+    const formatDateForOutlook = (date: Date) => {
+      return date.toISOString();
+    };
+    
+    // Google Calendar
+    const googleParams = new URLSearchParams({
       action: 'TEMPLATE',
       text: event.title,
       dates: `${formatDateForCalendar(startDate)}/${formatDateForCalendar(endDate)}`,
@@ -91,7 +103,47 @@ const EventsPage = () => {
       location: event.location,
     });
     
-    return `https://calendar.google.com/calendar/render?${params.toString()}`;
+    // Outlook Calendar
+    const outlookParams = new URLSearchParams({
+      path: '/calendar/action/compose',
+      rru: 'addevent',
+      subject: event.title,
+      startdt: formatDateForOutlook(startDate),
+      enddt: formatDateForOutlook(endDate),
+      body: event.description,
+      location: event.location,
+    });
+    
+    // Yahoo Calendar
+    const yahooParams = new URLSearchParams({
+      v: '60',
+      title: event.title,
+      st: formatDateForCalendar(startDate),
+      et: formatDateForCalendar(endDate),
+      desc: event.description,
+      in_loc: event.location,
+    });
+    
+    // ICS file for Apple Calendar and others
+    const icsContent = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'BEGIN:VEVENT',
+      `DTSTART:${formatDateForCalendar(startDate)}`,
+      `DTEND:${formatDateForCalendar(endDate)}`,
+      `SUMMARY:${event.title}`,
+      `DESCRIPTION:${event.description}`,
+      `LOCATION:${event.location}`,
+      'END:VEVENT',
+      'END:VCALENDAR',
+    ].join('\n');
+    
+    return {
+      google: `https://calendar.google.com/calendar/render?${googleParams.toString()}`,
+      outlook: `https://outlook.live.com/calendar/0/action/compose?${outlookParams.toString()}`,
+      yahoo: `https://calendar.yahoo.com/?${yahooParams.toString()}`,
+      ics: `data:text/calendar;charset=utf-8,${encodeURIComponent(icsContent)}`,
+    };
   };
 
   // Filter and sort events
@@ -237,17 +289,38 @@ const EventsPage = () => {
                             </svg>
                             {event.location}
                           </div>
-                          <a
-                            href={generateCalendarUrl(event)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#215096] to-[#4299E1] text-white rounded-lg hover:opacity-90 transition-opacity text-sm font-medium"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
-                            </svg>
-                            Add to Calendar
-                          </a>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button className="inline-flex items-center gap-2 bg-gradient-to-r from-[#215096] to-[#4299E1] text-white hover:opacity-90 text-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+                                </svg>
+                                Add to Calendar
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="start">
+                              <DropdownMenuItem asChild>
+                                <a href={generateCalendarUrls(event).google} target="_blank" rel="noopener noreferrer" className="cursor-pointer">
+                                  Google Calendar
+                                </a>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem asChild>
+                                <a href={generateCalendarUrls(event).outlook} target="_blank" rel="noopener noreferrer" className="cursor-pointer">
+                                  Outlook Calendar
+                                </a>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem asChild>
+                                <a href={generateCalendarUrls(event).yahoo} target="_blank" rel="noopener noreferrer" className="cursor-pointer">
+                                  Yahoo Calendar
+                                </a>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem asChild>
+                                <a href={generateCalendarUrls(event).ics} download={`${event.title}.ics`} className="cursor-pointer">
+                                  Apple Calendar (Download)
+                                </a>
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
                         
                         {/* Event Image/Attachment - Right Side */}
