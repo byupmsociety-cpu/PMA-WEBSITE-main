@@ -105,12 +105,34 @@ const DashboardPage = () => {
       return;
     }
 
-    if (!data.persona) {
-      navigate("/?selectPersona=true");
+    setProfile(data);
+  };
+
+  const updatePersona = async (persona: "curious" | "starting" | "recruiting") => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { error } = await supabase
+      .from("profiles")
+      .update({ persona, onboarding_completed: true })
+      .eq("user_id", user.id);
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update persona",
+        variant: "destructive"
+      });
       return;
     }
 
-    setProfile(data);
+    await loadProfile(user.id);
+    await loadJourneySteps(user.id);
+
+    toast({
+      title: "Welcome to your PM journey! 🚀",
+      description: "Your personalized dashboard is ready",
+    });
   };
 
   const loadJourneySteps = async (userId: string) => {
@@ -252,6 +274,77 @@ const DashboardPage = () => {
     starting: "Starting My PM Path",
     recruiting: "Actively Recruiting for PM"
   };
+
+  // Show persona selection if not set
+  if (!profile?.persona) {
+    return (
+      <div className="min-h-screen bg-background py-12 px-4">
+        <div className="container max-w-4xl mx-auto">
+          <Card className="border-2 border-primary/20">
+            <CardHeader className="text-center space-y-4">
+              <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                <Target className="h-8 w-8 text-primary" />
+              </div>
+              <div className="space-y-2">
+                <CardTitle className="text-3xl">Welcome to Your Dashboard, {profile?.full_name}! 🎉</CardTitle>
+                <CardDescription className="text-base">
+                  First, tell us where you are in your PM journey so we can personalize your experience
+                </CardDescription>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid gap-4">
+                <button
+                  onClick={() => updatePersona("curious")}
+                  className="p-6 rounded-lg border-2 border-border hover:border-primary hover:bg-primary/5 transition-all text-left space-y-2 group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <BookOpen className="h-6 w-6 text-blue-600 dark:text-blue-300" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-lg">Curious About PM</h3>
+                      <p className="text-sm text-muted-foreground">Just exploring what product management is all about</p>
+                    </div>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => updatePersona("starting")}
+                  className="p-6 rounded-lg border-2 border-border hover:border-primary hover:bg-primary/5 transition-all text-left space-y-2 group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <Target className="h-6 w-6 text-green-600 dark:text-green-300" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-lg">Starting My PM Path</h3>
+                      <p className="text-sm text-muted-foreground">Building skills and preparing for a PM career</p>
+                    </div>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => updatePersona("recruiting")}
+                  className="p-6 rounded-lg border-2 border-border hover:border-primary hover:bg-primary/5 transition-all text-left space-y-2 group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <Briefcase className="h-6 w-6 text-purple-600 dark:text-purple-300" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-lg">Actively Recruiting for PM</h3>
+                      <p className="text-sm text-muted-foreground">Ready to apply and land a PM role</p>
+                    </div>
+                  </div>
+                </button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background py-12 px-4">
