@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { 
   Trophy, 
   Target, 
@@ -20,7 +21,8 @@ import {
   Sparkles,
   Camera,
   Mail,
-  UserCircle
+  UserCircle,
+  ChevronDown
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -640,61 +642,70 @@ const DashboardPage = () => {
   const isStartingCompleted = userPersona === "recruiting";
 
   const renderStepSection = (title: string, steps: JourneyStep[], sectionCompleted: boolean, icon: React.ReactNode, colorClass: string) => (
-    <div className={`space-y-4 p-6 rounded-lg border-2 ${colorClass}`}>
-      <div className="flex items-center gap-3">
-        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-          sectionCompleted ? "bg-primary/20" : "bg-muted"
-        }`}>
-          {sectionCompleted ? <CheckCircle2 className="h-5 w-5 text-primary" /> : icon}
-        </div>
-        <div>
-          <h2 className="text-xl font-bold flex items-center gap-2">
-            {title}
-            {sectionCompleted && <Badge variant="secondary">Completed</Badge>}
-          </h2>
-        </div>
-      </div>
-      <div className="space-y-3">
-        {steps.map((step, index) => (
-          <div
-            key={step.id}
-            className={`p-4 rounded-lg border transition-all ${
-              step.completed || sectionCompleted
-                ? "bg-primary/5 border-primary/30" 
-                : "bg-card border-border hover:border-primary/50"
-            }`}
-          >
-            <div className="flex items-start gap-3">
-              <Checkbox
-                checked={step.completed || sectionCompleted}
-                onCheckedChange={() => toggleStepCompletion(step.id, step.completed || false)}
-                disabled={sectionCompleted}
-                className="mt-1"
-              />
-              <div className="flex-1 space-y-2">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className={`font-semibold ${(step.completed || sectionCompleted) ? "line-through text-muted-foreground" : ""}`}>
-                        {index + 1}. {step.title}
-                      </span>
-                      {(step.completed || sectionCompleted) && <CheckCircle2 className="h-4 w-4 text-primary" />}
-                    </div>
-                    <p className="text-sm text-muted-foreground">{step.description}</p>
-                  </div>
-                  <Badge className={categoryColors[step.category as keyof typeof categoryColors]}>
-                    <span className="flex items-center gap-1">
-                      {categoryIcons[step.category as keyof typeof categoryIcons]}
-                      {step.category}
-                    </span>
-                  </Badge>
-                </div>
+    <Collapsible defaultOpen={true}>
+      <div className={`space-y-4 p-6 rounded-lg border-2 ${colorClass}`}>
+        <CollapsibleTrigger className="w-full">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                sectionCompleted ? "bg-primary/20" : "bg-muted"
+              }`}>
+                {sectionCompleted ? <CheckCircle2 className="h-5 w-5 text-primary" /> : icon}
+              </div>
+              <div>
+                <h2 className="text-xl font-bold flex items-center gap-2">
+                  {title}
+                  {sectionCompleted && <Badge variant="secondary">Completed</Badge>}
+                </h2>
               </div>
             </div>
+            <ChevronDown className="h-5 w-5 text-muted-foreground transition-transform duration-200 data-[state=open]:rotate-180" />
           </div>
-        ))}
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <div className="space-y-3 pt-4">
+            {steps.map((step, index) => (
+              <div
+                key={step.id}
+                className={`p-4 rounded-lg border transition-all ${
+                  step.completed || sectionCompleted
+                    ? "bg-primary/5 border-primary/30" 
+                    : "bg-card border-border hover:border-primary/50"
+                }`}
+              >
+                <div className="flex items-start gap-3">
+                  <Checkbox
+                    checked={step.completed || sectionCompleted}
+                    onCheckedChange={() => toggleStepCompletion(step.id, step.completed || false)}
+                    disabled={sectionCompleted}
+                    className="mt-1"
+                  />
+                  <div className="flex-1 space-y-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className={`font-semibold ${(step.completed || sectionCompleted) ? "line-through text-muted-foreground" : ""}`}>
+                            {index + 1}. {step.title}
+                          </span>
+                          {(step.completed || sectionCompleted) && <CheckCircle2 className="h-4 w-4 text-primary" />}
+                        </div>
+                        <p className="text-sm text-muted-foreground">{step.description}</p>
+                      </div>
+                      <Badge className={categoryColors[step.category as keyof typeof categoryColors]}>
+                        <span className="flex items-center gap-1">
+                          {categoryIcons[step.category as keyof typeof categoryIcons]}
+                          {step.category}
+                        </span>
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CollapsibleContent>
       </div>
-    </div>
+    </Collapsible>
   );
 
   return (
@@ -704,11 +715,18 @@ const DashboardPage = () => {
           {/* Left Sidebar */}
           <div className="lg:col-span-1 space-y-6">
             {/* Profile Card */}
-            <Card className="border-2 border-primary/20">
-              <CardHeader>
-                <CardTitle className="text-lg">Profile</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
+            <Collapsible defaultOpen={true}>
+              <Card className="border-2 border-primary/20">
+                <CardHeader>
+                  <CollapsibleTrigger className="w-full">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-lg">Profile</CardTitle>
+                      <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform duration-200 data-[state=open]:rotate-180" />
+                    </div>
+                  </CollapsibleTrigger>
+                </CardHeader>
+                <CollapsibleContent>
+                  <CardContent className="space-y-4">
                 <div className="flex flex-col items-center space-y-3">
                   <div className="relative">
                     <Avatar className="h-24 w-24">
@@ -825,17 +843,27 @@ const DashboardPage = () => {
                     </div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+                  </CardContent>
+                </CollapsibleContent>
+              </Card>
+            </Collapsible>
 
             {/* Tabs for Badges, Connect, Share */}
-            <Card>
-              <Tabs defaultValue="badges" className="w-full">
-                <TabsList className="w-full grid grid-cols-3">
-                  <TabsTrigger value="badges" className="text-xs">Badges</TabsTrigger>
-                  <TabsTrigger value="connect" className="text-xs">Connect</TabsTrigger>
-                  <TabsTrigger value="share" className="text-xs">Share</TabsTrigger>
-                </TabsList>
+            <Collapsible defaultOpen={true}>
+              <Card>
+                <CollapsibleTrigger className="w-full px-6 pt-6">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold">Activity</h3>
+                    <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform duration-200 data-[state=open]:rotate-180" />
+                  </div>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <Tabs defaultValue="badges" className="w-full pt-4">
+                    <TabsList className="w-full grid grid-cols-3 mx-6" style={{ width: 'calc(100% - 3rem)' }}>
+                      <TabsTrigger value="badges" className="text-xs">Badges</TabsTrigger>
+                      <TabsTrigger value="connect" className="text-xs">Connect</TabsTrigger>
+                      <TabsTrigger value="share" className="text-xs">Share</TabsTrigger>
+                    </TabsList>
                 
                 <TabsContent value="badges" className="p-4 space-y-3">
                   {userBadges.length > 0 ? (
@@ -900,8 +928,10 @@ const DashboardPage = () => {
                     </Button>
                   </div>
                 </TabsContent>
-              </Tabs>
-            </Card>
+                  </Tabs>
+                </CollapsibleContent>
+              </Card>
+            </Collapsible>
           </div>
 
           {/* Main Content - Journey Checklist */}
