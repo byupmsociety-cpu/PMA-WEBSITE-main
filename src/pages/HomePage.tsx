@@ -325,7 +325,7 @@ const HomePage = () => {
           
           {/* Sign-in CTA Card - Only show when persona is selected */}
           {selectedPersona && (
-            <Card className="max-w-2xl mx-auto mt-8 bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20 animate-fade-in">
+            <Card className="max-w-2xl mx-auto mt-8 bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20 animate-in fade-in duration-500">
               <CardContent className="pt-6 space-y-4 text-center">
                 <h3 className="text-xl font-semibold">Ready to Start Your Journey?</h3>
                 <p className="text-muted-foreground">

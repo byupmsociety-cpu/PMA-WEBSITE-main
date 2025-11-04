@@ -123,7 +123,7 @@ const PersonaTailoredContent = ({ persona }: PersonaTailoredContentProps) => {
   const content = personaContent[persona as keyof typeof personaContent];
 
   return (
-    <div className="space-y-12 animate-fade-in">
+    <div className="space-y-12 animate-in fade-in duration-500">
       {/* Header */}
       <div className="text-center space-y-3">
         <h2 className="text-3xl md:text-4xl font-bold">{content.title}</h2>
