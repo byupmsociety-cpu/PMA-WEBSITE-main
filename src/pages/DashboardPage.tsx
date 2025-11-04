@@ -207,48 +207,64 @@ const DashboardPage = () => {
   };
 
   const loadPeerActivity = async () => {
+    // Get current user to filter them out
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
     const { data: progressData, error } = await supabase
       .from("user_progress")
       .select("user_id, step_id, completed_at")
       .eq("completed", true)
       .not("completed_at", "is", null)
+      .neq("user_id", user.id) // Exclude current user
       .order("completed_at", { ascending: false })
-      .limit(10);
+      .limit(15);
 
     if (error) {
       console.error("Error loading peer activity:", error);
       return;
     }
 
-    if (!progressData) return;
+    if (!progressData || progressData.length === 0) {
+      console.log("No peer activity found");
+      return;
+    }
 
     // Get user profiles and steps separately
     const userIds = [...new Set(progressData.map(p => p.user_id))];
     const stepIds = [...new Set(progressData.map(p => p.step_id))];
 
-    const { data: profiles } = await supabase
+    const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
-      .select("user_id, full_name")
+      .select("user_id, full_name, persona, school_year")
       .in("user_id", userIds);
+
+    if (profilesError) {
+      console.error("Error loading profiles:", profilesError);
+    }
 
     const { data: steps } = await supabase
       .from("pm_journey_steps")
       .select("id, title, persona")
       .in("id", stepIds);
 
-    const profileMap = new Map(profiles?.map(p => [p.user_id, p.full_name]) || []);
+    const profileMap = new Map(profiles?.map(p => [p.user_id, { name: p.full_name, persona: p.persona, school_year: p.school_year }]) || []);
     const stepMap = new Map(steps?.map(s => [s.id, { title: s.title, persona: s.persona }]) || []);
 
-    const activities = progressData.map(activity => {
-      const stepInfo = stepMap.get(activity.step_id);
-      return {
-        user_name: profileMap.get(activity.user_id) || "Anonymous",
-        step_title: stepInfo?.title || "Unknown",
-        persona: stepInfo?.persona || "curious",
-        completed_at: activity.completed_at || ""
-      };
-    });
+    const activities = progressData
+      .map(activity => {
+        const stepInfo = stepMap.get(activity.step_id);
+        const userInfo = profileMap.get(activity.user_id);
+        return {
+          user_name: userInfo?.name || "Anonymous",
+          step_title: stepInfo?.title || "Unknown",
+          persona: stepInfo?.persona || "curious",
+          completed_at: activity.completed_at || ""
+        };
+      })
+      .filter(activity => activity.user_name !== "Anonymous"); // Filter out users with no profile
 
+    console.log("Loaded peer activity:", activities.length, "activities");
     setPeerActivity(activities);
   };
 
@@ -852,22 +868,22 @@ const DashboardPage = () => {
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1 min-w-0">
-                          <p className="text-xs">
-                            <span className="font-semibold">{activity.user_name}</span>
-                          </p>
-                          <p className="text-xs text-muted-foreground truncate">{activity.step_title}</p>
+                          <div className="flex items-center gap-1">
+                            <span className="text-xs font-semibold">{activity.user_name}</span>
+                          </div>
                           <p className="text-xs text-muted-foreground">
-                            <Badge variant="outline" className="text-xs px-1 py-0">
-                              {personaLabels[activity.persona as keyof typeof personaLabels]}
-                            </Badge>
+                            completed <span className="font-medium text-foreground">{activity.step_title}</span>
                           </p>
+                          <Badge variant="outline" className="text-[10px] px-1.5 py-0 mt-1">
+                            {personaLabels[activity.persona as keyof typeof personaLabels]}
+                          </Badge>
                         </div>
                       </div>
                     ))
                   ) : (
                     <div className="text-center py-6 text-muted-foreground">
                       <Users className="h-10 w-10 mx-auto mb-2 opacity-20" />
-                      <p className="text-xs">No activity yet</p>
+                      <p className="text-xs">Be the first to complete a step!</p>
                     </div>
                   )}
                 </TabsContent>
