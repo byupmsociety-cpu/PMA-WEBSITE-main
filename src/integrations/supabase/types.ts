@@ -32,6 +32,69 @@ export type Database = {
         }
         Relationships: []
       }
+      badges: {
+        Row: {
+          badge_type: Database["public"]["Enums"]["badge_type"]
+          created_at: string | null
+          description: string | null
+          icon: string | null
+          id: string
+          name: string
+          points_required: number | null
+        }
+        Insert: {
+          badge_type: Database["public"]["Enums"]["badge_type"]
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+          points_required?: number | null
+        }
+        Update: {
+          badge_type?: Database["public"]["Enums"]["badge_type"]
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+          points_required?: number | null
+        }
+        Relationships: []
+      }
+      pm_journey_steps: {
+        Row: {
+          category: string
+          created_at: string | null
+          description: string | null
+          id: string
+          persona: Database["public"]["Enums"]["user_persona"]
+          points: number | null
+          step_order: number
+          title: string
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          persona: Database["public"]["Enums"]["user_persona"]
+          points?: number | null
+          step_order: number
+          title: string
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          persona?: Database["public"]["Enums"]["user_persona"]
+          points?: number | null
+          step_order?: number
+          title?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -40,6 +103,9 @@ export type Database = {
           id: string
           is_pma_member: boolean | null
           membership_verified_at: string | null
+          onboarding_completed: boolean | null
+          persona: Database["public"]["Enums"]["user_persona"] | null
+          progress_percentage: number | null
           updated_at: string
           user_id: string
         }
@@ -50,6 +116,9 @@ export type Database = {
           id?: string
           is_pma_member?: boolean | null
           membership_verified_at?: string | null
+          onboarding_completed?: boolean | null
+          persona?: Database["public"]["Enums"]["user_persona"] | null
+          progress_percentage?: number | null
           updated_at?: string
           user_id: string
         }
@@ -60,6 +129,9 @@ export type Database = {
           id?: string
           is_pma_member?: boolean | null
           membership_verified_at?: string | null
+          onboarding_completed?: boolean | null
+          persona?: Database["public"]["Enums"]["user_persona"] | null
+          progress_percentage?: number | null
           updated_at?: string
           user_id?: string
         }
@@ -86,18 +158,150 @@ export type Database = {
         }
         Relationships: []
       }
+      success_stories: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_featured: boolean | null
+          outcome: string | null
+          persona: Database["public"]["Enums"]["user_persona"] | null
+          school_year: string | null
+          story_text: string
+          student_name: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_featured?: boolean | null
+          outcome?: string | null
+          persona?: Database["public"]["Enums"]["user_persona"] | null
+          school_year?: string | null
+          story_text: string
+          student_name: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_featured?: boolean | null
+          outcome?: string | null
+          persona?: Database["public"]["Enums"]["user_persona"] | null
+          school_year?: string | null
+          story_text?: string
+          student_name?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      user_badges: {
+        Row: {
+          badge_id: string
+          earned_at: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          badge_id: string
+          earned_at?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          badge_id?: string
+          earned_at?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_badges_badge_id_fkey"
+            columns: ["badge_id"]
+            isOneToOne: false
+            referencedRelation: "badges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_connections: {
+        Row: {
+          connected_user_id: string
+          created_at: string | null
+          id: string
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          connected_user_id: string
+          created_at?: string | null
+          id?: string
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          connected_user_id?: string
+          created_at?: string | null
+          id?: string
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_progress: {
+        Row: {
+          completed: boolean | null
+          completed_at: string | null
+          created_at: string | null
+          id: string
+          notes: string | null
+          step_id: string
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          step_id: string
+          user_id: string
+        }
+        Update: {
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          step_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_progress_step_id_fkey"
+            columns: ["step_id"]
+            isOneToOne: false
+            referencedRelation: "pm_journey_steps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      calculate_user_progress: { Args: { user_uuid: string }; Returns: number }
       is_approved_pma_member: {
         Args: { email_address: string }
         Returns: boolean
       }
     }
     Enums: {
-      [_ in never]: never
+      badge_type: "milestone" | "social" | "achievement" | "special"
+      user_persona: "curious" | "starting" | "recruiting"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -224,6 +428,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      badge_type: ["milestone", "social", "achievement", "special"],
+      user_persona: ["curious", "starting", "recruiting"],
+    },
   },
 } as const

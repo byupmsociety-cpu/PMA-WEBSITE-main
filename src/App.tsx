@@ -16,6 +16,7 @@ import Navigation from "./components/Navigation";
 import Footer from "./components/Footer";
 import GamePage from './pages/GamePage';
 import AuthPage from "./pages/AuthPage";
+import DashboardPage from "./pages/DashboardPage";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ const App = () => (
             <Route path="/discover" element={<DiscoverPage />} />
             <Route path="/game" element={<GamePage />} />
             <Route path="/auth" element={<AuthPage />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <Footer />

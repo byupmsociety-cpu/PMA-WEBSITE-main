@@ -5,6 +5,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useInView } from 'react-intersection-observer';
 import { motion, AnimatePresence } from 'framer-motion';
+import PersonaWizard from '@/components/PersonaWizard';
+import SuccessStoriesCarousel from '@/components/SuccessStoriesCarousel';
+import ScrollTriggeredModals from '@/components/ScrollTriggeredModals';
 
 
 // Recruiting Timeline data
@@ -312,6 +315,13 @@ const HomePage = () => {
         </div>
       </section>
 
+      {/* Persona Wizard Section */}
+      <section className="py-20 bg-gradient-to-b from-background to-primary/5">
+        <div className="container mx-auto px-4 md:px-6">
+          <PersonaWizard />
+        </div>
+      </section>
+
       <style>{`
         @keyframes scroll {
           0% { transform: translateX(0); }
@@ -381,6 +391,13 @@ const HomePage = () => {
               </div>
             </div>
           </AnimatedSection>
+        </div>
+      </section>
+
+      {/* Success Stories Carousel */}
+      <section className="py-20">
+        <div className="container mx-auto px-4 md:px-6">
+          <SuccessStoriesCarousel />
         </div>
       </section>
 
@@ -665,6 +682,9 @@ const HomePage = () => {
           </motion.div>
         )}
       </AnimatePresence>
+      
+      {/* Scroll-Triggered Modals */}
+      <ScrollTriggeredModals />
     </div>
   );
 };
