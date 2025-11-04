@@ -52,6 +52,7 @@ interface UserBadge {
 interface PeerActivity {
   user_name: string;
   step_title: string;
+  persona: string;
   completed_at: string;
 }
 
@@ -67,6 +68,18 @@ const categoryColors = {
   networking: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
   practice: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
   applying: "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200",
+};
+
+const sectionColors = {
+  curious: "bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800",
+  starting: "bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-800",
+  recruiting: "bg-purple-50 dark:bg-purple-950 border-purple-200 dark:border-purple-800",
+};
+
+const personaLabels = {
+  curious: "Exploring PM",
+  starting: "Starting PM Path",
+  recruiting: "Recruiting for PM",
 };
 
 const DashboardPage = () => {
@@ -178,13 +191,9 @@ const DashboardPage = () => {
   };
 
   const loadPeerActivity = async () => {
-    const { data, error } = await supabase
+    const { data: progressData, error } = await supabase
       .from("user_progress")
-      .select(`
-        completed_at,
-        pm_journey_steps (title),
-        profiles (full_name)
-      `)
+      .select("user_id, step_id, completed_at")
       .eq("completed", true)
       .not("completed_at", "is", null)
       .order("completed_at", { ascending: false })
@@ -195,11 +204,34 @@ const DashboardPage = () => {
       return;
     }
 
-    const activities = data?.map(activity => ({
-      user_name: (activity.profiles as any)?.full_name || "Anonymous",
-      step_title: (activity.pm_journey_steps as any)?.title || "Unknown",
-      completed_at: activity.completed_at || ""
-    })) || [];
+    if (!progressData) return;
+
+    // Get user profiles and steps separately
+    const userIds = [...new Set(progressData.map(p => p.user_id))];
+    const stepIds = [...new Set(progressData.map(p => p.step_id))];
+
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("user_id, full_name")
+      .in("user_id", userIds);
+
+    const { data: steps } = await supabase
+      .from("pm_journey_steps")
+      .select("id, title, persona")
+      .in("id", stepIds);
+
+    const profileMap = new Map(profiles?.map(p => [p.user_id, p.full_name]) || []);
+    const stepMap = new Map(steps?.map(s => [s.id, { title: s.title, persona: s.persona }]) || []);
+
+    const activities = progressData.map(activity => {
+      const stepInfo = stepMap.get(activity.step_id);
+      return {
+        user_name: profileMap.get(activity.user_id) || "Anonymous",
+        step_title: stepInfo?.title || "Unknown",
+        persona: stepInfo?.persona || "curious",
+        completed_at: activity.completed_at || ""
+      };
+    });
 
     setPeerActivity(activities);
   };
@@ -231,6 +263,83 @@ const DashboardPage = () => {
     });
   };
 
+  const checkAndAwardBadges = async (userId: string) => {
+    // Check section completion
+    const curiousComplete = curiousSteps.every(s => s.completed);
+    const startingComplete = startingSteps.every(s => s.completed);
+    const recruitingComplete = recruitingSteps.every(s => s.completed);
+
+    const badgesToAward: string[] = [];
+
+    // Get badge IDs
+    const { data: badges } = await supabase
+      .from("badges")
+      .select("id, name")
+      .in("name", ["Exploring PM Complete", "Starting PM Complete", "Recruiting PM Complete"]);
+
+    const badgeMap = new Map(badges?.map(b => [b.name, b.id]) || []);
+
+    // Check which badges to award
+    if (curiousComplete) badgesToAward.push(badgeMap.get("Exploring PM Complete")!);
+    if (startingComplete) badgesToAward.push(badgeMap.get("Starting PM Complete")!);
+    if (recruitingComplete) badgesToAward.push(badgeMap.get("Recruiting PM Complete")!);
+
+    // Award badges that aren't already earned
+    for (const badgeId of badgesToAward) {
+      if (!badgeId) continue;
+      
+      const { error } = await supabase
+        .from("user_badges")
+        .upsert({
+          user_id: userId,
+          badge_id: badgeId
+        }, {
+          onConflict: "user_id,badge_id",
+          ignoreDuplicates: true
+        });
+
+      if (!error) {
+        await loadUserBadges(userId);
+      }
+    }
+
+    // Check for PMA Champion badge
+    const { data: allUserBadges } = await supabase
+      .from("user_badges")
+      .select("badge_id")
+      .eq("user_id", userId);
+
+    const { data: allBadges } = await supabase
+      .from("badges")
+      .select("id, name")
+      .not("name", "eq", "PMA Champion");
+
+    if (allUserBadges && allBadges && allUserBadges.length >= allBadges.length - 1) {
+      const { data: championBadge } = await supabase
+        .from("badges")
+        .select("id")
+        .eq("name", "PMA Champion")
+        .single();
+
+      if (championBadge) {
+        await supabase
+          .from("user_badges")
+          .upsert({
+            user_id: userId,
+            badge_id: championBadge.id
+          }, {
+            onConflict: "user_id,badge_id",
+            ignoreDuplicates: true
+          });
+
+        toast({
+          title: "🏆 PMA Champion! 🏆",
+          description: "You've earned all badges! Contact PMA leadership for your merch!",
+        });
+      }
+    }
+  };
+
   const toggleStepCompletion = async (stepId: string, currentStatus: boolean) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
@@ -242,6 +351,8 @@ const DashboardPage = () => {
         step_id: stepId,
         completed: !currentStatus,
         completed_at: !currentStatus ? new Date().toISOString() : null
+      }, {
+        onConflict: "user_id,step_id"
       });
 
     if (error) {
@@ -255,6 +366,7 @@ const DashboardPage = () => {
 
     await loadAllJourneySteps(user.id);
     await loadProfile(user.id);
+    await checkAndAwardBadges(user.id);
 
     if (!currentStatus) {
       toast({
@@ -298,7 +410,7 @@ const DashboardPage = () => {
     );
   }
 
-  const personaLabels = {
+  const profileLabels = {
     curious: "Curious About PM",
     starting: "Starting My PM Path",
     recruiting: "Actively Recruiting for PM"
@@ -385,8 +497,8 @@ const DashboardPage = () => {
   const isCuriousCompleted = userPersona === "starting" || userPersona === "recruiting";
   const isStartingCompleted = userPersona === "recruiting";
 
-  const renderStepSection = (title: string, steps: JourneyStep[], sectionCompleted: boolean, icon: React.ReactNode) => (
-    <div className="space-y-4">
+  const renderStepSection = (title: string, steps: JourneyStep[], sectionCompleted: boolean, icon: React.ReactNode, colorClass: string) => (
+    <div className={`space-y-4 p-6 rounded-lg border-2 ${colorClass}`}>
       <div className="flex items-center gap-3">
         <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
           sectionCompleted ? "bg-primary/20" : "bg-muted"
@@ -444,7 +556,7 @@ const DashboardPage = () => {
   );
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pt-20">
       <div className="container max-w-7xl mx-auto py-8 px-4">
         <div className="grid lg:grid-cols-4 gap-8">
           {/* Left Sidebar */}
@@ -502,7 +614,7 @@ const DashboardPage = () => {
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Journey Stage</span>
-                      <Badge variant="secondary">{personaLabels[userPersona as keyof typeof personaLabels]}</Badge>
+                      <Badge variant="secondary">{profileLabels[userPersona as keyof typeof profileLabels]}</Badge>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Progress</span>
@@ -557,6 +669,11 @@ const DashboardPage = () => {
                             <span className="font-semibold">{activity.user_name}</span>
                           </p>
                           <p className="text-xs text-muted-foreground truncate">{activity.step_title}</p>
+                          <p className="text-xs text-muted-foreground">
+                            <Badge variant="outline" className="text-xs px-1 py-0">
+                              {personaLabels[activity.persona as keyof typeof personaLabels]}
+                            </Badge>
+                          </p>
                         </div>
                       </div>
                     ))
@@ -593,9 +710,9 @@ const DashboardPage = () => {
               </p>
             </div>
 
-            {renderStepSection("Exploring PM", curiousSteps, isCuriousCompleted, <BookOpen className="h-5 w-5 text-primary" />)}
-            {renderStepSection("Starting PM Path", startingSteps, isStartingCompleted, <Target className="h-5 w-5 text-primary" />)}
-            {renderStepSection("Recruiting for PM", recruitingSteps, false, <Briefcase className="h-5 w-5 text-primary" />)}
+            {renderStepSection("Exploring PM", curiousSteps, isCuriousCompleted, <BookOpen className="h-5 w-5 text-primary" />, sectionColors.curious)}
+            {renderStepSection("Starting PM Path", startingSteps, isStartingCompleted, <Target className="h-5 w-5 text-primary" />, sectionColors.starting)}
+            {renderStepSection("Recruiting for PM", recruitingSteps, false, <Briefcase className="h-5 w-5 text-primary" />, sectionColors.recruiting)}
           </div>
         </div>
       </div>
