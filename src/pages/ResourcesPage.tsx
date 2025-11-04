@@ -321,6 +321,7 @@ const ResourcesPage = () => {
     [],
   );
   const [user, setUser] = useState<User | null>(null);
+  const [isPmaMember, setIsPmaMember] = useState(false);
   const [selectedPaidResource, setSelectedPaidResource] = useState<{ title: string; url: string } | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -331,10 +332,18 @@ const ResourcesPage = () => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchMembershipStatus(session.user.id);
+      } else {
+        setIsPmaMember(false);
+      }
     });
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchMembershipStatus(session.user.id);
+      }
     });
 
     // Check if we need to open a modal for a paid resource after auth
@@ -367,6 +376,16 @@ const ResourcesPage = () => {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  const fetchMembershipStatus = async (userId: string) => {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("is_pma_member")
+      .eq("user_id", userId)
+      .single();
+    
+    setIsPmaMember(profile?.is_pma_member ?? false);
+  };
 
   const fetchTopResources = async () => {
     // Get click counts from the database
@@ -861,6 +880,7 @@ const ResourcesPage = () => {
         resourceTitle={selectedPaidResource?.title || ""}
         resourceUrl={selectedPaidResource?.url || ""}
         isAuthenticated={!!user}
+        isPmaMember={isPmaMember}
       />
     </div>
   );

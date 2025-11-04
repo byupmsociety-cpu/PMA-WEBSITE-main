@@ -11,16 +11,17 @@ interface PaidResourceModalProps {
   resourceTitle: string;
   resourceUrl: string;
   isAuthenticated: boolean;
+  isPmaMember: boolean;
 }
 
-const PaidResourceModal = ({ isOpen, onClose, resourceTitle, resourceUrl, isAuthenticated }: PaidResourceModalProps) => {
+const PaidResourceModal = ({ isOpen, onClose, resourceTitle, resourceUrl, isAuthenticated, isPmaMember }: PaidResourceModalProps) => {
   const [authModalOpen, setAuthModalOpen] = useState(false);
 
   const getResourceContent = () => {
     if (resourceTitle === "PMF Labs") {
       return {
         description: "We are partnered with PMF Labs! It's an AI-powered mock interviewer for PM interviews. Practice real company interview questions from the comfort of your home and receive real assessments and feedback.",
-        benefit: isAuthenticated 
+        benefit: isPmaMember 
           ? "As a PMA member you get 90 minutes of free credits and 75% off purchase with code" 
           : "As a PMA member you get 90 minutes of free credits and 75% off purchase",
         code: "BYU2025",
@@ -29,7 +30,7 @@ const PaidResourceModal = ({ isOpen, onClose, resourceTitle, resourceUrl, isAuth
     } else if (resourceTitle === "Leland+") {
       return {
         description: "Leland offers PMA students access to premium recruiting resources created by industry professionals.",
-        benefit: isAuthenticated
+        benefit: isPmaMember
           ? "Leland offers PMA students $50 Coaching Credit with code"
           : "Leland offers PMA students $50 Coaching Credit",
         code: "BYU-PMA-50",
@@ -78,7 +79,7 @@ const PaidResourceModal = ({ isOpen, onClose, resourceTitle, resourceUrl, isAuth
                 
                 <div className="bg-gradient-to-br from-primary/5 to-primary/10 p-4 rounded-lg border border-primary/20 space-y-2">
                   <p className="font-semibold text-sm text-foreground">{content.benefit}</p>
-                  {isAuthenticated && (
+                  {isPmaMember && (
                     <>
                       <p className="text-xs text-muted-foreground">Just make sure you create your account with your BYU email!</p>
                       <div className="flex items-center gap-3 pt-2">
@@ -89,15 +90,42 @@ const PaidResourceModal = ({ isOpen, onClose, resourceTitle, resourceUrl, isAuth
                       </div>
                     </>
                   )}
+                  {!isPmaMember && isAuthenticated && (
+                    <p className="text-xs text-muted-foreground">
+                      Join PMA at{" "}
+                      <a 
+                        href="https://clubs.byu.edu/p/clubview/18295873486206095" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-primary underline hover:no-underline"
+                      >
+                        clubs.byu.edu
+                      </a>
+                      {" "}to unlock your discount code!
+                    </p>
+                  )}
                 </div>
 
                 {!isAuthenticated ? (
                   <div className="space-y-3 pt-2">
                     <p className="text-xs text-muted-foreground text-center">
-                      Sign in to access your exclusive discount code
+                      Sign in to view premium partner benefits
                     </p>
                     <Button onClick={() => setAuthModalOpen(true)} className="w-full" size="default">
-                      Sign In to Access
+                      Sign In to View
+                    </Button>
+                  </div>
+                ) : !isPmaMember ? (
+                  <div className="space-y-3 pt-2">
+                    <p className="text-xs text-muted-foreground text-center">
+                      Join PMA to access exclusive discount codes
+                    </p>
+                    <Button 
+                      onClick={() => window.open("https://clubs.byu.edu/p/clubview/18295873486206095", '_blank')}
+                      className="w-full"
+                      size="default"
+                    >
+                      Join PMA
                     </Button>
                   </div>
                 ) : (

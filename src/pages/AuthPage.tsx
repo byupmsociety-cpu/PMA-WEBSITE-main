@@ -52,6 +52,17 @@ const AuthPage = () => {
     e.preventDefault();
     setLoading(true);
 
+    // Validate BYU email
+    if (!email.toLowerCase().endsWith('@byu.edu')) {
+      toast({
+        title: "Invalid Email",
+        description: "You must use a @byu.edu email address to create an account.",
+        variant: "destructive",
+      });
+      setLoading(false);
+      return;
+    }
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -113,8 +124,8 @@ const AuthPage = () => {
           <CardTitle>{isSignUp ? "Create an Account" : "Sign In"}</CardTitle>
           <CardDescription>
             {isSignUp
-              ? "Sign up to access premium partnership resources"
-              : "Sign in to access your premium resources"}
+              ? "Join PMA with your BYU email to start your PM journey"
+              : "Sign in to access your dashboard and resources"}
           </CardDescription>
         </CardHeader>
         <CardContent>

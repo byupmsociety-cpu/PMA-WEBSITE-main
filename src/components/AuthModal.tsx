@@ -46,43 +46,6 @@ const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
       return;
     }
 
-    // Check if user is an approved PMA member
-    const { data: isApproved, error: checkError } = await supabase.rpc('is_approved_pma_member', { 
-      email_address: email.toLowerCase() 
-    });
-
-    if (checkError) {
-      toast({
-        title: "Error",
-        description: "Unable to verify membership status. Please try again.",
-        variant: "destructive",
-      });
-      setLoading(false);
-      return;
-    }
-
-    if (!isApproved) {
-      toast({
-        title: "Membership Required",
-        description: (
-          <div className="space-y-2">
-            <p>Looks like you haven't paid membership dues for the PMA.</p>
-            <a 
-              href="https://clubs.byu.edu/p/clubview/18295873486206095" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-primary underline hover:no-underline"
-            >
-              You can do that here!
-            </a>
-          </div>
-        ),
-        variant: "destructive",
-      });
-      setLoading(false);
-      return;
-    }
-
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -103,7 +66,7 @@ const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
     } else {
       toast({
         title: "Success!",
-        description: "Account created successfully. Your PMA membership has been verified!",
+        description: "Account created successfully! Check your email to verify your account.",
       });
     }
 
@@ -142,8 +105,8 @@ const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
           <DialogTitle>{isSignUp ? "Create an Account" : "Sign In"}</DialogTitle>
           <DialogDescription>
             {isSignUp
-              ? "Sign up to access premium partnership resources"
-              : "Sign in to access your premium resources"}
+              ? "Join with your BYU email to start your PM journey"
+              : "Sign in to access your resources"}
           </DialogDescription>
         </DialogHeader>
         
