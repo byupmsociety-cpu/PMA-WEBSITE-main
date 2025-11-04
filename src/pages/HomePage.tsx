@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import PersonaWizard from '@/components/PersonaWizard';
 import SuccessStoriesCarousel from '@/components/SuccessStoriesCarousel';
 import ScrollTriggeredModals from '@/components/ScrollTriggeredModals';
+import PersonaTailoredContent from '@/components/PersonaTailoredContent';
 
 
 // Recruiting Timeline data
@@ -136,6 +137,8 @@ const HomePage = () => {
   useEffect(() => {
     fetchUpcomingEvents();
   }, [fetchUpcomingEvents]);
+
+  const [selectedPersona, setSelectedPersona] = useState<string | null>(null);
 
   return (
     <div className="min-h-screen">
@@ -315,12 +318,41 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Persona Wizard Section */}
+      {/* Persona Wizard Section - Right after hero */}
       <section className="py-20 bg-gradient-to-b from-background to-primary/5">
         <div className="container mx-auto px-4 md:px-6">
-          <PersonaWizard />
+          <PersonaWizard onSelect={setSelectedPersona} />
+          
+          {/* Sign-in CTA Card - Only show when persona is selected */}
+          {selectedPersona && (
+            <Card className="max-w-2xl mx-auto mt-8 bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20 animate-fade-in">
+              <CardContent className="pt-6 space-y-4 text-center">
+                <h3 className="text-xl font-semibold">Ready to Start Your Journey?</h3>
+                <p className="text-muted-foreground">
+                  Sign in to track your progress, earn badges, and connect with peers
+                </p>
+                <Link to="/auth">
+                  <Button size="lg" className="gap-2">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    Sign In to Unlock Dashboard
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </section>
+
+      {/* Persona-Tailored Content - Changes based on selection */}
+      {selectedPersona && (
+        <section className="py-20">
+          <div className="container mx-auto px-4 md:px-6">
+            <PersonaTailoredContent persona={selectedPersona} />
+          </div>
+        </section>
+      )}
 
       <style>{`
         @keyframes scroll {

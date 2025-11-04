@@ -1,10 +1,7 @@
-import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Compass, Rocket, Target } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
 
 interface PersonaOption {
   id: string;
@@ -44,64 +41,13 @@ interface PersonaWizardProps {
 
 const PersonaWizard = ({ onSelect }: PersonaWizardProps) => {
   const [selectedPersona, setSelectedPersona] = useState<string | null>(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const navigate = useNavigate();
-  const { toast } = useToast();
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    setIsLoggedIn(!!user);
-  };
-
-  const handlePersonaSelect = async (personaId: string) => {
+  const handlePersonaSelect = (personaId: string) => {
     setSelectedPersona(personaId);
     
     if (onSelect) {
       onSelect(personaId);
     }
-
-    if (!isLoggedIn) {
-      // Show sign-in prompt
-      toast({
-        title: "Sign in to continue",
-        description: "Create an account to unlock your personalized PM dashboard",
-      });
-      return;
-    }
-
-    // Save persona to profile
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    const { error } = await supabase
-      .from("profiles")
-      .update({ 
-        persona: personaId as "curious" | "starting" | "recruiting", 
-        onboarding_completed: true 
-      })
-      .eq("user_id", user.id);
-
-    if (error) {
-      toast({
-        title: "Error",
-        description: "Failed to save your selection. Please try again.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    toast({
-      title: "Persona saved! 🎉",
-      description: "Redirecting to your personalized dashboard...",
-    });
-
-    setTimeout(() => {
-      navigate("/dashboard");
-    }, 1000);
   };
 
   return (
@@ -148,20 +94,6 @@ const PersonaWizard = ({ onSelect }: PersonaWizardProps) => {
         ))}
       </div>
 
-      {!isLoggedIn && (
-        <Card className="max-w-2xl mx-auto bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
-          <CardContent className="pt-6 space-y-4 text-center">
-            <h3 className="text-xl font-semibold">Unlock Your Personal PM Dashboard</h3>
-            <p className="text-muted-foreground">
-              Track your progress, earn badges, and connect with peers on their PM journey
-            </p>
-            <Button size="lg" onClick={() => navigate("/auth")} className="gap-2">
-              <Sparkles className="h-4 w-4" />
-              Sign In to Get Started
-            </Button>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 };
