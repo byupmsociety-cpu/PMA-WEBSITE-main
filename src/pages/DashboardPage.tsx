@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { 
   Trophy, 
   Target, 
@@ -15,7 +17,10 @@ import {
   Briefcase, 
   Network,
   CheckCircle2,
-  Sparkles
+  Sparkles,
+  Camera,
+  Mail,
+  UserCircle
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -23,6 +28,7 @@ interface Profile {
   persona: string | null;
   progress_percentage: number | null;
   full_name: string | null;
+  email: string | null;
 }
 
 interface JourneyStep {
@@ -31,6 +37,7 @@ interface JourneyStep {
   description: string | null;
   category: string;
   step_order: number;
+  persona: string;
   completed?: boolean;
 }
 
@@ -64,10 +71,12 @@ const categoryColors = {
 
 const DashboardPage = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [journeySteps, setJourneySteps] = useState<JourneyStep[]>([]);
+  const [allSteps, setAllSteps] = useState<JourneyStep[]>([]);
   const [userBadges, setUserBadges] = useState<UserBadge[]>([]);
   const [peerActivity, setPeerActivity] = useState<PeerActivity[]>([]);
   const [loading, setLoading] = useState(true);
+  const [editingProfile, setEditingProfile] = useState(false);
+  const [editedName, setEditedName] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -85,7 +94,7 @@ const DashboardPage = () => {
 
     await Promise.all([
       loadProfile(user.id),
-      loadJourneySteps(user.id),
+      loadAllJourneySteps(user.id),
       loadUserBadges(user.id),
       loadPeerActivity()
     ]);
@@ -96,7 +105,7 @@ const DashboardPage = () => {
   const loadProfile = async (userId: string) => {
     const { data, error } = await supabase
       .from("profiles")
-      .select("persona, progress_percentage, full_name")
+      .select("persona, progress_percentage, full_name, email")
       .eq("user_id", userId)
       .single();
 
@@ -106,48 +115,15 @@ const DashboardPage = () => {
     }
 
     setProfile(data);
+    setEditedName(data.full_name || "");
   };
 
-  const updatePersona = async (persona: "curious" | "starting" | "recruiting") => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    const { error } = await supabase
-      .from("profiles")
-      .update({ persona, onboarding_completed: true })
-      .eq("user_id", user.id);
-
-    if (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update persona",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    await loadProfile(user.id);
-    await loadJourneySteps(user.id);
-
-    toast({
-      title: "Welcome to your PM journey! 🚀",
-      description: "Your personalized dashboard is ready",
-    });
-  };
-
-  const loadJourneySteps = async (userId: string) => {
-    const { data: profileData } = await supabase
-      .from("profiles")
-      .select("persona")
-      .eq("user_id", userId)
-      .single();
-
-    if (!profileData?.persona) return;
-
+  const loadAllJourneySteps = async (userId: string) => {
+    // Load all steps from all personas
     const { data: steps, error: stepsError } = await supabase
       .from("pm_journey_steps")
       .select("*")
-      .eq("persona", profileData.persona)
+      .order("persona")
       .order("step_order");
 
     if (stepsError) {
@@ -167,7 +143,7 @@ const DashboardPage = () => {
       completed: progressMap.get(step.id) || false
     })) || [];
 
-    setJourneySteps(stepsWithProgress);
+    setAllSteps(stepsWithProgress);
   };
 
   const loadUserBadges = async (userId: string) => {
@@ -228,6 +204,33 @@ const DashboardPage = () => {
     setPeerActivity(activities);
   };
 
+  const updatePersona = async (persona: "curious" | "starting" | "recruiting") => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { error } = await supabase
+      .from("profiles")
+      .update({ persona, onboarding_completed: true })
+      .eq("user_id", user.id);
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update persona",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    await loadProfile(user.id);
+    await loadAllJourneySteps(user.id);
+
+    toast({
+      title: "Welcome to your PM journey! 🚀",
+      description: "Your personalized dashboard is ready",
+    });
+  };
+
   const toggleStepCompletion = async (stepId: string, currentStatus: boolean) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
@@ -250,7 +253,7 @@ const DashboardPage = () => {
       return;
     }
 
-    await loadJourneySteps(user.id);
+    await loadAllJourneySteps(user.id);
     await loadProfile(user.id);
 
     if (!currentStatus) {
@@ -261,9 +264,35 @@ const DashboardPage = () => {
     }
   };
 
+  const saveProfile = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { error } = await supabase
+      .from("profiles")
+      .update({ full_name: editedName })
+      .eq("user_id", user.id);
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update profile",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    await loadProfile(user.id);
+    setEditingProfile(false);
+    toast({
+      title: "Profile Updated",
+      description: "Your profile has been saved successfully",
+    });
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
@@ -287,9 +316,9 @@ const DashboardPage = () => {
               </div>
               <div className="space-y-2">
                 <CardTitle className="text-3xl">Welcome to Your Dashboard, {profile?.full_name}! 🎉</CardTitle>
-                <CardDescription className="text-base">
+                <p className="text-muted-foreground text-base">
                   First, tell us where you are in your PM journey so we can personalize your experience
-                </CardDescription>
+                </p>
               </div>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -346,186 +375,227 @@ const DashboardPage = () => {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-background py-12 px-4">
-      <div className="container max-w-7xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="space-y-2">
-          <h1 className="text-4xl font-bold">Welcome back, {profile?.full_name}! 👋</h1>
-          <p className="text-muted-foreground">
-            Your PM Journey: {profile?.persona && personaLabels[profile.persona as keyof typeof personaLabels]}
-          </p>
+  // Organize steps by persona
+  const curiousSteps = allSteps.filter(s => s.persona === "curious");
+  const startingSteps = allSteps.filter(s => s.persona === "starting");
+  const recruitingSteps = allSteps.filter(s => s.persona === "recruiting");
+
+  // Determine which sections should be marked as completed
+  const userPersona = profile.persona;
+  const isCuriousCompleted = userPersona === "starting" || userPersona === "recruiting";
+  const isStartingCompleted = userPersona === "recruiting";
+
+  const renderStepSection = (title: string, steps: JourneyStep[], sectionCompleted: boolean, icon: React.ReactNode) => (
+    <div className="space-y-4">
+      <div className="flex items-center gap-3">
+        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+          sectionCompleted ? "bg-primary/20" : "bg-muted"
+        }`}>
+          {sectionCompleted ? <CheckCircle2 className="h-5 w-5 text-primary" /> : icon}
         </div>
-
-        {/* Progress Overview */}
-        <Card className="border-2 border-primary/20">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Trophy className="h-5 w-5 text-primary" />
-              Your Progress
-            </CardTitle>
-            <CardDescription>
-              You're {profile?.progress_percentage}% through your PM journey
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Progress value={profile?.progress_percentage || 0} className="h-3" />
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">
-                {journeySteps.filter(s => s.completed).length} of {journeySteps.length} steps completed
-              </span>
-              <span className="font-semibold text-primary">
-                Keep going! 🚀
-              </span>
+        <div>
+          <h2 className="text-xl font-bold flex items-center gap-2">
+            {title}
+            {sectionCompleted && <Badge variant="secondary">Completed</Badge>}
+          </h2>
+        </div>
+      </div>
+      <div className="space-y-3">
+        {steps.map((step, index) => (
+          <div
+            key={step.id}
+            className={`p-4 rounded-lg border transition-all ${
+              step.completed || sectionCompleted
+                ? "bg-primary/5 border-primary/30" 
+                : "bg-card border-border hover:border-primary/50"
+            }`}
+          >
+            <div className="flex items-start gap-3">
+              <Checkbox
+                checked={step.completed || sectionCompleted}
+                onCheckedChange={() => !sectionCompleted && toggleStepCompletion(step.id, step.completed || false)}
+                disabled={sectionCompleted}
+                className="mt-1"
+              />
+              <div className="flex-1 space-y-2">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className={`font-semibold ${(step.completed || sectionCompleted) ? "line-through text-muted-foreground" : ""}`}>
+                        {index + 1}. {step.title}
+                      </span>
+                      {(step.completed || sectionCompleted) && <CheckCircle2 className="h-4 w-4 text-primary" />}
+                    </div>
+                    <p className="text-sm text-muted-foreground">{step.description}</p>
+                  </div>
+                  <Badge className={categoryColors[step.category as keyof typeof categoryColors]}>
+                    <span className="flex items-center gap-1">
+                      {categoryIcons[step.category as keyof typeof categoryIcons]}
+                      {step.category}
+                    </span>
+                  </Badge>
+                </div>
+              </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Main Content - Journey Steps */}
-          <div className="lg:col-span-2 space-y-6">
-            <Card>
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="container max-w-7xl mx-auto py-8 px-4">
+        <div className="grid lg:grid-cols-4 gap-8">
+          {/* Left Sidebar */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* Profile Card */}
+            <Card className="border-2 border-primary/20">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Target className="h-5 w-5" />
-                  Your PM Journey Checklist
-                </CardTitle>
-                <CardDescription>
-                  Complete these steps to master product management
-                </CardDescription>
+                <CardTitle className="text-lg">Profile</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
-                {journeySteps.map((step, index) => (
-                  <div
-                    key={step.id}
-                    className={`p-4 rounded-lg border-2 transition-all ${
-                      step.completed 
-                        ? "bg-primary/5 border-primary/30" 
-                        : "bg-card border-border hover:border-primary/50"
-                    }`}
-                  >
-                    <div className="flex items-start gap-3">
-                      <Checkbox
-                        checked={step.completed}
-                        onCheckedChange={() => toggleStepCompletion(step.id, step.completed || false)}
-                        className="mt-1"
+              <CardContent className="space-y-4">
+                <div className="flex flex-col items-center space-y-3">
+                  <div className="relative">
+                    <Avatar className="h-24 w-24">
+                      <AvatarFallback className="bg-primary/10 text-primary text-2xl">
+                        {profile?.full_name?.split(' ').map(n => n[0]).join('').toUpperCase() || <UserCircle className="h-12 w-12" />}
+                      </AvatarFallback>
+                    </Avatar>
+                    <Button
+                      size="icon"
+                      variant="secondary"
+                      className="absolute bottom-0 right-0 h-8 w-8 rounded-full"
+                    >
+                      <Camera className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  {editingProfile ? (
+                    <div className="w-full space-y-2">
+                      <Label htmlFor="fullName">Full Name</Label>
+                      <Input
+                        id="fullName"
+                        value={editedName}
+                        onChange={(e) => setEditedName(e.target.value)}
                       />
-                      <div className="flex-1 space-y-2">
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="space-y-1">
-                            <div className="flex items-center gap-2">
-                              <span className={`font-semibold ${step.completed ? "line-through text-muted-foreground" : ""}`}>
-                                {index + 1}. {step.title}
-                              </span>
-                              {step.completed && <CheckCircle2 className="h-4 w-4 text-primary" />}
-                            </div>
-                            <p className="text-sm text-muted-foreground">{step.description}</p>
-                          </div>
-                          <Badge className={categoryColors[step.category as keyof typeof categoryColors]}>
-                            <span className="flex items-center gap-1">
-                              {categoryIcons[step.category as keyof typeof categoryIcons]}
-                              {step.category}
-                            </span>
-                          </Badge>
-                        </div>
+                      <div className="flex gap-2">
+                        <Button size="sm" onClick={saveProfile} className="flex-1">Save</Button>
+                        <Button size="sm" variant="outline" onClick={() => setEditingProfile(false)} className="flex-1">Cancel</Button>
                       </div>
                     </div>
+                  ) : (
+                    <>
+                      <div className="text-center">
+                        <h3 className="font-semibold text-lg">{profile?.full_name}</h3>
+                        <p className="text-sm text-muted-foreground flex items-center gap-1 justify-center">
+                          <Mail className="h-3 w-3" />
+                          {profile?.email}
+                        </p>
+                      </div>
+                      <Button size="sm" variant="outline" onClick={() => setEditingProfile(true)} className="w-full">
+                        Edit Profile
+                      </Button>
+                    </>
+                  )}
+                </div>
+                <div className="pt-4 border-t border-border">
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Journey Stage</span>
+                      <Badge variant="secondary">{personaLabels[userPersona as keyof typeof personaLabels]}</Badge>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Progress</span>
+                      <span className="font-semibold">{profile?.progress_percentage}%</span>
+                    </div>
                   </div>
-                ))}
+                </div>
               </CardContent>
+            </Card>
+
+            {/* Tabs for Badges, Connect, Share */}
+            <Card>
+              <Tabs defaultValue="badges" className="w-full">
+                <TabsList className="w-full grid grid-cols-3">
+                  <TabsTrigger value="badges" className="text-xs">Badges</TabsTrigger>
+                  <TabsTrigger value="connect" className="text-xs">Connect</TabsTrigger>
+                  <TabsTrigger value="share" className="text-xs">Share</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="badges" className="p-4 space-y-3">
+                  {userBadges.length > 0 ? (
+                    <div className="grid grid-cols-2 gap-2">
+                      {userBadges.map((badge) => (
+                        <div
+                          key={badge.id}
+                          className="p-3 rounded-lg bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 text-center space-y-1"
+                        >
+                          <div className="text-2xl">{badge.icon}</div>
+                          <p className="text-xs font-semibold">{badge.name}</p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-6 text-muted-foreground">
+                      <Trophy className="h-10 w-10 mx-auto mb-2 opacity-20" />
+                      <p className="text-xs">Complete steps to earn badges!</p>
+                    </div>
+                  )}
+                </TabsContent>
+                
+                <TabsContent value="connect" className="p-4 space-y-3">
+                  {peerActivity.length > 0 ? (
+                    peerActivity.slice(0, 5).map((activity, index) => (
+                      <div key={index} className="flex items-start gap-2 p-2 rounded-lg hover:bg-accent/50 transition-colors">
+                        <Avatar className="h-8 w-8">
+                          <AvatarFallback className="bg-primary/10 text-primary text-xs">
+                            {activity.user_name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs">
+                            <span className="font-semibold">{activity.user_name}</span>
+                          </p>
+                          <p className="text-xs text-muted-foreground truncate">{activity.step_title}</p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-6 text-muted-foreground">
+                      <Users className="h-10 w-10 mx-auto mb-2 opacity-20" />
+                      <p className="text-xs">No activity yet</p>
+                    </div>
+                  )}
+                </TabsContent>
+                
+                <TabsContent value="share" className="p-4 space-y-3">
+                  <div className="text-center space-y-3">
+                    <Sparkles className="h-10 w-10 mx-auto text-primary" />
+                    <div>
+                      <h4 className="font-semibold text-sm">Share Your Story</h4>
+                      <p className="text-xs text-muted-foreground">Inspire others by sharing your PM journey</p>
+                    </div>
+                    <Button size="sm" className="w-full" onClick={() => navigate("/contact")}>
+                      Submit Your Story
+                    </Button>
+                  </div>
+                </TabsContent>
+              </Tabs>
             </Card>
           </div>
 
-          {/* Sidebar - Badges & Social */}
-          <div className="space-y-6">
-            {/* Badges */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-yellow-500" />
-                  Your Badges
-                </CardTitle>
-                <CardDescription>
-                  {userBadges.length} badge{userBadges.length !== 1 ? "s" : ""} earned
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {userBadges.length > 0 ? (
-                  <div className="grid grid-cols-2 gap-3">
-                    {userBadges.map((badge) => (
-                      <div
-                        key={badge.id}
-                        className="p-3 rounded-lg bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 text-center space-y-1"
-                      >
-                        <div className="text-3xl">{badge.icon}</div>
-                        <p className="text-xs font-semibold">{badge.name}</p>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Trophy className="h-12 w-12 mx-auto mb-2 opacity-20" />
-                    <p className="text-sm">Complete steps to earn badges!</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+          {/* Main Content - Journey Checklist */}
+          <div className="lg:col-span-3 space-y-8">
+            <div className="space-y-2">
+              <h1 className="text-3xl font-bold">Your PM Journey</h1>
+              <p className="text-muted-foreground">
+                Track your progress through the complete PM career path
+              </p>
+            </div>
 
-            {/* Peer Activity */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="h-5 w-5" />
-                  Community Activity
-                </CardTitle>
-                <CardDescription>
-                  See what your peers are working on
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {peerActivity.length > 0 ? (
-                  peerActivity.slice(0, 5).map((activity, index) => (
-                    <div key={index} className="flex items-start gap-3 p-2 rounded-lg hover:bg-accent/50 transition-colors">
-                      <Avatar className="h-8 w-8">
-                        <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                          {activity.user_name.split(' ').map(n => n[0]).join('').toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm">
-                          <span className="font-semibold">{activity.user_name}</span>
-                          {" completed "}
-                          <span className="text-muted-foreground">{activity.step_title}</span>
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {new Date(activity.completed_at).toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Users className="h-12 w-12 mx-auto mb-2 opacity-20" />
-                    <p className="text-sm">Be the first to complete a step!</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* CTA Card */}
-            <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
-              <CardContent className="pt-6 space-y-4">
-                <div className="space-y-2">
-                  <h3 className="font-semibold">Share Your Success Story</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Inspire others by sharing your PM journey and achievements
-                  </p>
-                </div>
-                <Button className="w-full" onClick={() => navigate("/contact")}>
-                  Share Your Story
-                </Button>
-              </CardContent>
-            </Card>
+            {renderStepSection("Exploring PM", curiousSteps, isCuriousCompleted, <BookOpen className="h-5 w-5 text-primary" />)}
+            {renderStepSection("Starting PM Path", startingSteps, isStartingCompleted, <Target className="h-5 w-5 text-primary" />)}
+            {renderStepSection("Recruiting for PM", recruitingSteps, false, <Briefcase className="h-5 w-5 text-primary" />)}
           </div>
         </div>
       </div>

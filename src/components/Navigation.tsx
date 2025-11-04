@@ -1,19 +1,29 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import ThemeToggle from './ThemeToggle';
 import { Button } from './ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import AuthModal from './AuthModal';
 import { User } from '@supabase/supabase-js';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { UserCircle } from 'lucide-react';
 
 const Navigation = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [prevScrollPos, setPrevScrollPos] = useState(0);
   const [visible, setVisible] = useState(true);
   const [activeLink, setActiveLink] = useState('/');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [firstName, setFirstName] = useState<string>('');
   
   // Handle scroll behavior to hide/show navbar
   useEffect(() => {
@@ -32,21 +42,43 @@ const Navigation = () => {
     setActiveLink(location.pathname);
   }, [location.pathname]);
 
-  // Check auth status
+  // Check auth status and load profile
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
+      if (session?.user) {
+        loadProfile(session.user.id);
+      }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
+      if (session?.user) {
+        loadProfile(session.user.id);
+      } else {
+        setFirstName('');
+      }
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
+  const loadProfile = async (userId: string) => {
+    const { data } = await supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("user_id", userId)
+      .single();
+    
+    if (data?.full_name) {
+      const name = data.full_name.split(' ')[0];
+      setFirstName(name);
+    }
+  };
+
   const handleSignOut = async () => {
     await supabase.auth.signOut();
+    setFirstName('');
   };
 
   // Close mobile menu when clicking on a link
@@ -54,20 +86,12 @@ const Navigation = () => {
     setActiveLink(path);
     setMobileMenuOpen(false);
   };
-  
-  const handleDashboardClick = (e: React.MouseEvent) => {
-    if (!user) {
-      e.preventDefault();
-      setAuthModalOpen(true);
-    }
-  };
 
   const links = [
     { name: 'Home', path: '/' },
     { name: 'Events', path: '/events' },
     { name: 'Resources', path: '/resources' },
     { name: 'Discover PM', path: '/discover' },
-    { name: 'Dashboard', path: '/dashboard', requiresAuth: true },
     { name: 'Contact', path: '/contact' }
   ];
   
@@ -100,12 +124,7 @@ const Navigation = () => {
                       after:bg-gradient-to-r after:from-[#215096] after:to-[#4299E1] after:origin-bottom-right
                       after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left
                       ${activeLink === link.path ? 'after:scale-x-100' : ''}`}
-                      onClick={(e) => {
-                        if (link.requiresAuth) {
-                          handleDashboardClick(e);
-                        }
-                        setActiveLink(link.path);
-                      }}
+                      onClick={() => setActiveLink(link.path)}
                     >
                       {link.name}
                     </Link>
@@ -117,20 +136,33 @@ const Navigation = () => {
             <div className="flex items-center space-x-2">
               <ThemeToggle />
               {user ? (
-                <Button 
-                  onClick={handleSignOut}
-                  variant="outline"
-                  size="sm"
-                  className="hidden md:flex"
-                >
-                  Sign Out
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild className="hidden md:flex">
+                    <Button variant="ghost" size="sm" className="gap-2">
+                      <Avatar className="h-6 w-6">
+                        <AvatarFallback className="bg-primary/10 text-primary text-xs">
+                          {firstName ? firstName[0].toUpperCase() : <UserCircle className="h-4 w-4" />}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span>{firstName || 'Profile'}</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48 bg-popover">
+                    <DropdownMenuItem onClick={() => navigate('/dashboard')} className="cursor-pointer">
+                      Dashboard
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
+                      Sign Out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               ) : (
                 <Button 
                   onClick={() => setAuthModalOpen(true)}
                   size="sm"
-                  className="hidden md:flex"
+                  className="hidden md:flex gap-2"
                 >
+                  <UserCircle className="h-4 w-4" />
                   Sign In
                 </Button>
               )}
@@ -167,12 +199,7 @@ const Navigation = () => {
                           ? 'text-primary dark:text-white bg-blue-50 dark:bg-blue-900/20' 
                           : 'text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800/50'
                       }`}
-                      onClick={(e) => {
-                        if (link.requiresAuth) {
-                          handleDashboardClick(e);
-                        }
-                        handleLinkClick(link.path);
-                      }}
+                      onClick={() => handleLinkClick(link.path)}
                     >
                       {link.name}
                     </Link>
@@ -180,12 +207,23 @@ const Navigation = () => {
                 ))}
                 <li>
                   {user ? (
-                    <button
-                      onClick={handleSignOut}
-                      className="block w-full text-left px-4 py-3 text-base font-medium rounded-md transition-colors text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800/50"
-                    >
-                      Sign Out
-                    </button>
+                    <>
+                      <button
+                        onClick={() => {
+                          navigate('/dashboard');
+                          setMobileMenuOpen(false);
+                        }}
+                        className="block w-full text-left px-4 py-3 text-base font-medium rounded-md transition-colors text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                      >
+                        Dashboard
+                      </button>
+                      <button
+                        onClick={handleSignOut}
+                        className="block w-full text-left px-4 py-3 text-base font-medium rounded-md transition-colors text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                      >
+                        Sign Out
+                      </button>
+                    </>
                   ) : (
                     <button
                       onClick={() => setAuthModalOpen(true)}
