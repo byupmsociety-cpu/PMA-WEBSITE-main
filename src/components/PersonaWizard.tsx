@@ -38,7 +38,7 @@ interface PersonaWizardProps {
 }
 
 const PersonaWizard = ({ onSelect }: PersonaWizardProps) => {
-  const [selectedPersona, setSelectedPersona] = useState<string | null>(null);
+  const [selectedPersona, setSelectedPersona] = useState<string | null>("curious");
 
   const handlePersonaSelect = (personaId: string) => {
     setSelectedPersona(personaId);

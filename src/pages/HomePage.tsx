@@ -138,7 +138,7 @@ const HomePage = () => {
     fetchUpcomingEvents();
   }, [fetchUpcomingEvents]);
 
-  const [selectedPersona, setSelectedPersona] = useState<string | null>(null);
+  const [selectedPersona, setSelectedPersona] = useState<string | null>("curious");
 
   return (
     <div className="min-h-screen">
