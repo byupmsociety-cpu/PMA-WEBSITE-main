@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sparkles, Compass, Rocket, Target } from "lucide-react";
 
 interface PersonaOption {
@@ -39,6 +39,13 @@ interface PersonaWizardProps {
 
 const PersonaWizard = ({ onSelect }: PersonaWizardProps) => {
   const [selectedPersona, setSelectedPersona] = useState<string | null>("curious");
+
+  // Notify parent of default selection on mount
+  useEffect(() => {
+    if (onSelect && selectedPersona) {
+      onSelect(selectedPersona);
+    }
+  }, []); // Only run on mount
 
   const handlePersonaSelect = (personaId: string) => {
     setSelectedPersona(personaId);
