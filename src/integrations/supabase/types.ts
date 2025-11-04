@@ -97,6 +97,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar_url: string | null
           created_at: string
           email: string | null
           full_name: string | null
@@ -106,10 +107,12 @@ export type Database = {
           onboarding_completed: boolean | null
           persona: Database["public"]["Enums"]["user_persona"] | null
           progress_percentage: number | null
+          school_year: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          avatar_url?: string | null
           created_at?: string
           email?: string | null
           full_name?: string | null
@@ -119,10 +122,12 @@ export type Database = {
           onboarding_completed?: boolean | null
           persona?: Database["public"]["Enums"]["user_persona"] | null
           progress_percentage?: number | null
+          school_year?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          avatar_url?: string | null
           created_at?: string
           email?: string | null
           full_name?: string | null
@@ -132,6 +137,7 @@ export type Database = {
           onboarding_completed?: boolean | null
           persona?: Database["public"]["Enums"]["user_persona"] | null
           progress_percentage?: number | null
+          school_year?: string | null
           updated_at?: string
           user_id?: string
         }

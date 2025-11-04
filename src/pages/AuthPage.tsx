@@ -6,12 +6,15 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const AuthPage = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [schoolYear, setSchoolYear] = useState("");
+  const [persona, setPersona] = useState<"curious" | "starting" | "recruiting">("curious");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -26,7 +29,7 @@ const AuthPage = () => {
         if (resource) {
           navigate(`/resources?resource=${resource}`);
         } else {
-          navigate("/resources");
+          navigate("/dashboard");
         }
       }
     });
@@ -37,7 +40,7 @@ const AuthPage = () => {
         if (resource) {
           navigate(`/resources?resource=${resource}`);
         } else {
-          navigate("/resources");
+          navigate("/dashboard");
         }
       }
     });
@@ -53,9 +56,11 @@ const AuthPage = () => {
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/resources`,
+        emailRedirectTo: `${window.location.origin}/dashboard`,
         data: {
           full_name: fullName,
+          school_year: schoolYear,
+          persona: persona,
         },
       },
     });
@@ -115,17 +120,59 @@ const AuthPage = () => {
         <CardContent>
           <form onSubmit={isSignUp ? handleSignUp : handleSignIn} className="space-y-4">
             {isSignUp && (
-              <div className="space-y-2">
-                <Label htmlFor="fullName">Full Name</Label>
-                <Input
-                  id="fullName"
-                  type="text"
-                  placeholder="John Doe"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  required
-                />
-              </div>
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="fullName">Full Name</Label>
+                  <Input
+                    id="fullName"
+                    type="text"
+                    placeholder="John Doe"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="schoolYear">School Year</Label>
+                  <select
+                    id="schoolYear"
+                    value={schoolYear}
+                    onChange={(e) => setSchoolYear(e.target.value)}
+                    required
+                    className="w-full h-10 px-3 rounded-md border border-input bg-background"
+                  >
+                    <option value="">Select your year</option>
+                    <option value="Freshman">Freshman</option>
+                    <option value="Sophomore">Sophomore</option>
+                    <option value="Junior">Junior</option>
+                    <option value="Senior">Senior</option>
+                    <option value="Graduate">Graduate</option>
+                  </select>
+                </div>
+                <div className="space-y-3">
+                  <Label>Where are you in your PM journey?</Label>
+                  <RadioGroup value={persona} onValueChange={(v) => setPersona(v as any)}>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="curious" id="curious" />
+                      <Label htmlFor="curious" className="font-normal cursor-pointer">
+                        Curious About PM - Just exploring
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="starting" id="starting" />
+                      <Label htmlFor="starting" className="font-normal cursor-pointer">
+                        Starting My PM Path - Building skills
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="recruiting" id="recruiting" />
+                      <Label htmlFor="recruiting" className="font-normal cursor-pointer">
+                        Actively Recruiting - Ready to apply
+                      </Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+              </>
             )}
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>

@@ -29,6 +29,8 @@ interface Profile {
   progress_percentage: number | null;
   full_name: string | null;
   email: string | null;
+  avatar_url: string | null;
+  school_year: string | null;
 }
 
 interface JourneyStep {
@@ -90,12 +92,24 @@ const DashboardPage = () => {
   const [loading, setLoading] = useState(true);
   const [editingProfile, setEditingProfile] = useState(false);
   const [editedName, setEditedName] = useState("");
+  const [editedSchoolYear, setEditedSchoolYear] = useState("");
+  const [editedPersona, setEditedPersona] = useState<string>("");
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
     checkAuth();
-  }, []);
+    
+    // Listen for auth state changes and redirect if signed out
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT' || !session) {
+        navigate('/auth');
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
 
   const checkAuth = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -118,7 +132,7 @@ const DashboardPage = () => {
   const loadProfile = async (userId: string) => {
     const { data, error } = await supabase
       .from("profiles")
-      .select("persona, progress_percentage, full_name, email")
+      .select("persona, progress_percentage, full_name, email, avatar_url, school_year")
       .eq("user_id", userId)
       .single();
 
@@ -129,6 +143,8 @@ const DashboardPage = () => {
 
     setProfile(data);
     setEditedName(data.full_name || "");
+    setEditedSchoolYear(data.school_year || "");
+    setEditedPersona(data.persona || "");
   };
 
   const loadAllJourneySteps = async (userId: string) => {
@@ -254,6 +270,9 @@ const DashboardPage = () => {
       return;
     }
 
+    // Award previous section badges based on selected persona
+    await awardPreviousSectionBadges(user.id, persona);
+
     await loadProfile(user.id);
     await loadAllJourneySteps(user.id);
 
@@ -261,6 +280,47 @@ const DashboardPage = () => {
       title: "Welcome to your PM journey! 🚀",
       description: "Your personalized dashboard is ready",
     });
+  };
+
+  const awardPreviousSectionBadges = async (userId: string, persona: string) => {
+    const badgesToAward: string[] = [];
+
+    // Get badge IDs
+    const { data: badges } = await supabase
+      .from("badges")
+      .select("id, name")
+      .in("name", ["Exploring PM Complete", "Starting PM Complete"]);
+
+    const badgeMap = new Map(badges?.map(b => [b.name, b.id]) || []);
+
+    // If starting or recruiting, award Exploring PM Complete
+    if (persona === "starting" || persona === "recruiting") {
+      const exploringBadgeId = badgeMap.get("Exploring PM Complete");
+      if (exploringBadgeId) badgesToAward.push(exploringBadgeId);
+    }
+
+    // If recruiting, also award Starting PM Complete
+    if (persona === "recruiting") {
+      const startingBadgeId = badgeMap.get("Starting PM Complete");
+      if (startingBadgeId) badgesToAward.push(startingBadgeId);
+    }
+
+    // Award the badges
+    for (const badgeId of badgesToAward) {
+      await supabase
+        .from("user_badges")
+        .upsert({
+          user_id: userId,
+          badge_id: badgeId
+        }, {
+          onConflict: "user_id,badge_id",
+          ignoreDuplicates: true
+        });
+    }
+
+    if (badgesToAward.length > 0) {
+      await loadUserBadges(userId);
+    }
   };
 
   const checkAndAwardBadges = async (userId: string) => {
@@ -376,13 +436,78 @@ const DashboardPage = () => {
     }
   };
 
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    setUploadingAvatar(true);
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${user.id}/avatar.${fileExt}`;
+
+      // Delete old avatar if exists
+      if (profile?.avatar_url) {
+        const oldPath = profile.avatar_url.split('/').pop();
+        if (oldPath) {
+          await supabase.storage.from('avatars').remove([`${user.id}/${oldPath}`]);
+        }
+      }
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: publicUrl })
+        .eq('user_id', user.id);
+
+      if (updateError) throw updateError;
+
+      await loadProfile(user.id);
+      toast({
+        title: "Avatar Updated",
+        description: "Your profile photo has been updated successfully",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to upload avatar",
+        variant: "destructive"
+      });
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
   const saveProfile = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
+    const updates: any = { 
+      full_name: editedName,
+      school_year: editedSchoolYear
+    };
+
+    // If persona changed, award previous badges
+    if (editedPersona !== profile?.persona) {
+      updates.persona = editedPersona;
+      await awardPreviousSectionBadges(user.id, editedPersona);
+    }
+
     const { error } = await supabase
       .from("profiles")
-      .update({ full_name: editedName })
+      .update(updates)
       .eq("user_id", user.id);
 
     if (error) {
@@ -395,6 +520,7 @@ const DashboardPage = () => {
     }
 
     await loadProfile(user.id);
+    await loadAllJourneySteps(user.id);
     setEditingProfile(false);
     toast({
       title: "Profile Updated",
@@ -525,7 +651,7 @@ const DashboardPage = () => {
             <div className="flex items-start gap-3">
               <Checkbox
                 checked={step.completed || sectionCompleted}
-                onCheckedChange={() => !sectionCompleted && toggleStepCompletion(step.id, step.completed || false)}
+                onCheckedChange={() => toggleStepCompletion(step.id, step.completed || false)}
                 disabled={sectionCompleted}
                 className="mt-1"
               />
@@ -570,29 +696,85 @@ const DashboardPage = () => {
                 <div className="flex flex-col items-center space-y-3">
                   <div className="relative">
                     <Avatar className="h-24 w-24">
-                      <AvatarFallback className="bg-primary/10 text-primary text-2xl">
-                        {profile?.full_name?.split(' ').map(n => n[0]).join('').toUpperCase() || <UserCircle className="h-12 w-12" />}
-                      </AvatarFallback>
+                      {profile?.avatar_url ? (
+                        <img src={profile.avatar_url} alt="Profile" className="object-cover" />
+                      ) : (
+                        <AvatarFallback className="bg-primary/10 text-primary text-2xl">
+                          {profile?.full_name?.split(' ').map(n => n[0]).join('').toUpperCase() || <UserCircle className="h-12 w-12" />}
+                        </AvatarFallback>
+                      )}
                     </Avatar>
-                    <Button
-                      size="icon"
-                      variant="secondary"
-                      className="absolute bottom-0 right-0 h-8 w-8 rounded-full"
-                    >
-                      <Camera className="h-4 w-4" />
-                    </Button>
+                    {editingProfile && (
+                      <label className="absolute bottom-0 right-0 p-2 bg-primary rounded-full cursor-pointer hover:bg-primary/90">
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/jpg,image/png,image/webp"
+                          onChange={handleAvatarUpload}
+                          className="hidden"
+                          disabled={uploadingAvatar}
+                        />
+                        {uploadingAvatar ? (
+                          <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                        ) : (
+                          <Camera className="h-4 w-4 text-white" />
+                        )}
+                      </label>
+                    )}
                   </div>
                   {editingProfile ? (
-                    <div className="w-full space-y-2">
-                      <Label htmlFor="fullName">Full Name</Label>
-                      <Input
-                        id="fullName"
-                        value={editedName}
-                        onChange={(e) => setEditedName(e.target.value)}
-                      />
+                    <div className="w-full space-y-3">
+                      <div className="space-y-2">
+                        <Label htmlFor="fullName">Full Name</Label>
+                        <Input
+                          id="fullName"
+                          value={editedName}
+                          onChange={(e) => setEditedName(e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="schoolYear">School Year</Label>
+                        <select
+                          id="schoolYear"
+                          value={editedSchoolYear}
+                          onChange={(e) => setEditedSchoolYear(e.target.value)}
+                          className="w-full h-10 px-3 rounded-md border border-input bg-background"
+                        >
+                          <option value="">Select year</option>
+                          <option value="Freshman">Freshman</option>
+                          <option value="Sophomore">Sophomore</option>
+                          <option value="Junior">Junior</option>
+                          <option value="Senior">Senior</option>
+                          <option value="Graduate">Graduate</option>
+                        </select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="persona">PM Journey Stage</Label>
+                        <select
+                          id="persona"
+                          value={editedPersona}
+                          onChange={(e) => setEditedPersona(e.target.value)}
+                          className="w-full h-10 px-3 rounded-md border border-input bg-background"
+                        >
+                          <option value="curious">Curious About PM</option>
+                          <option value="starting">Starting My PM Path</option>
+                          <option value="recruiting">Actively Recruiting for PM</option>
+                        </select>
+                      </div>
                       <div className="flex gap-2">
                         <Button size="sm" onClick={saveProfile} className="flex-1">Save</Button>
-                        <Button size="sm" variant="outline" onClick={() => setEditingProfile(false)} className="flex-1">Cancel</Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          onClick={() => {
+                            setEditingProfile(false);
+                            setEditedName(profile?.full_name || "");
+                            setEditedSchoolYear(profile?.school_year || "");
+                            setEditedPersona(profile?.persona || "");
+                          }} 
+                          className="flex-1"
+                        >
+                          Cancel
+                        </Button>
                       </div>
                     </div>
                   ) : (
@@ -603,6 +785,11 @@ const DashboardPage = () => {
                           <Mail className="h-3 w-3" />
                           {profile?.email}
                         </p>
+                        {profile?.school_year && (
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {profile.school_year}
+                          </p>
+                        )}
                       </div>
                       <Button size="sm" variant="outline" onClick={() => setEditingProfile(true)} className="w-full">
                         Edit Profile
