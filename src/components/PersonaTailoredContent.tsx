@@ -14,31 +14,33 @@ const personaContent = {
     steps: [
       {
         title: "Learn the Basics",
-        description: "Understand what product managers do daily",
+        description: "Understand what product managers do daily and the skills they use",
         icon: <BookOpen className="h-5 w-5" />,
         action: "Explore Resources",
         link: "/resources"
       },
       {
         title: "Talk to PMs",
-        description: "Have coffee chats with current product managers",
+        description: "Connect with current PMs through coffee chats and info sessions",
         icon: <Users className="h-5 w-5" />,
         action: "View Events",
         link: "/events"
       },
       {
         title: "Join the Community",
-        description: "Attend PMA events and meet like-minded students",
+        description: "Attend PMA workshops and network with aspiring PMs",
         icon: <Target className="h-5 w-5" />,
         action: "Meet the Team",
         link: "/team"
       }
     ],
     resources: [
-      "PM 101: Introduction to Product Management",
-      "Coffee Chat Guide: Questions to Ask PMs",
-      "Essential PM Reading List",
-      "PM Tools Overview (Figma, Jira, Analytics)"
+      "PM 101: What Does a Product Manager Actually Do?",
+      "Coffee Chat Guide: 20 Questions to Ask PMs",
+      "Essential PM Reading List & Blogs to Follow",
+      "PM Tools Overview: Figma, Jira, Analytics & More",
+      "Day in the Life: Real PM Stories from Alumni",
+      "Is PM Right for You? Self-Assessment Quiz"
     ]
   },
   starting: {
@@ -47,31 +49,33 @@ const personaContent = {
     steps: [
       {
         title: "Build Your Portfolio",
-        description: "Document PM projects and case studies",
+        description: "Create compelling case studies and document your PM projects",
         icon: <Briefcase className="h-5 w-5" />,
         action: "Get Started",
         link: "/resources"
       },
       {
         title: "Practice Interviews",
-        description: "Master behavioral and case interview questions",
+        description: "Master behavioral questions, product design, and case frameworks",
         icon: <Target className="h-5 w-5" />,
         action: "Find Resources",
         link: "/resources"
       },
       {
         title: "Network with Alumni",
-        description: "Connect with PMA alumni in PM roles",
+        description: "Build relationships with PMA alumni at top tech companies",
         icon: <Users className="h-5 w-5" />,
         action: "View Events",
         link: "/events"
       }
     ],
     resources: [
-      "PM Interview Frameworks (CIRCLES, AARM)",
-      "Case Study Template & Examples",
-      "Resume Review Checklist for PMs",
-      "Mock Interview Sign-Up"
+      "PM Interview Frameworks: CIRCLES, AARM, and More",
+      "Portfolio Building: Case Study Templates & Examples",
+      "Resume Review: Get Feedback from Real PMs",
+      "Mock Interview Practice: Schedule Your Session",
+      "Product Teardowns: Learn by Analyzing Great Products",
+      "Technical Skills for PMs: SQL, APIs, and Data Analysis"
     ]
   },
   recruiting: {
@@ -80,31 +84,33 @@ const personaContent = {
     steps: [
       {
         title: "Perfect Your Resume",
-        description: "Get professional feedback on your PM resume",
+        description: "Get expert feedback from PMs at top companies",
         icon: <Briefcase className="h-5 w-5" />,
         action: "Get Review",
         link: "/contact"
       },
       {
         title: "Master Case Interviews",
-        description: "Complete 10+ practice case interviews",
+        description: "Practice product design, strategy, and analytics cases",
         icon: <Target className="h-5 w-5" />,
         action: "Practice Now",
         link: "/resources"
       },
       {
         title: "Attend Recruiting Events",
-        description: "Connect with companies at info sessions",
+        description: "Network at company info sessions and career fairs",
         icon: <Users className="h-5 w-5" />,
         action: "View Calendar",
         link: "/events"
       }
     ],
     resources: [
-      "Company-Specific Interview Guides",
-      "Offer Negotiation Strategies",
-      "Recruiting Timeline Checklist",
-      "PM Compensation Data"
+      "Company-Specific Interview Guides: Google, Meta, Amazon & More",
+      "Offer Negotiation: Strategies for Maximizing Compensation",
+      "Recruiting Timeline: When to Apply for Summer & Full-Time",
+      "PM Compensation Data: Know Your Worth",
+      "Final Round Prep: Executive Interviews & Panel Tips",
+      "Onboarding Success: Your First 90 Days as a PM"
     ]
   }
 };

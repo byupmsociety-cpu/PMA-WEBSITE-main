@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Sparkles, Compass, Rocket, Target } from "lucide-react";
 
 interface PersonaOption {
@@ -51,9 +49,9 @@ const PersonaWizard = ({ onSelect }: PersonaWizardProps) => {
   };
 
   return (
-    <div className="w-full space-y-6">
+    <div className="w-full space-y-8">
       <div className="text-center space-y-2">
-        <h2 className="text-3xl font-bold flex items-center justify-center gap-2">
+        <h2 className="text-3xl md:text-4xl font-bold flex items-center justify-center gap-2">
           <Sparkles className="h-6 w-6 text-primary" />
           Start Your PM Journey
         </h2>
@@ -62,38 +60,27 @@ const PersonaWizard = ({ onSelect }: PersonaWizardProps) => {
         </p>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+      {/* Toggle Buttons */}
+      <div className="flex flex-col sm:flex-row gap-3 max-w-3xl mx-auto">
         {personas.map((persona) => (
-          <Card
+          <button
             key={persona.id}
-            className={`cursor-pointer transition-all hover:scale-105 hover:shadow-xl ${
-              selectedPersona === persona.id 
-                ? "ring-2 ring-primary shadow-lg" 
-                : "hover:border-primary/50"
-            }`}
             onClick={() => handlePersonaSelect(persona.id)}
+            className={`flex-1 p-4 rounded-lg border-2 transition-all ${
+              selectedPersona === persona.id
+                ? "border-primary bg-primary/10 shadow-lg scale-105"
+                : "border-border hover:border-primary/50 hover:bg-accent"
+            }`}
           >
-            <CardHeader className="space-y-4">
-              <div className={`w-16 h-16 rounded-full bg-gradient-to-br ${persona.color} flex items-center justify-center text-white mx-auto`}>
+            <div className="flex flex-col items-center gap-2">
+              <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${persona.color} flex items-center justify-center text-white`}>
                 {persona.icon}
               </div>
-              <CardTitle className="text-center">{persona.title}</CardTitle>
-              <CardDescription className="text-center">
-                {persona.description}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button 
-                className="w-full" 
-                variant={selectedPersona === persona.id ? "default" : "outline"}
-              >
-                Select This Path
-              </Button>
-            </CardContent>
-          </Card>
+              <h3 className="font-semibold text-sm">{persona.title}</h3>
+            </div>
+          </button>
         ))}
       </div>
-
     </div>
   );
 };

@@ -55,11 +55,19 @@ const Navigation = () => {
     setMobileMenuOpen(false);
   };
   
+  const handleDashboardClick = (e: React.MouseEvent) => {
+    if (!user) {
+      e.preventDefault();
+      setAuthModalOpen(true);
+    }
+  };
+
   const links = [
     { name: 'Home', path: '/' },
     { name: 'Events', path: '/events' },
     { name: 'Resources', path: '/resources' },
     { name: 'Discover PM', path: '/discover' },
+    { name: 'Dashboard', path: '/dashboard', requiresAuth: true },
     { name: 'Contact', path: '/contact' }
   ];
   
@@ -92,7 +100,12 @@ const Navigation = () => {
                       after:bg-gradient-to-r after:from-[#215096] after:to-[#4299E1] after:origin-bottom-right
                       after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left
                       ${activeLink === link.path ? 'after:scale-x-100' : ''}`}
-                      onClick={() => setActiveLink(link.path)}
+                      onClick={(e) => {
+                        if (link.requiresAuth) {
+                          handleDashboardClick(e);
+                        }
+                        setActiveLink(link.path);
+                      }}
                     >
                       {link.name}
                     </Link>
@@ -154,7 +167,12 @@ const Navigation = () => {
                           ? 'text-primary dark:text-white bg-blue-50 dark:bg-blue-900/20' 
                           : 'text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800/50'
                       }`}
-                      onClick={() => handleLinkClick(link.path)}
+                      onClick={(e) => {
+                        if (link.requiresAuth) {
+                          handleDashboardClick(e);
+                        }
+                        handleLinkClick(link.path);
+                      }}
                     >
                       {link.name}
                     </Link>
