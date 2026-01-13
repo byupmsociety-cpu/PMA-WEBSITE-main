@@ -1,15 +1,14 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { Link } from 'react-router-dom';
-import AnimatedSection from '@/components/AnimatedSection';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { useInView } from 'react-intersection-observer';
-import { motion, AnimatePresence } from 'framer-motion';
-import PersonaWizard from '@/components/PersonaWizard';
-import SuccessStoriesCarousel from '@/components/SuccessStoriesCarousel';
-import ScrollTriggeredModals from '@/components/ScrollTriggeredModals';
-import PersonaTailoredContent from '@/components/PersonaTailoredContent';
-
+import React, { useRef, useEffect, useState, useCallback } from "react";
+import { Link } from "react-router-dom";
+import AnimatedSection from "@/components/AnimatedSection";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useInView } from "react-intersection-observer";
+import { motion, AnimatePresence } from "framer-motion";
+import PersonaWizard from "@/components/PersonaWizard";
+import SuccessStoriesCarousel from "@/components/SuccessStoriesCarousel";
+import ScrollTriggeredModals from "@/components/ScrollTriggeredModals";
+import PersonaTailoredContent from "@/components/PersonaTailoredContent";
 
 // Recruiting Timeline data
 const recruitingMilestones = [
@@ -40,9 +39,9 @@ const recruitingMilestones = [
 ];
 
 // Airtable configuration (using same config as EventsPage)
-const AIRTABLE_API_KEY = 'pat32NdNyEvz1lH3s.a777c3f877a0b354eabf7e503872efd7ad4ecd0567e6d4c60d4cc6d56e219499';
-const AIRTABLE_BASE_ID = 'app8MiB9XxERjKDqC';
-const EVENTS_TABLE_ID = 'tblsZMV8hbA285Lay'; // Using the actual working table ID from EventsPage
+const AIRTABLE_API_KEY = "pat32NdNyEvz1lH3s.a777c3f877a0b354eabf7e503872efd7ad4ecd0567e6d4c60d4cc6d56e219499";
+const AIRTABLE_BASE_ID = "app8MiB9XxERjKDqC";
+const EVENTS_TABLE_ID = "tblsZMV8hbA285Lay"; // Using the actual working table ID from EventsPage
 
 interface Event {
   id: string;
@@ -60,46 +59,46 @@ const HomePage = () => {
 
   // Fallback event for when API fails
   const fallbackEvent: Event = {
-    id: 'fallback',
-    title: 'PMA Workshop Series',
-    description: 'Join us for our PM Workshop Series - Learn from industry experts',
+    id: "fallback",
+    title: "PMA Workshop Series",
+    description: "Join us for our PM Workshop Series - Learn from industry experts",
     date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // Next week
-    location: 'BYU Campus',
-    status: 'upcoming'
+    location: "BYU Campus",
+    status: "upcoming",
   };
 
   // Fetch upcoming events from Airtable
   const fetchUpcomingEvents = useCallback(async () => {
     try {
       setIsLoadingEvents(true);
-      
+
       // Get events that are upcoming (date >= today)
       const response = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${EVENTS_TABLE_ID}`, {
         headers: {
-          'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-          'Content-Type': 'application/json'
+          Authorization: `Bearer ${AIRTABLE_API_KEY}`,
+          "Content-Type": "application/json",
         },
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         if (data.records && data.records.length > 0) {
           // Transform Airtable data to our Event format (same as EventsPage)
           const transformedEvents = data.records.map((record: any) => ({
             id: record.id,
-            title: record.fields.title || '',
-            date: record.fields.date || '',
-            description: record.fields.description || '',
-            location: record.fields.location || '',
-            status: record.fields.status || 'upcoming'
+            title: record.fields.title || "",
+            date: record.fields.date || "",
+            description: record.fields.description || "",
+            location: record.fields.location || "",
+            status: record.fields.status || "upcoming",
           }));
-          
+
           // Find the next upcoming event
           const now = new Date();
           const upcomingEvents = transformedEvents
             .filter((event: Event) => new Date(event.date) >= now)
             .sort((a: Event, b: Event) => new Date(a.date).getTime() - new Date(b.date).getTime());
-          
+
           if (upcomingEvents.length > 0) {
             setUpcomingEvent(upcomingEvents[0]);
           } else {
@@ -116,7 +115,7 @@ const HomePage = () => {
         setUpcomingEvent(fallbackEvent);
       }
     } catch (error) {
-      console.error('Error fetching events:', error);
+      console.error("Error fetching events:", error);
       // Network error, use fallback
       setUpcomingEvent(fallbackEvent);
     } finally {
@@ -149,7 +148,7 @@ const HomePage = () => {
           <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-[#4299E1]/10 dark:bg-[#4299E1]/20 rounded-full filter blur-3xl"></div>
           <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-[#215096]/10 dark:bg-[#215096]/20 rounded-full filter blur-3xl"></div>
         </div>
-        
+
         <div className="container mx-auto px-4 md:px-6 z-10 mt-16">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -158,72 +157,65 @@ const HomePage = () => {
                   BYU Product Management <span className="text-gradient">Association</span>
                 </h1>
               </AnimatedSection>
-              
+
               <AnimatedSection animation="fade-in" delay={300}>
                 <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mt-6">
-                  Empowering the next generation of product leaders through hands-on experience, industry connections, and community.
+                  Empowering the next generation of product leaders through hands-on experience, industry connections,
+                  and community.
                 </p>
               </AnimatedSection>
-              
+
               <AnimatedSection animation="fade-in" delay={600}>
                 <div className="mt-10 flex flex-col sm:flex-row gap-4">
-                  <a 
-                    href="https://clubs.byu.edu/p/clubview/18295873486206095" 
-                    target="_blank" 
+                  <a
+                    href="https://clubs.byu.edu/link/club/18295873486206095"
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-[#215096] to-[#4299E1] rounded-xl text-white font-bold text-lg hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
                   >
                     <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                      />
                     </svg>
                     Join BYU PMA
                   </a>
-                  <Link to="/team" className="inline-flex items-center justify-center px-6 py-3 bg-transparent border border-gray-300 dark:border-white/20 rounded-lg text-gray-700 dark:text-white font-medium hover:bg-gray-100 dark:hover:bg-white/5 transition-all">
+                  <Link
+                    to="/team"
+                    className="inline-flex items-center justify-center px-6 py-3 bg-transparent border border-gray-300 dark:border-white/20 rounded-lg text-gray-700 dark:text-white font-medium hover:bg-gray-100 dark:hover:bg-white/5 transition-all"
+                  >
                     Meet Our Team
                   </Link>
                 </div>
               </AnimatedSection>
             </div>
-            
+
             <AnimatedSection animation="slide-up" className="hidden lg:block">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-4">
                   <div className="h-64 rounded-xl bg-gradient-to-br from-[#215096]/20 to-[#4299E1]/20 border border-gray-200 dark:border-white/10 p-1">
                     <div className="h-full w-full rounded-lg bg-white/50 dark:bg-black/50 backdrop-blur-sm overflow-hidden">
-                      <img 
-                        src="/img/Home1.png" 
-                        alt="BYU PMA Event" 
-                        className="h-full w-full object-cover"
-                      />
+                      <img src="/img/Home1.png" alt="BYU PMA Event" className="h-full w-full object-cover" />
                     </div>
                   </div>
                   <div className="h-40 rounded-xl bg-gradient-to-br from-[#4299E1]/20 to-[#215096]/20 border border-gray-200 dark:border-white/10 p-1">
                     <div className="h-full w-full rounded-lg bg-white/50 dark:bg-black/50 backdrop-blur-sm overflow-hidden">
-                      <img 
-                        src="/img/Home2.png" 
-                        alt="BYU PMA Workshop" 
-                        className="h-full w-full object-cover"
-                      />
+                      <img src="/img/Home2.png" alt="BYU PMA Workshop" className="h-full w-full object-cover" />
                     </div>
                   </div>
                 </div>
                 <div className="space-y-4 mt-8">
                   <div className="h-40 rounded-xl bg-gradient-to-br from-[#215096]/20 to-[#4299E1]/20 border border-gray-200 dark:border-white/10 p-1">
                     <div className="h-full w-full rounded-lg bg-white/50 dark:bg-black/50 backdrop-blur-sm overflow-hidden">
-                      <img 
-                        src="/img/Home3.png" 
-                        alt="BYU PMA Networking" 
-                        className="h-full w-full object-cover"
-                      />
+                      <img src="/img/Home3.png" alt="BYU PMA Networking" className="h-full w-full object-cover" />
                     </div>
                   </div>
                   <div className="h-64 rounded-xl bg-gradient-to-br from-[#4299E1]/20 to-[#215096]/20 border border-gray-200 dark:border-white/10 p-1">
                     <div className="h-full w-full rounded-lg bg-white/50 dark:bg-black/50 backdrop-blur-sm overflow-hidden">
-                      <img 
-                        src="/img/Home4.png" 
-                        alt="BYU PMA Team" 
-                        className="h-full w-full object-cover"
-                      />
+                      <img src="/img/Home4.png" alt="BYU PMA Team" className="h-full w-full object-cover" />
                     </div>
                   </div>
                 </div>
@@ -237,7 +229,7 @@ const HomePage = () => {
       <section className="py-16">
         <div className="container mx-auto px-4 md:px-6">
           <div className="overflow-hidden">
-            <div 
+            <div
               className="flex space-x-8 animate-scroll items-center hover:overflow-x-auto hover:animate-none"
               onWheel={(e) => {
                 if (e.deltaY !== 0) {
@@ -249,8 +241,6 @@ const HomePage = () => {
             >
               {[...Array(2)].map((_, i) => (
                 <React.Fragment key={i}>
-                  
-                  
                   <div className="h-24 w-48 bg-gray-700/20 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
                     <img src="/img/amazon-logo.jpg" alt="Amazon" className="h-full w-full object-cover" />
                   </div>
@@ -264,7 +254,7 @@ const HomePage = () => {
                     <img src="/img/databricks-logo.png" alt="Databricks" className="h-full w-full object-cover" />
                   </div>
                   <div className="h-24 w-48 bg-gray-700/20 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
-                    <img src="/img/domo-logo.png" alt="Domo" className="h-full w-full object-cover" /> 
+                    <img src="/img/domo-logo.png" alt="Domo" className="h-full w-full object-cover" />
                   </div>
                   <div className="h-24 w-48 bg-gray-700/20 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
                     <img src="/img/microsoft-logo.jpg" alt="Microsoft" className="h-full w-full object-cover" />
@@ -297,19 +287,19 @@ const HomePage = () => {
                     <img src="/img/goldman-logo.png" alt="Goldman Sachs" className="h-full w-full object-cover" />
                   </div>
                   <div className="h-24 w-48 bg-gray-700/20 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
-                    <img src="/img/disney-logo.jpg" alt="Disney" className="h-full w-full object-cover" /> 
+                    <img src="/img/disney-logo.jpg" alt="Disney" className="h-full w-full object-cover" />
                   </div>
                   <div className="h-24 w-48 bg-gray-700/20 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
-                    <img src="/img/brevium-logo.png" alt="Brevium" className="h-full w-full object-cover" /> 
+                    <img src="/img/brevium-logo.png" alt="Brevium" className="h-full w-full object-cover" />
                   </div>
                   <div className="h-24 w-48 bg-gray-700/20 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
-                    <img src="/img/pattern-logo.png" alt="Pattern" className="h-full w-full object-cover" /> 
+                    <img src="/img/pattern-logo.png" alt="Pattern" className="h-full w-full object-cover" />
                   </div>
                   <div className="h-24 w-48 bg-gray-700/20 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
-                    <img src="/img/entrata-logo.png" alt="Entrata" className="h-full w-full object-cover" /> 
+                    <img src="/img/entrata-logo.png" alt="Entrata" className="h-full w-full object-cover" />
                   </div>
                   <div className="h-24 w-48 bg-gray-700/20 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
-                    <img src="/img/awardco-logo.png" alt="Awardco" className="h-full w-full object-cover" /> 
+                    <img src="/img/awardco-logo.png" alt="Awardco" className="h-full w-full object-cover" />
                   </div>
                 </React.Fragment>
               ))}
@@ -322,7 +312,7 @@ const HomePage = () => {
       <section className="py-20 bg-gradient-to-b from-background to-primary/5">
         <div className="container mx-auto px-4 md:px-6">
           <PersonaWizard onSelect={setSelectedPersona} />
-          
+
           {/* Sign-in CTA Card - Only show when persona is selected */}
           {selectedPersona && (
             <Card className="max-w-2xl mx-auto mt-8 bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20 animate-in fade-in duration-500">
@@ -334,7 +324,12 @@ const HomePage = () => {
                 <Link to="/auth">
                   <Button size="lg" className="gap-2">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M13 10V3L4 14h7v7l9-11h-7z"
+                      />
                     </svg>
                     Sign In to Unlock Dashboard
                   </Button>
@@ -372,20 +367,18 @@ const HomePage = () => {
           <AnimatedSection animation="fade-in">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-8">
-                <h2 className="text-2xl md:text-3xl font-bold mb-3 text-foreground">
-                  Product Management Pays Off
-                </h2>
-                <p className="text-base text-muted-foreground">
-                  Real outcomes from BYU
-                </p>
+                <h2 className="text-2xl md:text-3xl font-bold mb-3 text-foreground">Product Management Pays Off</h2>
+                <p className="text-base text-muted-foreground">Real outcomes from BYU</p>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
                 {/* Average Comp Card */}
                 <div className="group relative">
                   <div className="absolute inset-0 bg-gradient-to-br from-primary to-primary/60 rounded-2xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity"></div>
                   <div className="relative bg-card border border-primary/20 rounded-2xl p-6 hover:border-primary/40 transition-all hover:scale-105 duration-300">
-                    <div className="text-xs font-semibold text-primary mb-2 uppercase tracking-wide">Average Total Comp</div>
+                    <div className="text-xs font-semibold text-primary mb-2 uppercase tracking-wide">
+                      Average Total Comp
+                    </div>
                     <div className="text-4xl md:text-5xl font-bold text-gradient mb-1">$123.4K</div>
                     <div className="text-xs text-muted-foreground">Undergraduate starting compensation</div>
                   </div>
@@ -395,7 +388,9 @@ const HomePage = () => {
                 <div className="group relative">
                   <div className="absolute inset-0 bg-gradient-to-br from-primary to-primary/60 rounded-2xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity"></div>
                   <div className="relative bg-card border border-primary/20 rounded-2xl p-6 hover:border-primary/40 transition-all hover:scale-105 duration-300">
-                    <div className="text-xs font-semibold text-primary mb-2 uppercase tracking-wide">Top Compensation</div>
+                    <div className="text-xs font-semibold text-primary mb-2 uppercase tracking-wide">
+                      Top Compensation
+                    </div>
                     <div className="text-4xl md:text-5xl font-bold text-gradient mb-1">$196.7K</div>
                     <div className="text-xs text-muted-foreground">Highest undergraduate offer</div>
                   </div>
@@ -438,52 +433,94 @@ const HomePage = () => {
         <div className="container mx-auto px-4 md:px-6">
           <AnimatedSection animation="slide-up">
             <div className="max-w-3xl mx-auto text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold mb-6">About <span className="text-gradient">BYU PMA</span></h2>
+              <h2 className="text-3xl md:text-4xl font-bold mb-6">
+                About <span className="text-gradient">BYU PMA</span>
+              </h2>
               <p className="text-lg text-gray-600 dark:text-gray-300">
-                The Product Management Association at Brigham Young University is dedicated to helping students develop the skills necessary to excel in the world of product management.
+                The Product Management Association at Brigham Young University is dedicated to helping students develop
+                the skills necessary to excel in the world of product management.
               </p>
             </div>
           </AnimatedSection>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <AnimatedSection animation="slide-up" delay={100}>
               <Card className="bg-white/80 dark:bg-black/40 border border-gray-200 dark:border-white/10 backdrop-blur-sm">
                 <CardContent className="p-6">
                   <div className="h-12 w-12 rounded-full bg-gradient-to-r from-[#4A90E2] to-[#87CEEB] flex items-center justify-center mb-6">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="w-6 h-6"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
+                      />
                     </svg>
                   </div>
                   <h3 className="text-xl font-bold mb-3">Community</h3>
-                  <p className="text-gray-600 dark:text-gray-400">Join a network of like-minded students passionate about product management and technology.</p>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    Join a network of like-minded students passionate about product management and technology.
+                  </p>
                 </CardContent>
               </Card>
             </AnimatedSection>
-            
+
             <AnimatedSection animation="slide-up" delay={200}>
               <Card className="bg-white/80 dark:bg-black/40 border border-gray-200 dark:border-white/10 backdrop-blur-sm">
                 <CardContent className="p-6">
                   <div className="h-12 w-12 rounded-full bg-gradient-to-r from-[#215096] to-[#4299E1] flex items-center justify-center mb-6">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="w-6 h-6"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5"
+                      />
                     </svg>
                   </div>
                   <h3 className="text-xl font-bold mb-3">Education</h3>
-                  <p className="text-gray-600 dark:text-gray-400">Access workshops, guest speakers, and resources to develop essential product management skills.</p>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    Access workshops, guest speakers, and resources to develop essential product management skills.
+                  </p>
                 </CardContent>
               </Card>
             </AnimatedSection>
-            
+
             <AnimatedSection animation="slide-up" delay={300}>
               <Card className="bg-white/80 dark:bg-black/40 border border-gray-200 dark:border-white/10 backdrop-blur-sm">
                 <CardContent className="p-6">
                   <div className="h-12 w-12 rounded-full bg-gradient-to-r from-[#215096] to-[#4299E1] flex items-center justify-center mb-6">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 0 0 .75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0 1 12 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 0 1-.673-.38m0 0A2.18 2.18 0 0 1 3 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 0 1 3.413-.387m7.5 0V5.25A2.25 2.25 0 0 0 13.5 3h-3a2.25 2.25 0 0 0-2.25 2.25v.894m7.5 0a48.667 48.667 0 0 0-7.5 0M12 12.75h.008v.008H12v-.008Z" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="w-6 h-6"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 0 0 .75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0 1 12 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 0 1-.673-.38m0 0A2.18 2.18 0 0 1 3 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 0 1 3.413-.387m7.5 0V5.25A2.25 2.25 0 0 0 13.5 3h-3a2.25 2.25 0 0 0-2.25 2.25v.894m7.5 0a48.667 48.667 0 0 0-7.5 0M12 12.75h.008v.008H12v-.008Z"
+                      />
                     </svg>
                   </div>
                   <h3 className="text-xl font-bold mb-3">Industry Access</h3>
-                  <p className="text-gray-600 dark:text-gray-400">Connect with product leaders and companies for internships, job opportunities, and mentorship.</p>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    Connect with product leaders and companies for internships, job opportunities, and mentorship.
+                  </p>
                 </CardContent>
               </Card>
             </AnimatedSection>
@@ -492,19 +529,20 @@ const HomePage = () => {
           {/* New to Product Management Section */}
           <AnimatedSection animation="slide-up" delay={400}>
             <div className="mt-10 text-center">
-              <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">New to Product Management or want to learn more?</h2>
-              <a 
-                href="/discover" 
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
+                New to Product Management or want to learn more?
+              </h2>
+              <a
+                href="/discover"
                 className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-[#215096] to-[#4299E1] rounded-xl text-white font-bold text-lg hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
               >
                 Discover PM
               </a>
             </div>
           </AnimatedSection>
-
         </div>
       </section>
-      
+
       {/* Club Impact Section
       <section className="py-32 relative">
         <div className="absolute inset-0 z-0">
@@ -574,7 +612,7 @@ const HomePage = () => {
           </div>
         </div>
       </section> */}
-      
+
       {/* Recruiting Timeline Section (Framer Motion) */}
       {/* <RecruitingTimeline /> */}
 
@@ -646,7 +684,7 @@ const HomePage = () => {
           </div>
         </div>
       </section> */}
-      
+
       {/* Event Banner */}
       <AnimatePresence>
         {showEventBanner && upcomingEvent && !isLoadingEvents && (
@@ -662,30 +700,65 @@ const HomePage = () => {
                 <div className="flex items-start gap-3 flex-1">
                   <div className="flex-shrink-0 mt-0.5">
                     <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-primary">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5a2.25 2.25 0 0 0 2.25-2.25m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5a2.25 2.25 0 0 1 2.25 2.25v7.5" />
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="w-5 h-5 text-primary"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5a2.25 2.25 0 0 0 2.25-2.25m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5a2.25 2.25 0 0 1 2.25 2.25v7.5"
+                        />
                       </svg>
                     </div>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-semibold text-foreground mb-1">
-                      {upcomingEvent.title}
-                    </h3>
+                    <h3 className="text-sm font-semibold text-foreground mb-1">{upcomingEvent.title}</h3>
                     <p className="text-xs text-muted-foreground line-clamp-2 mb-2">{upcomingEvent.description}</p>
                     <div className="flex items-center gap-3 text-xs text-muted-foreground">
                       <span className="flex items-center gap-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3.5 h-3.5">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5a2.25 2.25 0 0 0 2.25-2.25m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5a2.25 2.25 0 0 1 2.25 2.25v7.5" />
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="w-3.5 h-3.5"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5a2.25 2.25 0 0 0 2.25-2.25m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5a2.25 2.25 0 0 1 2.25 2.25v7.5"
+                          />
                         </svg>
-                        {new Date(upcomingEvent.date).toLocaleDateString('en-US', { 
-                          month: 'short', 
-                          day: 'numeric'
+                        {new Date(upcomingEvent.date).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
                         })}
                       </span>
                       <span className="flex items-center gap-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3.5 h-3.5">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="w-3.5 h-3.5"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                          />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"
+                          />
                         </svg>
                         {upcomingEvent.location}
                       </span>
@@ -693,7 +766,7 @@ const HomePage = () => {
                   </div>
                 </div>
                 <div className="flex items-start gap-2 flex-shrink-0">
-                  <Link 
+                  <Link
                     to="/events"
                     className="px-3 py-1.5 bg-primary text-primary-foreground rounded-lg font-medium text-xs hover:bg-primary/90 transition-colors whitespace-nowrap"
                   >
@@ -704,7 +777,14 @@ const HomePage = () => {
                     className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg transition-colors"
                     aria-label="Dismiss banner"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="w-4 h-4"
+                    >
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
@@ -714,7 +794,7 @@ const HomePage = () => {
           </motion.div>
         )}
       </AnimatePresence>
-      
+
       {/* Scroll-Triggered Modals */}
       <ScrollTriggeredModals />
     </div>
@@ -733,7 +813,7 @@ export function RecruitingTimeline() {
 
   useEffect(() => {
     if (inView && containerRef.current) {
-      containerRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      containerRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   }, [inView]);
 
@@ -752,10 +832,7 @@ export function RecruitingTimeline() {
         {/* Vertical line */}
         <div className="absolute left-6 top-0 bottom-0 w-1 bg-gradient-to-b from-[#4A90E2] to-[#87CEEB] rounded-full opacity-40" />
         {recruitingMilestones.map((milestone) => (
-          <Milestone
-            key={milestone.title}
-            milestone={milestone}
-          />
+          <Milestone key={milestone.title} milestone={milestone} />
         ))}
       </div>
     </section>
@@ -769,14 +846,9 @@ function Milestone({ milestone }: { milestone: { title: string; description: str
   });
 
   return (
-    <div
-      ref={ref}
-      className="relative flex items-center min-h-[60vh] snap-center"
-      style={{ zIndex: 2 }}
-    >
+    <div ref={ref} className="relative flex items-center min-h-[60vh] snap-center" style={{ zIndex: 2 }}>
       {/* Dot/Icon */}
-      <span className="absolute left-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-gradient-to-br from-[#4A90E2] to-[#87CEEB] flex items-center justify-center text-white text-lg shadow-lg border-2 border-white/10">
-      </span>
+      <span className="absolute left-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-gradient-to-br from-[#4A90E2] to-[#87CEEB] flex items-center justify-center text-white text-lg shadow-lg border-2 border-white/10"></span>
       {/* Content */}
       <AnimatePresence>
         {inView && (
