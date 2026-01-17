@@ -219,17 +219,17 @@ const TeamPage: React.FC = () => {
               </div>
             </div>
           ))}
-
-          <p className="text-lg text-gray-300 mb-6"></p>
-          <a
-            href="https://forms.office.com/pages/responsepage.aspx?id=m278xvtRqEi3eZ7lZLQEE8C_ph6CqvNEvrlyhQcKDr1UQjFQUFdNNVRIQzZBTjZGWVpSUTZPN01FTS4u&route=shorturl"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-6 py-3 rounded-lg transition-colors"
-          >
-            Apply to be an Ambassador today
-          </a>
         </div>
+
+        <p className="text-lg text-gray-300 mb-6"></p>
+        <a
+          href="https://forms.office.com/pages/responsepage.aspx?id=m278xvtRqEi3eZ7lZLQEE8C_ph6CqvNEvrlyhQcKDr1UQjFQUFdNNVRIQzZBTjZGWVpSUTZPN01FTS4u&route=shorturl"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-6 py-3 rounded-lg transition-colors"
+        >
+          Apply to be an Ambassador today
+        </a>
       </div>
     </div>
   );
