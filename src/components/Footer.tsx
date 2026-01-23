@@ -8,7 +8,7 @@ const Footer = () => {
           <div>
             <h3 className="text-xl font-bold text-gradient mb-4">BYU PMA</h3>
             <p className="text-gray-600 dark:text-gray-400 text-sm">
-              Empowering the next generation of product managers at Brigham Young University
+              Empowering the next generation of product managers at Brigham Young University.
             </p>
             <div className="flex mt-4 space-x-4">
               <a href="https://instagram.com/byupmassociation" target="_blank" rel="noopener noreferrer" className="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-white transition-colors">
