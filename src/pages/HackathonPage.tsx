@@ -1,0 +1,467 @@
+import { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Rocket, Users, Briefcase, Calendar, Zap, Layout, Target, ChevronDown } from 'lucide-react';
+import { cn } from "@/lib/utils";
+
+// Custom TechCard Component
+const TechCard = ({ className, children, delay = 0 }: { className?: string, children: React.ReactNode, delay?: number }) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5, delay: delay * 0.1 }}
+      className={cn(
+        "relative group bg-black/40 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden transition-all duration-300",
+        "hover:border-blue-500/50 hover:shadow-[0_0_30px_-5px_rgba(59,130,246,0.4)]",
+        className
+      )}
+    >
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+      <div className="p-6 relative z-10 h-full">
+        {children}
+      </div>
+    </motion.div>
+  );
+};
+
+const FAQItem = ({ question, answer }: { question: string, answer: string }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="border-b border-white/10 last:border-none">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full py-4 flex items-center justify-between text-left group"
+      >
+        <span className="text-lg font-bold text-white group-hover:text-blue-400 transition-colors">{question}</span>
+        <ChevronDown
+          className={cn(
+            "text-gray-400 transition-transform duration-300",
+            isOpen ? "rotate-180 text-blue-400" : ""
+          )}
+        />
+      </button>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="overflow-hidden"
+          >
+            <p className="pb-4 text-gray-400 text-sm leading-relaxed">
+              {answer}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+
+
+const SectionHeader = ({ title, subtitle }: { title: string, subtitle?: string }) => (
+  <div className="mb-12 text-center">
+    <motion.h2
+      initial={{ opacity: 0, y: 10 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      className="text-3xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-white to-white/60 mb-4 tracking-tight"
+    >
+      {title}
+    </motion.h2>
+    {subtitle && (
+      <motion.p
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        className="text-slate-400 mb-6"
+      >
+        {subtitle}
+      </motion.p>
+    )}
+    <motion.div
+      initial={{ opacity: 0, scaleX: 0 }}
+      whileInView={{ opacity: 1, scaleX: 1 }}
+      viewport={{ once: true }}
+      className="h-1 w-24 bg-blue-500 mx-auto rounded-full shadow-[0_0_10px_rgba(59,130,246,0.5)]"
+    />
+  </div>
+);
+
+const HackathonPage = () => {
+  // Load Luma checkout script
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://embed.lu.ma/checkout-button.js';
+    script.id = 'luma-checkout';
+    script.async = true;
+    document.body.appendChild(script);
+
+    return () => {
+      const existingScript = document.getElementById('luma-checkout');
+      if (existingScript) {
+        existingScript.remove();
+      }
+    };
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-[#030712] text-white selection:bg-blue-500/30">
+      {/* Background Decor */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl opacity-50" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl opacity-50" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.07)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.07)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:linear-gradient(to_bottom,white_20%,transparent_90%)]" />
+      </div>
+
+      {/* Hero Section */}
+      <section className="relative pt-32 pb-24 overflow-hidden">
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-5xl mx-auto text-center">
+
+            {/* Presented By */}
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="inline-flex items-center gap-4 mb-8 px-6 py-0 rounded-full bg-white/10 border border-white/10 backdrop-blur-sm hover:border-white/20 transition-colors"
+            >
+              <span className="text-slate-300 text-xs font-mono tracking-widest uppercase">Presented by</span>
+              <img src="/img/pma-logo-transparent.png" alt="PMA Logo" className="h-12 md:h-20 w-auto py-1" />
+            </motion.div>
+
+            {/* Main Title */}
+            <motion.h1
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="text-7xl md:text-9xl font-bold mb-8 tracking-tighter"
+            >
+              <span className="bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-white/40">
+                PRODUCT
+              </span>
+              <br />
+              <span className="text-white relative drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
+                HACKATHON
+              </span>
+            </motion.h1>
+
+            {/* Stats / Details */}
+            <div className="flex flex-wrap justify-center gap-8 md:gap-16 mb-6 text-lg md:text-xl font-light">
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.4 }}
+                className="flex items-center gap-3"
+              >
+                <Calendar className="text-white" />
+                <span>Feb 9th - 13th</span>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.4 }}
+                className="flex items-center gap-3"
+              >
+                <div className="flex -space-x-4">
+                  <div className="w-8 h-8 rounded-full bg-white/10 border border-black" />
+                  <div className="w-8 h-8 rounded-full bg-white/20 border border-black" />
+                  <div className="w-8 h-8 rounded-full bg-white/30 border border-black" />
+                </div>
+                <span>Teams of 2-5</span>
+              </motion.div>
+            </div>
+
+            {/* Supporters */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="flex flex-col items-center gap-3 mb-8"
+            >
+              <span className="text-slate-500 text-[10px] font-mono tracking-widest uppercase">Supported By</span>
+              <div className="flex items-center gap-4">
+                {[
+                  { name: "Figma", logo: "/img/figma-logo.png", className: "w-5 h-5 object-contain" },
+                  { name: "Utah PMA", logo: "/img/utah-pma-icon.png", className: "w-5 h-5 object-contain" },
+                  { name: "BYU UX Design Association", logo: "/img/byu-uxd-logo.png", className: "w-full h-full object-cover" },
+                  { name: "AI in Business Society", logo: "/img/ai-business-logo.png", className: "w-full h-full object-cover" }
+                ].map((supporter, i) => (
+                  <div key={i} className="relative group w-10 h-10">
+                    <div className="absolute inset-0 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-white/10 transition-colors cursor-pointer overflow-hidden">
+                      {supporter.logo ? (
+                        <img
+                          src={supporter.logo}
+                          alt={supporter.name}
+                          className={cn("opacity-80 group-hover:opacity-100 transition-opacity", supporter.className)}
+                        />
+                      ) : (
+                        <div className="w-4 h-4 rounded-full bg-white/20 group-hover:bg-white/40 transition-colors" />
+                      )}
+                    </div>
+
+                    {/* Tooltip */}
+                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-black/90 border border-white/10 rounded text-[10px] text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-20">
+                      {supporter.name}
+                      <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-black/90" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* CTA */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+            >
+              <a
+                href="https://lu.ma/event/evt-26S8mILGH5NJMVJ"
+                className="luma-checkout--button group relative inline-flex items-center gap-3 px-8 py-4 bg-white text-black rounded-full font-bold text-lg hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.5)] transition-all duration-300"
+                data-luma-action="checkout"
+                data-luma-event-id="evt-26S8mILGH5NJMVJ"
+              >
+                RSVP to Compete
+                <Rocket className="w-5 h-5 group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform" />
+              </a>
+            </motion.div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* Main Content Container */}
+      <div className="container mx-auto px-4 md:px-6 pb-32 space-y-32">
+
+        {/* Why Compete Grid */}
+        <section>
+          <SectionHeader title="WHY COMPETE?" subtitle={undefined} />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <TechCard delay={0}>
+              <div className="w-12 h-12 rounded-lg bg-white/10 flex items-center justify-center mb-4 text-white">
+                <Users size={24} />
+              </div>
+              <h3 className="text-xl font-bold mb-2">Cross-Functional</h3>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                Learn to work cross-functionally. Collaborate with designers, PMs, and engineers.
+              </p>
+            </TechCard>
+
+            <TechCard delay={1}>
+              <div className="w-12 h-12 rounded-lg bg-white/10 flex items-center justify-center mb-4 text-white">
+                <Briefcase size={24} />
+              </div>
+              <h3 className="text-xl font-bold mb-2">Build Your Resume</h3>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                Build a 0 to 1 project. Perfect experience for your portfolio and interviews.
+              </p>
+            </TechCard>
+
+            <TechCard delay={2}>
+              <div className="w-12 h-12 rounded-lg bg-white/10 flex items-center justify-center mb-4 text-white">
+                <Zap size={24} />
+              </div>
+              <h3 className="text-xl font-bold mb-2">Solve Real Problems</h3>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                Tackle actual challenges. Create viable solutions that matter.
+              </p>
+            </TechCard>
+
+            <TechCard delay={3}>
+              <div className="w-12 h-12 rounded-lg bg-white/10 flex items-center justify-center mb-4 text-white">
+                <Target size={24} />
+              </div>
+              <h3 className="text-xl font-bold mb-2">Win Prizes</h3>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                Compete for a prize pool of up to $500. Show off your skills and win big.
+              </p>
+            </TechCard>
+          </div>
+        </section>
+
+        {/* Format Section */}
+        <section>
+          <SectionHeader title="THE FORMAT" subtitle={undefined} />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <TechCard>
+              <div className="h-full flex flex-col">
+                <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                  <Users className="text-blue-400" size={20} /> Teams
+                </h3>
+                <ul className="space-y-3 text-gray-400 flex-1 mb-4">
+                  <li className="flex items-start gap-2">
+                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-blue-500" />
+                    <span>2-5 Members</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-blue-500" />
+                    <span>Rec: PM + UXD + ENG</span>
+                  </li>
+                </ul>
+                <p className="text-xs text-slate-500 italic border-t border-white/10 pt-3">
+                  No team? Register alone and we'll group you.
+                </p>
+              </div>
+            </TechCard>
+
+            <TechCard>
+              <div className="h-full flex flex-col">
+                <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                  <Calendar className="text-purple-400" size={20} /> Duration
+                </h3>
+                <div className="flex-1 flex flex-col justify-center">
+                  <div className="text-5xl font-mono font-bold text-white mb-2">5<span className="text-lg text-gray-500 ml-2">DAYS</span></div>
+                  <p className="text-gray-400 text-sm">Mon-Fri Intense Sprint</p>
+                </div>
+              </div>
+            </TechCard>
+
+            <TechCard className="relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
+              <div className="relative z-10 h-full flex flex-col">
+                <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                  <Layout className="text-emerald-400" size={20} /> Deliverables
+                </h3>
+                <ul className="space-y-3 text-gray-400 flex-1">
+                  <li className="flex items-start gap-2">
+                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    <span>Working Prototype</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    <span>Live Demo</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    <span>Product Strategy Slide Deck</span>
+                  </li>
+                </ul>
+              </div>
+            </TechCard>
+          </div>
+        </section>
+
+        {/* Schedule */}
+        <section className="max-w-4xl mx-auto">
+          <SectionHeader title="SCHEDULE" subtitle={undefined} />
+          <div className="space-y-4">
+            <TechCard className="flex flex-col md:flex-row gap-6 md:items-center">
+              <div className="min-w-[120px] text-center md:text-left">
+                <div className="text-sm text-white font-bold uppercase tracking-wider">Day 1</div>
+                <div className="text-2xl font-bold">Feb 9</div>
+              </div>
+              <div className="h-px w-full md:w-px md:h-12 bg-white/10" />
+              <div className="flex-1 space-y-1">
+                <h4 className="text-lg font-bold">Kickoff</h4>
+                <p className="text-gray-400 text-sm">Receive prompt & packet. Team formation.</p>
+              </div>
+            </TechCard>
+
+            <TechCard className="flex flex-col md:flex-row gap-6 md:items-center border-white/5 bg-white/5">
+              <div className="min-w-[120px] text-center md:text-left">
+                <div className="text-sm text-gray-500 font-bold uppercase tracking-wider">Days 2-4</div>
+                <div className="text-2xl font-bold text-gray-400">Build</div>
+              </div>
+              <div className="h-px w-full md:w-px md:h-12 bg-white/10" />
+              <div className="flex-1 space-y-1">
+                <h4 className="text-lg font-bold text-gray-300">Async Hacking</h4>
+                <p className="text-gray-500 text-sm">Everything due 9:00 AM Friday morning.</p>
+              </div>
+            </TechCard>
+
+            <TechCard className="flex flex-col md:flex-row gap-6 md:items-center">
+              <div className="min-w-[120px] text-center md:text-left">
+                <div className="text-sm text-white font-bold uppercase tracking-wider">Day 5</div>
+                <div className="text-2xl font-bold">Feb 13</div>
+              </div>
+              <div className="h-px w-full md:w-px md:h-12 bg-white/10" />
+              <div className="flex-1 space-y-1">
+                <h4 className="text-lg font-bold">Presentations & Awards</h4>
+                <p className="text-gray-400 text-sm">2:00 PM - 5:00 PM @ BYU Rollins Center.</p>
+              </div>
+            </TechCard>
+          </div>
+        </section>
+
+        {/* Register Section */}
+        <section className="max-w-4xl mx-auto">
+          <SectionHeader title="REGISTER" subtitle={undefined} />
+          <div className="w-full">
+            <iframe
+              src="https://lu.ma/embed/event/evt-26S8mILGH5NJMVJ/simple"
+              width="100%"
+              height="450"
+              frameBorder="0"
+              style={{ border: '1px solid #bfcbda88', borderRadius: '12px' }}
+              allow="fullscreen; payment"
+              aria-hidden="false"
+              tabIndex={0}
+            />
+          </div>
+        </section>
+
+        {/* FAQ Section */}
+        <section className="max-w-4xl mx-auto">
+          <SectionHeader title="FAQ" subtitle={undefined} />
+          <TechCard>
+            <FAQItem
+              question="Who can participate?"
+              answer="All students are welcome. No prior experience in product management, design, or engineering is required."
+            />
+            <FAQItem
+              question="Do I need a team to sign up?"
+              answer="No. You can compete solo or choose to be grouped with others. Teams can have 2 to 5 members."
+            />
+            <FAQItem
+              question="What skills do I need?"
+              answer="None required. Teams typically include PM, UXD, and ENG roles, but you are not required to fill every role."
+            />
+            <FAQItem
+              question="What will we be judged on?"
+              answer="Teams will be evaluated on several criteria including PM fundamentals, UX design principles, and engineering quality."
+            />
+            <FAQItem
+              question="What is the time commitment?"
+              answer="1 Hour kickoff meeting. Four build days (asynchronous). Final in-person demo and presentation for 3 hours."
+            />
+            <FAQItem
+              question="What do we submit?"
+              answer="A working prototype, live demo, and product strategy slide deck."
+            />
+            <FAQItem
+              question="How does judging work?"
+              answer="Judges will score each team using a standardized rubric across PM fundamentals (user selection, problem selection and validation, solution quality and validation). Other criteria include principles of UX design, and engineering."
+            />
+            <FAQItem
+              question="Can this go on my resume?"
+              answer="Yes. This is a legitimate 0 to 1 product build and demo experience."
+            />
+          </TechCard>
+        </section>
+
+
+
+        {/* Footer CTA */}
+        <section className="text-center pt-20">
+          <h2 className="text-3xl font-bold mb-8">Ready to ship?</h2>
+          <a
+            href="https://lu.ma/event/evt-26S8mILGH5NJMVJ"
+            className="luma-checkout--button inline-block bg-white text-black hover:bg-gray-200 text-lg px-12 py-5 font-bold rounded-full transition-colors"
+            data-luma-action="checkout"
+            data-luma-event-id="evt-26S8mILGH5NJMVJ"
+          >
+            Register Now
+          </a>
+        </section>
+
+      </div>
+    </div>
+  );
+};
+
+export default HackathonPage;
