@@ -17,6 +17,7 @@ import Footer from "./components/Footer";
 import GamePage from './pages/GamePage';
 import AuthPage from "./pages/AuthPage";
 import DashboardPage from "./pages/DashboardPage";
+import HackathonPage from "./pages/HackathonPage";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/team" element={<TeamPage />} />
+            <Route path="/hackathon" element={<HackathonPage />} />
             <Route path="/events" element={<EventsPage />} />
             <Route path="/resources" element={<ResourcesPage />} />
             <Route path="/contact" element={<ContactPage />} />
