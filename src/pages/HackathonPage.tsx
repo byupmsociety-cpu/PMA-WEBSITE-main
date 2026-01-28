@@ -195,11 +195,11 @@ const HackathonPage = () => {
                       <span className="text-yellow-400 text-xs font-mono tracking-widest uppercase">Cash Prizes</span>
                     </div>
                     <div className="h-6 w-px bg-yellow-500/30" />
-                    <div className="flex items-baseline gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-yellow-400/70 text-sm font-light leading-none">up to</span>
                       <span className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-300 bg-clip-text text-transparent">
                         $500
                       </span>
-                      <span className="text-yellow-400/70 text-sm font-light">for 1st Place</span>
                     </div>
                   </div>
                 </div>
@@ -214,55 +214,66 @@ const HackathonPage = () => {
               className="flex flex-col items-center gap-3 mb-8"
             >
               <span className="text-slate-500 text-[10px] font-mono tracking-widest uppercase">Supported By</span>
-              <div className="flex items-center justify-center gap-4">
-                {[
-                  { name: "BYU PMA", logo: "/img/pma-logo-transparent.png", className: "w-full h-full object-contain", link: "https://product.byu.edu/" },
+              {(() => {
+                const supporters = [
+                  { name: "BYU PMA", logo: "/img/pma-logo-white.png", className: "w-full h-full object-contain", link: "https://product.byu.edu/" },
                   { name: "Figma", logo: "/img/figma-logo.png", className: "w-3/4 h-3/4 object-contain", link: "https://www.figma.com/" },
                   { name: "Utah PMA", logo: "/img/utah-pma-icon.png", className: "w-full h-full object-contain", link: "https://www.linkedin.com/company/the-product-management-association/" },
                   { name: "Verso AI", logo: "/img/verso-ai-logo.png", className: "w-full h-full object-contain", link: "https://www.versomusic.ai/" },
                   { name: "BYU UX Design Association", logo: "/img/byu-uxd-logo.png", className: "w-full h-full object-cover", link: "https://uxd.byu.edu/" },
                   { name: "AI in Business Society", logo: "/img/ai-business-logo.png", className: "w-full h-full object-cover", link: "https://www.aiinbusinesssociety.org/" },
-                ].map((supporter, i) => (
-                  <div key={i} className="relative group w-20 h-20">
-                    {supporter.link ? (
-                      <a
-                        href={supporter.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="absolute inset-0 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-white/10 transition-colors cursor-pointer overflow-hidden"
-                      >
-                        {supporter.logo ? (
-                          <img
-                            src={supporter.logo}
-                            alt={supporter.name}
-                            className={cn("opacity-80 group-hover:opacity-100 transition-opacity", supporter.className)}
-                          />
-                        ) : (
-                          <div className="w-8 h-8 rounded-full bg-white/20 group-hover:bg-white/40 transition-colors" />
-                        )}
-                      </a>
-                    ) : (
-                      <div className="absolute inset-0 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-white/10 transition-colors cursor-pointer overflow-hidden">
-                        {supporter.logo ? (
-                          <img
-                            src={supporter.logo}
-                            alt={supporter.name}
-                            className={cn("opacity-80 group-hover:opacity-100 transition-opacity", supporter.className)}
-                          />
-                        ) : (
-                          <div className="w-8 h-8 rounded-full bg-white/20 group-hover:bg-white/40 transition-colors" />
-                        )}
-                      </div>
-                    )}
+                ];
 
-                    {/* Tooltip */}
-                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-black/90 border border-white/10 rounded text-[10px] text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-20">
+                const Logo = ({ supporter, idx }: { supporter: typeof supporters[number]; idx: number }) => (
+                  <div key={idx} className="relative group shrink-0 w-14 h-14 md:w-20 md:h-20">
+                    <a
+                      href={supporter.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="absolute inset-0 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-white/10 transition-colors cursor-pointer overflow-hidden"
+                    >
+                      <img
+                        src={supporter.logo}
+                        alt={supporter.name}
+                        className={cn("opacity-80 group-hover:opacity-100 transition-opacity", supporter.className)}
+                      />
+                    </a>
+
+                    {/* Tooltip (desktop only) */}
+                    <div className="hidden md:block absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-black/90 border border-white/10 rounded text-[10px] text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-20">
                       {supporter.name}
                       <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-black/90" />
                     </div>
                   </div>
-                ))}
-              </div>
+                );
+
+                return (
+                  <>
+                    {/* Mobile: auto-scrolling marquee (still clickable) */}
+                    <div className="w-full md:hidden overflow-hidden">
+                      <div className="supporters-marquee-track flex w-max">
+                        <div className="flex items-center gap-4 pr-4">
+                          {supporters.map((supporter, i) => (
+                            <Logo key={`${supporter.name}-${i}`} supporter={supporter} idx={i} />
+                          ))}
+                        </div>
+                        <div className="flex items-center gap-4 pr-4" aria-hidden="true">
+                          {supporters.map((supporter, i) => (
+                            <Logo key={`dup-${supporter.name}-${i}`} supporter={supporter} idx={i} />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Desktop: static row */}
+                    <div className="hidden md:flex items-center justify-center gap-4">
+                      {supporters.map((supporter, i) => (
+                        <Logo key={supporter.name} supporter={supporter} idx={i} />
+                      ))}
+                    </div>
+                  </>
+                );
+              })()}
             </motion.div>
 
             {/* CTA */}
@@ -277,7 +288,7 @@ const HackathonPage = () => {
                 data-luma-action="checkout"
                 data-luma-event-id="evt-26S8mILGH5NJMVJ"
               >
-                RSVP to Compete
+                Register to Compete
                 <Rocket className="w-5 h-5 group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform" />
               </a>
             </motion.div>
@@ -292,6 +303,32 @@ const HackathonPage = () => {
         {/* Why Compete Grid */}
         <section>
           <SectionHeader title="WHY COMPETE?" subtitle={undefined} />
+
+          <TechCard className="max-w-5xl mx-auto mb-8">
+            <div className="space-y-4">
+              <p className="text-base md:text-lg text-white leading-relaxed">
+                <span className="font-bold">Do you want to practice a real PM Big Tech case interview question?</span>{" "}
+                This hackathon gives you hands-on experience working in a product trio where you'll do actual PM work
+                like customer discovery, validating problems, and designing solutions.
+              </p>
+              <p className="text-sm md:text-base text-gray-300 leading-relaxed">
+                You'll tackle real challenges directly modeled after actual case interviews from companies like{" "}
+                <span className="font-semibold text-white">Google</span>,{" "}
+                <span className="font-semibold text-white">Meta</span>, and{" "}
+                <span className="font-semibold text-white">Amazon</span>. Best part? You'll build hands-on experience you
+                can immediately add to your resume and have concrete stories ready when interviewers ask,{" "}
+                <span className="italic text-white">
+                  &quot;Tell me about a time you led a cross-functional team.&quot;
+                </span>
+              </p>
+              <div className="pt-2 border-t border-white/10">
+                <p className="text-sm md:text-base text-blue-200 font-semibold">
+                  This isn't just learning—it's real experience that gets you hired.
+                </p>
+              </div>
+            </div>
+          </TechCard>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <TechCard delay={0}>
               <div className="w-12 h-12 rounded-lg bg-white/10 flex items-center justify-center mb-4 text-white">
@@ -498,12 +535,12 @@ const HackathonPage = () => {
                 <div className="space-y-3">
                   <p>Send them this website or show them this QR code:</p>
                   <a
-                    href="/img/hackathon-qr-code.png"
+                    href="/hackathon/share"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-block text-blue-400 hover:text-blue-300 underline transition-colors"
                   >
-                    QR Code
+                    Open share page (QR + link)
                   </a>
                 </div>
               }
