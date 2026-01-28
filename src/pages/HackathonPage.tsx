@@ -219,8 +219,9 @@ const HackathonPage = () => {
                   { name: "BYU PMA", logo: "/img/pma-logo-transparent.png", className: "w-full h-full object-contain" },
                   { name: "Figma", logo: "/img/figma-logo.png", className: "w-5 h-5 object-contain" },
                   { name: "Utah PMA", logo: "/img/utah-pma-icon.png", className: "w-5 h-5 object-contain" },
+                  { name: "Verso AI", logo: "/img/verso-ai-logo.png", className: "w-8 h-8 object-contain" },
                   { name: "BYU UX Design Association", logo: "/img/byu-uxd-logo.png", className: "w-full h-full object-cover" },
-                  { name: "AI in Business Society", logo: "/img/ai-business-logo.png", className: "w-full h-full object-cover" }
+                  { name: "AI in Business Society", logo: "/img/ai-business-logo.png", className: "w-full h-full object-cover" },
                 ].map((supporter, i) => (
                   <div key={i} className="relative group w-10 h-10">
                     <div className="absolute inset-0 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-white/10 transition-colors cursor-pointer overflow-hidden">
