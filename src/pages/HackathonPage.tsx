@@ -216,25 +216,44 @@ const HackathonPage = () => {
               <span className="text-slate-500 text-[10px] font-mono tracking-widest uppercase">Supported By</span>
               <div className="flex items-center justify-center gap-4">
                 {[
-                  { name: "BYU PMA", logo: "/img/pma-logo-transparent.png", className: "w-full h-full object-contain" },
-                  { name: "Figma", logo: "/img/figma-logo.png", className: "w-5 h-5 object-contain" },
-                  { name: "Utah PMA", logo: "/img/utah-pma-icon.png", className: "w-5 h-5 object-contain" },
-                  { name: "Verso AI", logo: "/img/verso-ai-logo.png", className: "w-8 h-8 object-contain" },
-                  { name: "BYU UX Design Association", logo: "/img/byu-uxd-logo.png", className: "w-full h-full object-cover" },
-                  { name: "AI in Business Society", logo: "/img/ai-business-logo.png", className: "w-full h-full object-cover" },
+                  { name: "BYU PMA", logo: "/img/pma-logo-transparent.png", className: "w-full h-full object-contain", link: "https://product.byu.edu/" },
+                  { name: "Figma", logo: "/img/figma-logo.png", className: "w-3/4 h-3/4 object-contain", link: "https://www.figma.com/" },
+                  { name: "Utah PMA", logo: "/img/utah-pma-icon.png", className: "w-full h-full object-contain", link: "https://www.linkedin.com/company/the-product-management-association/" },
+                  { name: "Verso AI", logo: "/img/verso-ai-logo.png", className: "w-full h-full object-contain", link: "https://www.versomusic.ai/" },
+                  { name: "BYU UX Design Association", logo: "/img/byu-uxd-logo.png", className: "w-full h-full object-cover", link: "https://uxd.byu.edu/" },
+                  { name: "AI in Business Society", logo: "/img/ai-business-logo.png", className: "w-full h-full object-cover", link: "https://www.aiinbusinesssociety.org/" },
                 ].map((supporter, i) => (
-                  <div key={i} className="relative group w-10 h-10">
-                    <div className="absolute inset-0 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-white/10 transition-colors cursor-pointer overflow-hidden">
-                      {supporter.logo ? (
-                        <img
-                          src={supporter.logo}
-                          alt={supporter.name}
-                          className={cn("opacity-80 group-hover:opacity-100 transition-opacity", supporter.className)}
-                        />
-                      ) : (
-                        <div className="w-4 h-4 rounded-full bg-white/20 group-hover:bg-white/40 transition-colors" />
-                      )}
-                    </div>
+                  <div key={i} className="relative group w-20 h-20">
+                    {supporter.link ? (
+                      <a
+                        href={supporter.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="absolute inset-0 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-white/10 transition-colors cursor-pointer overflow-hidden"
+                      >
+                        {supporter.logo ? (
+                          <img
+                            src={supporter.logo}
+                            alt={supporter.name}
+                            className={cn("opacity-80 group-hover:opacity-100 transition-opacity", supporter.className)}
+                          />
+                        ) : (
+                          <div className="w-8 h-8 rounded-full bg-white/20 group-hover:bg-white/40 transition-colors" />
+                        )}
+                      </a>
+                    ) : (
+                      <div className="absolute inset-0 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-white/10 transition-colors cursor-pointer overflow-hidden">
+                        {supporter.logo ? (
+                          <img
+                            src={supporter.logo}
+                            alt={supporter.name}
+                            className={cn("opacity-80 group-hover:opacity-100 transition-opacity", supporter.className)}
+                          />
+                        ) : (
+                          <div className="w-8 h-8 rounded-full bg-white/20 group-hover:bg-white/40 transition-colors" />
+                        )}
+                      </div>
+                    )}
 
                     {/* Tooltip */}
                     <div className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-black/90 border border-white/10 rounded text-[10px] text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-20">
