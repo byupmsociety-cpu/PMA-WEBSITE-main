@@ -14,6 +14,7 @@ import DiscoverPage from "./pages/DiscoverPage";
 import NotFound from "./pages/NotFound";
 import Navigation from "./components/Navigation";
 import Footer from "./components/Footer";
+import ScrollToTop from "./components/ScrollToTop";
 import GamePage from './pages/GamePage';
 import AuthPage from "./pages/AuthPage";
 import DashboardPage from "./pages/DashboardPage";
@@ -28,6 +29,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <ScrollToTop />
           <Navigation />
           <Routes>
             <Route path="/" element={<HomePage />} />

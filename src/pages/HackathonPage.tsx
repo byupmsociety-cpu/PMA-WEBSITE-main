@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Rocket, Users, Briefcase, Calendar, Zap, Layout, Target, ChevronDown } from 'lucide-react';
+import { Rocket, Users, Briefcase, Calendar, Zap, Layout, Target, ChevronDown, Trophy } from 'lucide-react';
 import { cn } from "@/lib/utils";
 
 // Custom TechCard Component
@@ -131,7 +131,9 @@ const HackathonPage = () => {
               className="inline-flex items-center gap-4 mb-8 px-6 py-0 rounded-full bg-white/10 border border-white/10 backdrop-blur-sm hover:border-white/20 transition-colors"
             >
               <span className="text-slate-300 text-xs font-mono tracking-widest uppercase">Presented by</span>
-              <img src="/img/pma-logo-transparent.png" alt="PMA Logo" className="h-12 md:h-20 w-auto py-1" />
+              <img src="/img/byu-logo-transparent.png" alt="BYU Logo" className="h-12 md:h-16 w-auto py-1" />
+              <span className="text-slate-300 text-lg font-bold">×</span>
+              <img src="/img/utah-pma-icon.png" alt="Utah PMA" className="h-12 md:h-16 w-auto py-1" />
             </motion.div>
 
             {/* Main Title */}
@@ -139,7 +141,8 @@ const HackathonPage = () => {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
-              className="text-7xl md:text-9xl font-bold mb-8 tracking-tighter"
+              className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold mb-8 tracking-tighter px-2 md:px-0 break-words"
+              style={{ fontSize: 'clamp(3rem, 8vw, 8rem)' }}
             >
               <span className="bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-white/40">
                 PRODUCT
@@ -176,6 +179,33 @@ const HackathonPage = () => {
               </motion.div>
             </div>
 
+            {/* Cash Prizes */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ delay: 0.7, duration: 1, ease: "easeOut" }}
+              className="mb-8"
+            >
+              <div className="relative inline-block mx-auto">
+                <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/15 via-yellow-400/15 to-yellow-500/15 rounded-xl blur-xl" />
+                <div className="relative bg-gradient-to-br from-yellow-500/10 via-yellow-400/5 to-yellow-500/10 border border-yellow-500/30 rounded-xl px-8 py-3 backdrop-blur-sm">
+                  <div className="flex items-center justify-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <Trophy className="w-5 h-5 text-yellow-400" />
+                      <span className="text-yellow-400 text-xs font-mono tracking-widest uppercase">Cash Prizes</span>
+                    </div>
+                    <div className="h-6 w-px bg-yellow-500/30" />
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-300 bg-clip-text text-transparent">
+                        $500
+                      </span>
+                      <span className="text-yellow-400/70 text-sm font-light">for 1st Place</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
             {/* Supporters */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
@@ -184,8 +214,9 @@ const HackathonPage = () => {
               className="flex flex-col items-center gap-3 mb-8"
             >
               <span className="text-slate-500 text-[10px] font-mono tracking-widest uppercase">Supported By</span>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center justify-center gap-4">
                 {[
+                  { name: "BYU PMA", logo: "/img/pma-logo-transparent.png", className: "w-full h-full object-contain" },
                   { name: "Figma", logo: "/img/figma-logo.png", className: "w-5 h-5 object-contain" },
                   { name: "Utah PMA", logo: "/img/utah-pma-icon.png", className: "w-5 h-5 object-contain" },
                   { name: "BYU UX Design Association", logo: "/img/byu-uxd-logo.png", className: "w-full h-full object-cover" },
