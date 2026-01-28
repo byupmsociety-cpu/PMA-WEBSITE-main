@@ -25,7 +25,7 @@ const TechCard = ({ className, children, delay = 0 }: { className?: string, chil
   );
 };
 
-const FAQItem = ({ question, answer }: { question: string, answer: string }) => {
+const FAQItem = ({ question, answer }: { question: string, answer: string | React.ReactNode }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -51,9 +51,9 @@ const FAQItem = ({ question, answer }: { question: string, answer: string }) => 
             transition={{ duration: 0.3 }}
             className="overflow-hidden"
           >
-            <p className="pb-4 text-gray-400 text-sm leading-relaxed">
-              {answer}
-            </p>
+            <div className="pb-4 text-gray-400 text-sm leading-relaxed">
+              {typeof answer === 'string' ? <p>{answer}</p> : answer}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -491,6 +491,22 @@ const HackathonPage = () => {
             <FAQItem
               question="Can this go on my resume?"
               answer="Yes. This is a legitimate 0 to 1 product build and demo experience."
+            />
+            <FAQItem
+              question="How do I share this with my friends?"
+              answer={
+                <div className="space-y-3">
+                  <p>Send them this website or show them this QR code:</p>
+                  <a
+                    href="/img/hackathon-qr-code.png"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block text-blue-400 hover:text-blue-300 underline transition-colors"
+                  >
+                    QR Code
+                  </a>
+                </div>
+              }
             />
           </TechCard>
         </section>
