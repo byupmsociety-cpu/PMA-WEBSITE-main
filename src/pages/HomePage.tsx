@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
+import { Rocket } from "lucide-react";
 import AnimatedSection from "@/components/AnimatedSection";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -123,8 +124,14 @@ const HomePage = () => {
     }
   }, [AIRTABLE_BASE_ID, EVENTS_TABLE_ID, AIRTABLE_API_KEY]);
 
-  // Show event banner after 3 seconds
+  // Show event banner after 3 seconds (unless dismissed in this session)
   useEffect(() => {
+    // Check if event banner was dismissed in this session
+    const dismissed = sessionStorage.getItem('eventBannerDismissed');
+    if (dismissed === 'true') {
+      return; // Don't show the banner if it was dismissed
+    }
+
     const timer = setTimeout(() => {
       setShowEventBanner(true);
     }, 3000);
@@ -160,35 +167,27 @@ const HomePage = () => {
 
               <AnimatedSection animation="fade-in" delay={300}>
                 <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mt-6">
-                  Empowering the next generation of product leaders through hands-on experience, industry connections,
-                  and community.
+                  Join us for the <span className="font-semibold text-[#215096] dark:text-[#4299E1]">Product Hackathon Feb 9-13</span>. Build a 0-to-1 product, compete for prizes, and showcase your skills.
                 </p>
               </AnimatedSection>
 
               <AnimatedSection animation="fade-in" delay={600}>
                 <div className="mt-10 flex flex-col sm:flex-row gap-4">
+                  <Link
+                    to="/hackathon"
+                    className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-[#215096] to-[#4299E1] rounded-xl !text-white font-bold text-lg hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl drop-shadow-md"
+                  >
+                    <Rocket className="w-6 h-6 mr-3" />
+                    Register for Hackathon
+                  </Link>
                   <a
                     href="https://clubs.byu.edu/link/club/18295873486206095"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-[#215096] to-[#4299E1] rounded-xl text-white font-bold text-lg hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
-                  >
-                    <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                      />
-                    </svg>
-                    Join BYU PMA
-                  </a>
-                  <Link
-                    to="/team"
                     className="inline-flex items-center justify-center px-6 py-3 bg-transparent border border-gray-300 dark:border-white/20 rounded-lg text-gray-700 dark:text-white font-medium hover:bg-gray-100 dark:hover:bg-white/5 transition-all"
                   >
-                    Meet Our Team
-                  </Link>
+                    Join the PMA
+                  </a>
                 </div>
               </AnimatedSection>
             </div>
@@ -230,7 +229,7 @@ const HomePage = () => {
         <div className="container mx-auto px-4 md:px-6">
           <div className="overflow-hidden">
             <div
-              className="flex space-x-8 animate-scroll items-center hover:overflow-x-auto hover:animate-none"
+              className="flex space-x-8 animate-scroll items-center hover:overflow-x-auto hover-scroll-pause"
               onWheel={(e) => {
                 if (e.deltaY !== 0) {
                   e.preventDefault();
@@ -355,8 +354,11 @@ const HomePage = () => {
           100% { transform: translateX(calc(-50% - 1rem)); }
         }
         .animate-scroll {
-          animation: scroll 30s linear infinite;
+          animation: scroll 40s linear infinite;
           width: max-content;
+        }
+        .hover-scroll-pause:hover {
+          animation-play-state: paused;
         }
       `}</style>
 
@@ -534,7 +536,7 @@ const HomePage = () => {
               </h2>
               <a
                 href="/discover"
-                className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-[#215096] to-[#4299E1] rounded-xl text-white font-bold text-lg hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+                className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-[#215096] to-[#4299E1] rounded-xl !text-white font-bold text-lg hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl drop-shadow-md"
               >
                 Discover PM
               </a>
@@ -767,13 +769,23 @@ const HomePage = () => {
                 </div>
                 <div className="flex items-start gap-2 flex-shrink-0">
                   <Link
-                    to="/events"
+                    to={upcomingEvent.title.toLowerCase().includes('hackathon') ? '/hackathon' : '/events'}
+                    onClick={() => {
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                      // Store dismissal in sessionStorage when user clicks Details
+                      sessionStorage.setItem('eventBannerDismissed', 'true');
+                      setShowEventBanner(false);
+                    }}
                     className="px-3 py-1.5 bg-primary text-primary-foreground rounded-lg font-medium text-xs hover:bg-primary/90 transition-colors whitespace-nowrap"
                   >
                     Details
                   </Link>
                   <button
-                    onClick={() => setShowEventBanner(false)}
+                    onClick={() => {
+                      setShowEventBanner(false);
+                      // Store dismissal in sessionStorage
+                      sessionStorage.setItem('eventBannerDismissed', 'true');
+                    }}
                     className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg transition-colors"
                     aria-label="Dismiss banner"
                   >

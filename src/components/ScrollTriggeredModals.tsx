@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Users } from "lucide-react";
+import { Sparkles, Users, Rocket } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const ScrollTriggeredModals = () => {
@@ -15,6 +15,11 @@ const ScrollTriggeredModals = () => {
 
   useEffect(() => {
     checkAuth();
+    // Check if modal was dismissed in this session
+    const dismissed = sessionStorage.getItem('hackathonModalDismissed');
+    if (dismissed === 'true') {
+      setHasShown30(true); // Prevent showing the modal
+    }
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [hasShown30, hasShown60]);
@@ -26,6 +31,10 @@ const ScrollTriggeredModals = () => {
 
   const handleScroll = () => {
     if (isLoggedIn) return; // Don't show modals for logged-in users
+    
+    // Check if modal was dismissed in this session
+    const dismissed = sessionStorage.getItem('hackathonModalDismissed');
+    if (dismissed === 'true') return;
 
     const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
 
@@ -34,58 +43,76 @@ const ScrollTriggeredModals = () => {
       setHasShown30(true);
     }
 
-    if (scrollPercent > 60 && !hasShown60 && !show60Modal) {
-      setShow60Modal(true);
-      setHasShown60(true);
-    }
+    // Disabled second modal for now
+    // if (scrollPercent > 60 && !hasShown60 && !show60Modal) {
+    //   setShow60Modal(true);
+    //   setHasShown60(true);
+    // }
   };
 
   return (
     <>
-      {/* 30% Scroll Modal - Dashboard Checklist */}
-      <Dialog open={show30Modal} onOpenChange={setShow30Modal}>
+      {/* 30% Scroll Modal - Hackathon CTA */}
+      <Dialog 
+        open={show30Modal} 
+        onOpenChange={(open) => {
+          setShow30Modal(open);
+          if (!open) {
+            // User dismissed the modal - store in sessionStorage
+            sessionStorage.setItem('hackathonModalDismissed', 'true');
+          }
+        }}
+      >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <div className="flex items-center justify-center mb-4">
               <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center">
-                <Sparkles className="h-8 w-8 text-white" />
+                <Rocket className="h-8 w-8 text-white" />
               </div>
             </div>
             <DialogTitle className="text-center text-2xl">
-              Want Your Own Step-by-Step PM Checklist?
+              Join the Product Hackathon!
             </DialogTitle>
             <DialogDescription className="text-center">
-              Sign in to get your personalized dashboard with:
+              Build a 0-to-1 product, compete for prizes, and showcase your skills:
               <ul className="mt-4 space-y-2 text-left">
                 <li className="flex items-center gap-2">
-                  ✓ <span>Customized PM journey checklist</span>
+                  🚀 <span>Build a complete product from scratch</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  ✓ <span>Progress tracking & badges</span>
+                  🏆 <span>Compete for exciting prizes</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  ✓ <span>Personalized resource recommendations</span>
+                  🤝 <span>Network with industry professionals</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  ✓ <span>Connect with peers on the same journey</span>
+                  💡 <span>Showcase your PM skills</span>
                 </li>
               </ul>
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-3 mt-4">
-            <Button size="lg" onClick={() => navigate("/auth")} className="gap-2">
-              <Sparkles className="h-4 w-4" />
-              Sign In to Get Started
+            <Button size="lg" onClick={() => navigate("/hackathon")} className="gap-2">
+              <Rocket className="h-4 w-4" />
+              Register for Hackathon
             </Button>
-            <Button size="lg" variant="outline" onClick={() => setShow30Modal(false)}>
+            <Button 
+              size="lg" 
+              variant="outline" 
+              onClick={() => {
+                setShow30Modal(false);
+                // Store dismissal in sessionStorage
+                sessionStorage.setItem('hackathonModalDismissed', 'true');
+              }}
+            >
               Maybe Later
             </Button>
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* 60% Scroll Modal - Community Connection */}
-      <Dialog open={show60Modal} onOpenChange={setShow60Modal}>
+      {/* 60% Scroll Modal - Disabled for now */}
+      {/* <Dialog open={show60Modal} onOpenChange={setShow60Modal}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <div className="flex items-center justify-center mb-4">
@@ -124,7 +151,7 @@ const ScrollTriggeredModals = () => {
             </Button>
           </div>
         </DialogContent>
-      </Dialog>
+      </Dialog> */}
     </>
   );
 };

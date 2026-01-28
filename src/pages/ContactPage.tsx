@@ -139,7 +139,7 @@ const ContactPage = () => {
                     <div>
                       <button 
                         type="submit"
-                        className="w-full bg-gradient-to-r from-[#215096] to-[#4299E1] text-white py-3 rounded-md hover:opacity-90 transition-opacity font-medium"
+                        className="w-full bg-gradient-to-r from-[#215096] to-[#4299E1] !text-white py-3 rounded-md hover:opacity-90 transition-opacity font-medium drop-shadow-md"
                       >
                         Send Message
                       </button>

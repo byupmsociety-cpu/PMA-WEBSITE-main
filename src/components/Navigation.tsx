@@ -121,9 +121,11 @@ const Navigation = () => {
                       <Link
                         to={link.path}
                         className={`relative px-4 py-2 text-sm font-bold transition-all duration-300
-                        bg-gradient-to-r from-[#215096] to-[#4299E1] text-white rounded-full
-                        hover:shadow-lg hover:shadow-blue-500/30 hover:scale-105
-                        ${activeLink === link.path ? 'ring-2 ring-white/50' : ''}`}
+                        border-2 rounded-full border-blue-500 text-blue-600 dark:text-blue-400
+                        hover:scale-105 hover:bg-blue-50 dark:hover:bg-blue-950/20
+                        ${activeLink === link.path 
+                          ? 'ring-2 ring-blue-500/50 bg-blue-50 dark:bg-blue-950/20 border-blue-600 dark:border-blue-400' 
+                          : 'animate-pulse-slow'}`}
                         onClick={() => setActiveLink(link.path)}
                       >
                         {link.name}
@@ -210,9 +212,11 @@ const Navigation = () => {
                       <Link
                         to={link.path}
                         className={`block px-4 py-3 text-base font-bold rounded-md transition-all
-                        bg-gradient-to-r from-[#215096] to-[#4299E1] text-white
-                        hover:shadow-lg hover:shadow-blue-500/30
-                        ${activeLink === link.path ? 'ring-2 ring-white/50' : ''}`}
+                        border-2 border-blue-500 text-blue-600 dark:text-blue-400
+                        hover:bg-blue-50 dark:hover:bg-blue-950/20
+                        ${activeLink === link.path 
+                          ? 'ring-2 ring-blue-500/50 bg-blue-50 dark:bg-blue-950/20 border-blue-600 dark:border-blue-400' 
+                          : 'animate-pulse-slow'}`}
                         onClick={() => handleLinkClick(link.path)}
                       >
                         {link.name}

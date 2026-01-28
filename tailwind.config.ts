@@ -67,10 +67,21 @@ const config: Config = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        "pulse-slow": {
+          "0%, 100%": { 
+            opacity: "1",
+            boxShadow: "0 0 0 0 rgba(66, 153, 225, 0.5)"
+          },
+          "50%": { 
+            opacity: "0.85",
+            boxShadow: "0 0 0 8px rgba(66, 153, 225, 0)"
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "pulse-slow": "pulse-slow 2s ease-in-out infinite",
       },
     },
   },
