@@ -135,3 +135,25 @@
 .animate-pulse-slow {
   animation: pulse-slow 2s ease-out infinite !important;
 }
+
+/* Mobile marquee for supporter logos */
+@keyframes supporters-marquee {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.supporters-marquee-track {
+  will-change: transform;
+  animation: supporters-marquee 26s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .supporters-marquee-track {
+    animation: none;
+    transform: none;
+  }
+}

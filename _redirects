@@ -1,1 +1,5 @@
+# Serve static assets directly (don’t SPA-rewrite them)
+/img/*    /img/:splat    200
+
+# SPA fallback
 /*    /index.html   200
