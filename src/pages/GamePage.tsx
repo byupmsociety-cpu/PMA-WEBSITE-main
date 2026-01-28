@@ -553,7 +553,7 @@ const GamePage = () => {
                     </button>
                     <Link
                       to="/"
-                      className="bg-gradient-to-r from-[#215096] to-[#4299E1] text-white font-bold text-lg sm:text-xl px-6 sm:px-8 py-3 sm:py-4 rounded-lg hover:from-[#1a3d7a] hover:to-[#3a8bd1] transition-all text-center shadow-lg transform hover:scale-105 w-full sm:w-auto"
+                      className="bg-gradient-to-r from-[#215096] to-[#4299E1] !text-white font-bold text-lg sm:text-xl px-6 sm:px-8 py-3 sm:py-4 rounded-lg hover:from-[#1a3d7a] hover:to-[#3a8bd1] transition-all text-center shadow-lg transform hover:scale-105 w-full sm:w-auto drop-shadow-md"
                     >
                       Club Home Page
                     </Link>

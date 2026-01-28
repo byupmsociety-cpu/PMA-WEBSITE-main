@@ -489,7 +489,7 @@ const DiscoverPage = () => {
           <h3 className="text-2xl font-bold">Your Personalized PM Roadmap</h3>
           <Button
             onClick={exportToCSV}
-            className="bg-gradient-to-r from-[#215096] to-[#4299E1] text-white"
+            className="bg-gradient-to-r from-[#215096] to-[#4299E1] !text-white drop-shadow-md"
           >
             Export Roadmap
           </Button>
@@ -614,7 +614,7 @@ const DiscoverPage = () => {
             <div className="space-y-4">
             <Dialog>
               <DialogTrigger asChild>
-                <Button className="bg-gradient-to-r from-[#215096] to-[#4299E1] text-white px-8 py-3 rounded-lg text-lg font-medium hover:opacity-90 transition-all">
+                <Button className="bg-gradient-to-r from-[#215096] to-[#4299E1] !text-white px-8 py-3 rounded-lg text-lg font-medium hover:opacity-90 transition-all drop-shadow-md">
                   Take the PM Quiz
                 </Button>
               </DialogTrigger>
@@ -642,7 +642,7 @@ const DiscoverPage = () => {
                           )}
                       <Button 
                             onClick={handleNext}
-                            className="bg-gradient-to-r from-[#215096] to-[#4299E1] text-white"
+                            className="bg-gradient-to-r from-[#215096] to-[#4299E1] !text-white drop-shadow-md"
                       >
                             {currentStep === 6 ? 'Get Results' : 'Next'}
                       </Button>
@@ -849,7 +849,7 @@ const DiscoverPage = () => {
                     <Button
                       onClick={spinWheel}
                       disabled={isSpinning}
-                      className="bg-gradient-to-r from-[#215096] to-[#4299E1] text-white"
+                      className="bg-gradient-to-r from-[#215096] to-[#4299E1] !text-white drop-shadow-md"
                     >
                       {isSpinning ? 'Spinning...' : 'Spin the Wheel'}
                     </Button>
@@ -889,7 +889,7 @@ const DiscoverPage = () => {
                           <p className="text-muted-foreground">{quizTerm?.definition}</p>
                           <Button
                             onClick={startNewQuiz}
-                            className="bg-gradient-to-r from-[#215096] to-[#4299E1] text-white"
+                            className="bg-gradient-to-r from-[#215096] to-[#4299E1] !text-white drop-shadow-md"
                           >
                             Next Term
                           </Button>
@@ -940,7 +940,7 @@ const DiscoverPage = () => {
                       </Button>
                       <Button
                         onClick={handleNextChallenge}
-                        className="bg-gradient-to-r from-[#215096] to-[#4299E1] text-white"
+                        className="bg-gradient-to-r from-[#215096] to-[#4299E1] !text-white drop-shadow-md"
                       >
                         Next Challenge
                       </Button>
