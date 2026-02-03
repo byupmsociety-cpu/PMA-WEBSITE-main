@@ -445,8 +445,19 @@ const HackathonPage = () => {
               </div>
               <div className="h-px w-full md:w-px md:h-12 bg-white/10" />
               <div className="flex-1 space-y-1">
-                <h4 className="text-lg font-bold">Kickoff</h4>
-                <p className="text-gray-400 text-sm">Receive prompt & packet. Team formation.</p>
+                <h4 className="text-lg font-bold">Kickoff (Virtual)</h4>
+                <p className="text-gray-400 text-sm">
+                  Monday 6–7 PM.{" "}
+                  <a
+                    href="https://lu.ma/event/evt-26S8mILGH5NJMVJ"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-400 hover:text-blue-300 underline transition-colors"
+                  >
+                    Register
+                  </a>
+                  {" "}to receive the Google Meet link.
+                </p>
               </div>
             </TechCard>
 
@@ -469,8 +480,19 @@ const HackathonPage = () => {
               </div>
               <div className="h-px w-full md:w-px md:h-12 bg-white/10" />
               <div className="flex-1 space-y-1">
-                <h4 className="text-lg font-bold">Presentations & Awards</h4>
-                <p className="text-gray-400 text-sm">2:00 PM - 5:00 PM @ BYU Rollins Center.</p>
+                <h4 className="text-lg font-bold">Presentations & Awards (In Person)</h4>
+                <p className="text-gray-400 text-sm">
+                  Friday 2–5 PM at the{" "}
+                  <a
+                    href="https://www.google.com/maps/search/?api=1&query=Rollins+Center+for+Entrepreneurship+%26+Technology+735+N+500+E+Provo+UT+84606"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-400 hover:text-blue-300 underline transition-colors"
+                  >
+                    Rollins Center for Entrepreneurship & Technology.
+                  </a>
+                  {" "}Food will be provided.
+                </p>
               </div>
             </TechCard>
           </div>
