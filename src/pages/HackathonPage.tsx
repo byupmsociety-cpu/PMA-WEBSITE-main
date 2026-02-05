@@ -145,7 +145,7 @@ const HackathonPage = () => {
               style={{ fontSize: 'clamp(3rem, 8vw, 8rem)' }}
             >
               <span className="bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-white/40">
-                PRODUCT
+                AI PRODUCT
               </span>
               <br />
               <span className="text-white relative drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
@@ -222,6 +222,8 @@ const HackathonPage = () => {
                   { name: "Verso AI", logo: "/img/verso-ai-logo.png", className: "w-full h-full object-contain", link: "https://www.versomusic.ai/" },
                   { name: "BYU UX Design Association", logo: "/img/byu-uxd-logo.png", className: "w-full h-full object-cover", link: "https://uxd.byu.edu/" },
                   { name: "AI in Business Society", logo: "/img/ai-business-logo.png", className: "w-full h-full object-cover", link: "https://www.aiinbusinesssociety.org/" },
+                  { name: "Entrata", logo: "/img/entrata-logo.png", className: "w-full h-full object-contain", link: "https://www.entrata.com/" },
+                  { name: "Shoreline", logo: "/img/shoreline-logo.jpeg", className: "w-full h-full object-contain", link: "https://shoreline.health/" },
                 ];
 
                 const Logo = ({ supporter, idx }: { supporter: typeof supporters[number]; idx: number }) => (
@@ -469,7 +471,7 @@ const HackathonPage = () => {
               <div className="h-px w-full md:w-px md:h-12 bg-white/10" />
               <div className="flex-1 space-y-1">
                 <h4 className="text-lg font-bold text-gray-300">Async Hacking</h4>
-                <p className="text-gray-500 text-sm">Everything due 9:00 AM Friday morning.</p>
+                <p className="text-gray-500 text-sm">Everything due 12:00 PM Friday noon.</p>
               </div>
             </TechCard>
 
@@ -495,6 +497,40 @@ const HackathonPage = () => {
                 </p>
               </div>
             </TechCard>
+          </div>
+        </section>
+
+        {/* Judges Section */}
+        <section>
+          <SectionHeader title="JUDGES" subtitle={undefined} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {[
+              { name: "Jonathan Bernal", position: "Co-Founder", company: "Verso AI (ex-Google)", photo: "/img/judge-jonathan.jpeg", linkedin: "https://www.linkedin.com/in/jonathan-ray-bernal/" },
+              { name: "Jacob Draper", position: "Sr. Product Manager", company: "Adobe", photo: "/img/judge-jacob.jpeg", linkedin: "https://www.linkedin.com/in/jakerdraper/" },
+              { name: "Stephen Dangerfield", position: "Sr. Director of Product", company: "Entrata", photo: "/img/judge-stephen.jpeg", linkedin: "https://www.linkedin.com/in/stephen-dangerfield/" },
+              { name: "Claire McGregor", position: "Digital Product Designer", company: "Vivint", photo: "/img/judge-claire.jpeg", linkedin: "https://www.linkedin.com/in/claire-mcgregor-1913aa247/" },
+              { name: "Alec Hui", position: "Head of Consumer Product", company: "Airbnb", photo: "/img/judge-alec.jpeg", linkedin: "https://www.linkedin.com/in/alexghui/" },
+              { name: "Rachel Wasden", position: "Associate Product Manager", company: "Lucid Software", photo: "/img/judge-rachel.jpeg", linkedin: "https://www.linkedin.com/in/rachel-wasden-781876223/" },
+            ].map((judge, idx) => (
+              <TechCard key={idx} delay={idx}>
+                <a href={judge.linkedin} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center text-center cursor-pointer">
+                  <div className="w-24 h-24 rounded-full bg-white/10 border border-white/10 overflow-hidden mb-4">
+                    {judge.photo ? (
+                      <img src={judge.photo} alt={judge.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-white/30">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-12 h-12">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+                  <h3 className="text-lg font-bold text-white mb-1">{judge.name}</h3>
+                  <p className="text-sm text-blue-400">{judge.position}</p>
+                  <p className="text-sm text-white/80 font-semibold">{judge.company}</p>
+                </a>
+              </TechCard>
+            ))}
           </div>
         </section>
 
