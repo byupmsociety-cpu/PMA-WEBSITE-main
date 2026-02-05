@@ -198,7 +198,7 @@ const HackathonPage = () => {
                     <div className="flex items-center gap-2">
                       <span className="text-yellow-400/70 text-sm font-light leading-none">up to</span>
                       <span className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-300 bg-clip-text text-transparent">
-                        $1,000
+                        $500
                       </span>
                     </div>
                   </div>
@@ -366,7 +366,7 @@ const HackathonPage = () => {
               </div>
               <h3 className="text-xl font-bold mb-2">Win Prizes</h3>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Compete for a prize pool of up to $1,000. Show off your skills and win big.
+                Compete for a prize pool of up to $500. Show off your skills and win big.
               </p>
             </TechCard>
           </div>
