@@ -295,7 +295,7 @@ const HomePage = () => {
                     <img src="/img/pattern-logo.png" alt="Pattern" className="h-full w-full object-cover" />
                   </div>
                   <div className="h-24 w-48 bg-gray-700/20 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
-                    <img src="/img/entrata-logo.png" alt="Entrata" className="h-full w-full object-cover" />
+                    <img src="/img/entrata-logo.png" alt="Entrata" className="h-full w-full object-contain" />
                   </div>
                   <div className="h-24 w-48 bg-gray-700/20 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
                     <img src="/img/awardco-logo.png" alt="Awardco" className="h-full w-full object-cover" />
