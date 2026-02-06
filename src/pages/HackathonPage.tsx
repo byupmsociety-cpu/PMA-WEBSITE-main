@@ -509,7 +509,7 @@ const HackathonPage = () => {
               { name: "Jacob Draper", position: "Sr. Product Manager", company: "Adobe", photo: "/img/judge-jacob.jpeg", linkedin: "https://www.linkedin.com/in/jakerdraper/" },
               { name: "Stephen Dangerfield", position: "Sr. Director of Product", company: "Entrata", photo: "/img/judge-stephen.jpeg", linkedin: "https://www.linkedin.com/in/stephen-dangerfield/" },
               { name: "Claire McGregor", position: "Digital Product Designer", company: "Vivint", photo: "/img/judge-claire.jpeg", linkedin: "https://www.linkedin.com/in/claire-mcgregor-1913aa247/" },
-              { name: "Alec Hui", position: "Head of Consumer Product", company: "Airbnb", photo: "/img/judge-alec.jpeg", linkedin: "https://www.linkedin.com/in/alexghui/" },
+              { name: "Alex Hui", position: "Head of Consumer Product", company: "Airbnb", photo: "/img/judge-alec.jpeg", linkedin: "https://www.linkedin.com/in/alexghui/" },
               { name: "Rachel Wasden", position: "Associate Product Manager", company: "Lucid Software", photo: "/img/judge-rachel.jpeg", linkedin: "https://www.linkedin.com/in/rachel-wasden-781876223/" },
             ].map((judge, idx) => (
               <TechCard key={idx} delay={idx}>
