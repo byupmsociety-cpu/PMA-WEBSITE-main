@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 const AIRTABLE_FAQ_URL = 'https://api.airtable.com/v0/app8MiB9XxERjKDqC/FAQ';
 const AIRTABLE_TOKEN = 'pat32NdNyEvz1lH3s.a777c3f877a0b354eabf7e503872efd7ad4ecd0567e6d4c60d4cc6d56e219499';
 
-type FAQEntry = { id: string; question: string; answer: string };
+type FAQEntry = { id: string; question: string; answer: string; order?: number };
 
 const URL_REGEX = /(https?:\/\/[^\s]+)/g;
 
@@ -96,12 +96,32 @@ const HackathonFAQPage = () => {
         }
 
         const data = await response.json();
+        const orderFields = ['ID', 'id', 'Number', 'Order', '#'];
+        const getOrder = (fields: Record<string, unknown>): number | undefined => {
+          for (const name of orderFields) {
+            const val = fields[name];
+            if (typeof val === 'number' && !isNaN(val)) return val;
+            if (typeof val === 'string') {
+              const n = parseInt(val, 10);
+              if (!isNaN(n)) return n;
+            }
+          }
+          return undefined;
+        };
+
         const entries: FAQEntry[] = (data.records || []).map((record: { id: string; fields: Record<string, unknown> }) => {
           const fields = record.fields || {};
           const question = (fields.Question as string) ?? (fields.question as string) ?? '';
           const answer = (fields.Answer as string) ?? (fields.answer as string) ?? '';
-          return { id: record.id, question, answer };
+          const order = getOrder(fields);
+          return { id: record.id, question, answer, order };
         }).filter((e: FAQEntry) => e.question || e.answer);
+
+        entries.sort((a, b) => {
+          const aOrd = a.order ?? Infinity;
+          const bOrd = b.order ?? Infinity;
+          return aOrd - bOrd;
+        });
 
         setFaqs(entries);
       } catch (err) {
