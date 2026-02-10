@@ -179,6 +179,16 @@ const HackathonPage = () => {
               </motion.div>
             </div>
 
+            {/* Kickoff tonight */}
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.35 }}
+              className="text-blue-300 text-sm md:text-base font-medium mb-6"
+            >
+              Kickoff is at 6:00 PM tonight — join the Meet or register to get the link.
+            </motion.p>
+
             {/* Cash Prizes */}
             <motion.div
               initial={{ opacity: 0, scale: 0.8, y: 20 }}
@@ -290,7 +300,7 @@ const HackathonPage = () => {
                 data-luma-action="checkout"
                 data-luma-event-id="evt-26S8mILGH5NJMVJ"
               >
-                Register to Compete
+                Join kickoff / Get Meet link
                 <Rocket className="w-5 h-5 group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform" />
               </a>
             </motion.div>
@@ -449,16 +459,16 @@ const HackathonPage = () => {
               <div className="flex-1 space-y-1">
                 <h4 className="text-lg font-bold">Kickoff (Virtual)</h4>
                 <p className="text-gray-400 text-sm">
-                  Monday 6–7 PM.{" "}
+                  Join the Google Meet (Monday 6–7 PM). Registered? Check your Luma confirmation for the link. Not registered?{" "}
                   <a
                     href="https://lu.ma/event/evt-26S8mILGH5NJMVJ"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-400 hover:text-blue-300 underline transition-colors"
                   >
-                    Register
+                    Register on Luma
                   </a>
-                  {" "}to receive the Google Meet link.
+                  {" "}to get the Meet link.
                 </p>
               </div>
             </TechCard>
@@ -617,7 +627,7 @@ const HackathonPage = () => {
             data-luma-action="checkout"
             data-luma-event-id="evt-26S8mILGH5NJMVJ"
           >
-            Register Now
+            Join kickoff / Get Meet link
           </a>
         </section>
 
