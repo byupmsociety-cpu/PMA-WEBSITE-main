@@ -21,6 +21,7 @@ import AuthPage from "./pages/AuthPage";
 import DashboardPage from "./pages/DashboardPage";
 import HackathonPage from "./pages/HackathonPage";
 import HackathonSharePage from "./pages/HackathonSharePage";
+import HackathonFAQPage from "./pages/HackathonFAQPage";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +39,7 @@ const App = () => (
             <Route path="/team" element={<TeamPage />} />
             <Route path="/hackathon" element={<HackathonPage />} />
             <Route path="/hackathon/share" element={<HackathonSharePage />} />
+            <Route path="/hackathon/faq" element={<HackathonFAQPage />} />
             <Route path="/events" element={<EventsPage />} />
             <Route path="/resources" element={<ResourcesPage />} />
             <Route path="/contact" element={<ContactPage />} />

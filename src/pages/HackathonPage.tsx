@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Rocket, Users, Briefcase, Calendar, Zap, Layout, Target, ChevronDown, Trophy } from 'lucide-react';
+import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { Rocket, Users, Briefcase, Calendar, Zap, Layout, Target, Trophy } from 'lucide-react';
 import { cn } from "@/lib/utils";
 
 // Custom TechCard Component
@@ -24,44 +25,6 @@ const TechCard = ({ className, children, delay = 0 }: { className?: string, chil
     </motion.div>
   );
 };
-
-const FAQItem = ({ question, answer }: { question: string, answer: string | React.ReactNode }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <div className="border-b border-white/10 last:border-none">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full py-4 flex items-center justify-between text-left group"
-      >
-        <span className="text-lg font-bold text-white group-hover:text-blue-400 transition-colors">{question}</span>
-        <ChevronDown
-          className={cn(
-            "text-gray-400 transition-transform duration-300",
-            isOpen ? "rotate-180 text-blue-400" : ""
-          )}
-        />
-      </button>
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="overflow-hidden"
-          >
-            <div className="pb-4 text-gray-400 text-sm leading-relaxed">
-              {typeof answer === 'string' ? <p>{answer}</p> : answer}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-};
-
-
 
 const SectionHeader = ({ title, subtitle }: { title: string, subtitle?: string }) => (
   <div className="mb-12 text-center">
@@ -179,14 +142,14 @@ const HackathonPage = () => {
               </motion.div>
             </div>
 
-            {/* Kickoff tonight */}
+            {/* Hackathon underway */}
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.35 }}
               className="text-blue-300 text-sm md:text-base font-medium mb-6"
             >
-              Kickoff is at 6:00 PM tonight — join the Meet or register to get the link.
+              The hackathon is underway. View details below or see the <Link to="/hackathon/faq" className="text-white underline hover:no-underline">FAQ</Link> if you have questions.
             </motion.p>
 
             {/* Cash Prizes */}
@@ -206,10 +169,10 @@ const HackathonPage = () => {
                     </div>
                     <div className="h-6 w-px bg-yellow-500/30" />
                     <div className="flex items-center gap-2">
-                      <span className="text-yellow-400/70 text-sm font-light leading-none">up to</span>
                       <span className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-300 bg-clip-text text-transparent">
                         $1,000
                       </span>
+                      <span className="text-yellow-400/70 text-sm font-light leading-none">for the first place team</span>
                     </div>
                   </div>
                 </div>
@@ -293,15 +256,20 @@ const HackathonPage = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
+              className="flex flex-col sm:flex-row items-center justify-center gap-4"
             >
+              <Link
+                to="/hackathon/faq"
+                className="group relative inline-flex items-center gap-3 px-8 py-4 bg-white text-black rounded-full font-bold text-lg hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.5)] transition-all duration-300"
+              >
+                View event details & FAQ
+                <Rocket className="w-5 h-5 group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform" />
+              </Link>
               <a
                 href="https://lu.ma/event/evt-26S8mILGH5NJMVJ"
-                className="luma-checkout--button group relative inline-flex items-center gap-3 px-8 py-4 bg-white text-black rounded-full font-bold text-lg hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.5)] transition-all duration-300"
-                data-luma-action="checkout"
-                data-luma-event-id="evt-26S8mILGH5NJMVJ"
+                className="text-blue-300 hover:text-white underline text-sm"
               >
-                Join kickoff / Get Meet link
-                <Rocket className="w-5 h-5 group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform" />
+                Register on Luma (late signup)
               </a>
             </motion.div>
 
@@ -378,7 +346,7 @@ const HackathonPage = () => {
               </div>
               <h3 className="text-xl font-bold mb-2">Win Prizes</h3>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Compete for a prize pool of up to $1,000. Show off your skills and win big.
+                Compete for a prize pool of $1,000 for the first place team. Show off your skills and win big.
               </p>
             </TechCard>
           </div>
@@ -459,7 +427,7 @@ const HackathonPage = () => {
               <div className="flex-1 space-y-1">
                 <h4 className="text-lg font-bold">Kickoff (Virtual)</h4>
                 <p className="text-gray-400 text-sm">
-                  Join the Google Meet (Monday 6–7 PM). Registered? Check your Luma confirmation for the link. Not registered?{" "}
+                  Kickoff was Monday 6–7 PM. If you missed it, check Luma for the recording or event updates. Still want to join?{" "}
                   <a
                     href="https://lu.ma/event/evt-26S8mILGH5NJMVJ"
                     target="_blank"
@@ -468,7 +436,7 @@ const HackathonPage = () => {
                   >
                     Register on Luma
                   </a>
-                  {" "}to get the Meet link.
+                  .
                 </p>
               </div>
             </TechCard>
@@ -561,74 +529,18 @@ const HackathonPage = () => {
           </div>
         </section>
 
-        {/* FAQ Section */}
-        <section className="max-w-4xl mx-auto">
-          <SectionHeader title="FAQ" subtitle={undefined} />
-          <TechCard>
-            <FAQItem
-              question="Who can participate?"
-              answer="All students are welcome. No prior experience in product management, design, or engineering is required."
-            />
-            <FAQItem
-              question="Do I need a team to sign up?"
-              answer="No. You can compete solo or choose to be grouped with others. Teams can have 2 to 5 members."
-            />
-            <FAQItem
-              question="What skills do I need?"
-              answer="None required. Teams typically include PM, UXD, and ENG roles, but you are not required to fill every role."
-            />
-            <FAQItem
-              question="What will we be judged on?"
-              answer="Teams will be evaluated on several criteria including PM fundamentals, UX design principles, and engineering quality."
-            />
-            <FAQItem
-              question="What is the time commitment?"
-              answer="1 Hour kickoff meeting. Four build days (asynchronous). Final in-person demo and presentation for 3 hours."
-            />
-            <FAQItem
-              question="What do we submit?"
-              answer="A working prototype, live demo, and product strategy slide deck."
-            />
-            <FAQItem
-              question="How does judging work?"
-              answer="Judges will score each team using a standardized rubric across PM fundamentals (user selection, problem selection and validation, solution quality and validation). Other criteria include principles of UX design, and engineering."
-            />
-            <FAQItem
-              question="Can this go on my resume?"
-              answer="Yes. This is a legitimate 0 to 1 product build and demo experience."
-            />
-            <FAQItem
-              question="How do I share this with my friends?"
-              answer={
-                <div className="space-y-3">
-                  <p>Send them this website or show them this QR code:</p>
-                  <a
-                    href="/hackathon/share"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-block text-blue-400 hover:text-blue-300 underline transition-colors"
-                  >
-                    Open share page (QR + link)
-                  </a>
-                </div>
-              }
-            />
-          </TechCard>
-        </section>
-
+        {/* FAQ link */}
 
 
         {/* Footer CTA */}
         <section className="text-center pt-20">
           <h2 className="text-3xl font-bold mb-8">Ready to ship?</h2>
-          <a
-            href="https://lu.ma/event/evt-26S8mILGH5NJMVJ"
-            className="luma-checkout--button inline-block bg-white text-black hover:bg-gray-200 text-lg px-12 py-5 font-bold rounded-full transition-colors"
-            data-luma-action="checkout"
-            data-luma-event-id="evt-26S8mILGH5NJMVJ"
+          <Link
+            to="/hackathon/faq"
+            className="inline-block bg-white text-black hover:bg-gray-200 text-lg px-12 py-5 font-bold rounded-full transition-colors"
           >
-            Join kickoff / Get Meet link
-          </a>
+            View event details & FAQ
+          </Link>
         </section>
 
       </div>

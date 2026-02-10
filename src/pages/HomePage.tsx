@@ -167,7 +167,7 @@ const HomePage = () => {
 
               <AnimatedSection animation="fade-in" delay={300}>
                 <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mt-6">
-                  The hackathon kickoff is at 6:00 PM tonight — join the Meet or register to get the link.
+                  The <span className="font-semibold text-[#215096] dark:text-[#4299E1]">Product Hackathon is underway</span> (Feb 9–13). View details and find answers in our <Link to="/hackathon/faq" className="font-semibold text-[#215096] dark:text-[#4299E1] hover:underline">FAQ</Link>.
                 </p>
               </AnimatedSection>
 
@@ -178,7 +178,7 @@ const HomePage = () => {
                     className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-[#215096] to-[#4299E1] rounded-xl !text-white font-bold text-lg hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl drop-shadow-md"
                   >
                     <Rocket className="w-6 h-6 mr-3" />
-                    Go to hackathon
+                    View hackathon details & FAQ
                   </Link>
                   <a
                     href="https://clubs.byu.edu/link/club/18295873486206095"
