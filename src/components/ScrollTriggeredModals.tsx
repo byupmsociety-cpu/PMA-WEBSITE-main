@@ -71,30 +71,16 @@ const ScrollTriggeredModals = () => {
               </div>
             </div>
             <DialogTitle className="text-center text-2xl">
-              Join the Product Hackathon!
+              The hackathon has begun!
             </DialogTitle>
             <DialogDescription className="text-center">
-              Build a 0-to-1 product, compete for prizes, and showcase your skills:
-              <ul className="mt-4 space-y-2 text-left">
-                <li className="flex items-center gap-2">
-                  🚀 <span>Build a complete product from scratch</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  🏆 <span>Compete for exciting prizes</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  🤝 <span>Network with industry professionals</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  💡 <span>Showcase your PM skills</span>
-                </li>
-              </ul>
+              View details and FAQ on the hackathon page.
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-3 mt-4">
             <Button size="lg" onClick={() => navigate("/hackathon")} className="gap-2">
               <Rocket className="h-4 w-4" />
-              Register for Hackathon
+              View details & FAQ
             </Button>
             <Button 
               size="lg" 
