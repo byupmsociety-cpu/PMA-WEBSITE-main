@@ -449,7 +449,7 @@ const HackathonPage = () => {
               <div className="h-px w-full md:w-px md:h-12 bg-white/10" />
               <div className="flex-1 space-y-1">
                 <h4 className="text-lg font-bold text-gray-300">Async Hacking</h4>
-                <p className="text-gray-500 text-sm">Everything due 12:00 PM Friday noon.</p>
+                <p className="text-gray-500 text-sm">Everything due 9:00 AM Friday.</p>
               </div>
             </TechCard>
 
@@ -464,12 +464,12 @@ const HackathonPage = () => {
                 <p className="text-gray-400 text-sm">
                   Friday 2–5 PM at the{" "}
                   <a
-                    href="https://www.google.com/maps/search/?api=1&query=Rollins+Center+for+Entrepreneurship+%26+Technology+735+N+500+E+Provo+UT+84606"
+                    href="https://maps.app.goo.gl/JXtXjyco5ayW6tcs7"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-400 hover:text-blue-300 underline transition-colors"
                   >
-                    Rollins Center for Entrepreneurship & Technology.
+                    Kiln.
                   </a>
                   {" "}Food will be provided.
                 </p>

@@ -9,6 +9,7 @@ interface TeamMember {
   image: string;
   email: string;
   linkedin?: string;
+  order?: number;
 }
 
 const TeamPage: React.FC = () => {
@@ -23,7 +24,7 @@ const TeamPage: React.FC = () => {
         setLoading(true);
         setError(null);
 
-        const response = await fetch("https://api.airtable.com/v0/app8MiB9XxERjKDqC/tblRtMfdCG6kRbsux", {
+        const response = await fetch("https://api.airtable.com/v0/app8MiB9XxERjKDqC/tblRtMfdCG6kRbsux?sort%5B0%5D%5Bfield%5D=ID&sort%5B0%5D%5Bdirection%5D=asc", {
           headers: {
             Authorization: "Bearer pat32NdNyEvz1lH3s.a777c3f877a0b354eabf7e503872efd7ad4ecd0567e6d4c60d4cc6d56e219499",
             "Content-Type": "application/json",
@@ -45,6 +46,9 @@ const TeamPage: React.FC = () => {
             imageUrl = record.fields.img[0].url;
           }
 
+          const idVal = record.fields.ID ?? record.fields.id;
+          const order = typeof idVal === "number" ? idVal : typeof idVal === "string" ? parseInt(idVal, 10) : undefined;
+
           return {
             id: record.id,
             name: record.fields.name || "",
@@ -53,9 +57,11 @@ const TeamPage: React.FC = () => {
             image: imageUrl,
             email: record.fields.email || "",
             linkedin: record.fields.linkedin || "",
+            order: !isNaN(order as number) ? order : undefined,
           };
         });
 
+        transformedTeam.sort((a, b) => (a.order ?? Infinity) - (b.order ?? Infinity));
         setTeam(transformedTeam);
       } catch (err) {
         console.error("Error fetching team data:", err);
