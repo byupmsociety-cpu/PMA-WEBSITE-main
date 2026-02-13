@@ -142,25 +142,32 @@ const HackathonPage = () => {
               </motion.div>
             </div>
 
-            {/* Submissions due today */}
+            {/* Presentation day info */}
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.35 }}
               className="text-blue-300 text-sm md:text-base font-medium mb-6"
             >
-              Submissions are due today at 9:00 AM.{" "}
+              Presentations are Friday, Feb 13th at the{" "}
               <a
-                href="https://docs.google.com/forms/d/e/1FAIpQLSe8zDVRJ7lW_40zlFgD9q6VfQuwQDbSUVXiH0l5CIUNLG7Iaw/viewform"
+                href="https://maps.app.goo.gl/JXtXjyco5ayW6tcs7"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-white underline hover:no-underline font-semibold"
               >
-                Submit here
+                Kiln
+              </a>
+              .{" "}
+              <a
+                href="https://docs.google.com/spreadsheets/d/1e_sVQZftfYrc-TiOKohjKHdkF12O8oao_diB6QjwRQc/edit?gid=0#gid=0"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white underline hover:no-underline font-semibold"
+              >
+                View presentation schedule & room assignments
               </a>
               .
-              <br />
-              View details below or see the <Link to="/hackathon/faq" className="text-white underline hover:no-underline">FAQ</Link> if you have questions.
             </motion.p>
 
             {/* Cash Prizes */}
@@ -267,23 +274,33 @@ const HackathonPage = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
-              className="flex flex-col sm:flex-row items-center justify-center gap-4"
+              className="flex flex-col items-center justify-center gap-4"
             >
               <a
-                href="https://docs.google.com/forms/d/e/1FAIpQLSe8zDVRJ7lW_40zlFgD9q6VfQuwQDbSUVXiH0l5CIUNLG7Iaw/viewform"
+                href="https://docs.google.com/spreadsheets/d/1e_sVQZftfYrc-TiOKohjKHdkF12O8oao_diB6QjwRQc/edit?gid=0#gid=0"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group relative inline-flex items-center gap-3 px-8 py-4 bg-white text-black rounded-full font-bold text-lg hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.5)] transition-all duration-300"
               >
-                Submit your project (due 9:00 AM)
+                View presentation schedule & room assignments
                 <Rocket className="w-5 h-5 group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform" />
               </a>
-              <Link
-                to="/hackathon/faq"
-                className="text-blue-300 hover:text-white underline text-sm"
-              >
-                View event details & FAQ
-              </Link>
+              <div className="flex flex-wrap items-center justify-center gap-4">
+                <a
+                  href="https://maps.app.goo.gl/JXtXjyco5ayW6tcs7"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-300 hover:text-white underline text-sm"
+                >
+                  Get directions to the Kiln
+                </a>
+                <Link
+                  to="/hackathon/faq"
+                  className="text-blue-300 hover:text-white underline text-sm"
+                >
+                  Event details & FAQ
+                </Link>
+              </div>
             </motion.div>
 
           </div>
@@ -463,21 +480,12 @@ const HackathonPage = () => {
               <div className="flex-1 space-y-1">
                 <h4 className="text-lg font-bold text-gray-300">Async Hacking</h4>
                 <p className="text-gray-500 text-sm">
-                  Submissions due today at 9:00 AM.{" "}
-                  <a
-                    href="https://docs.google.com/forms/d/e/1FAIpQLSe8zDVRJ7lW_40zlFgD9q6VfQuwQDbSUVXiH0l5CIUNLG7Iaw/viewform"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-400 hover:text-blue-300 underline transition-colors"
-                  >
-                    Submit here
-                  </a>
-                  .
+                  Submission period closed. See you at presentations!
                 </p>
               </div>
             </TechCard>
 
-            <TechCard className="flex flex-col md:flex-row gap-6 md:items-center">
+            <TechCard className="flex flex-col md:flex-row gap-6 md:items-center border-blue-500/20 bg-blue-500/5">
               <div className="min-w-[120px] text-center md:text-left">
                 <div className="text-sm text-white font-bold uppercase tracking-wider">Day 5</div>
                 <div className="text-2xl font-bold">Feb 13</div>
@@ -493,9 +501,18 @@ const HackathonPage = () => {
                     rel="noopener noreferrer"
                     className="text-blue-400 hover:text-blue-300 underline transition-colors"
                   >
-                    Kiln.
+                    Kiln
                   </a>
-                  {" "}Food will be provided.
+                  .{" "}
+                  <a
+                    href="https://docs.google.com/spreadsheets/d/1e_sVQZftfYrc-TiOKohjKHdkF12O8oao_diB6QjwRQc/edit?gid=0#gid=0"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-400 hover:text-blue-300 underline transition-colors"
+                  >
+                    View presentation schedule & room assignments
+                  </a>
+                  . Food will be provided.
                 </p>
               </div>
             </TechCard>
@@ -558,13 +575,33 @@ const HackathonPage = () => {
 
         {/* Footer CTA */}
         <section className="text-center pt-20">
-          <h2 className="text-3xl font-bold mb-8">Ready to ship?</h2>
-          <Link
-            to="/hackathon/faq"
-            className="inline-block bg-white text-black hover:bg-gray-200 text-lg px-12 py-5 font-bold rounded-full transition-colors"
-          >
-            View event details & FAQ
-          </Link>
+          <h2 className="text-3xl font-bold mb-8">See you at the Kiln!</h2>
+          <div className="flex flex-col items-center justify-center gap-4">
+            <a
+              href="https://docs.google.com/spreadsheets/d/1e_sVQZftfYrc-TiOKohjKHdkF12O8oao_diB6QjwRQc/edit?gid=0#gid=0"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block bg-white text-black hover:bg-gray-200 text-lg px-12 py-5 font-bold rounded-full transition-colors"
+            >
+              View presentation schedule
+            </a>
+            <div className="flex flex-wrap items-center justify-center gap-4">
+              <a
+                href="https://maps.app.goo.gl/JXtXjyco5ayW6tcs7"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-300 hover:text-white underline text-lg font-semibold"
+              >
+                Get directions to the Kiln
+              </a>
+              <Link
+                to="/hackathon/faq"
+                className="text-blue-300 hover:text-white underline text-lg font-semibold"
+              >
+                Event details & FAQ
+              </Link>
+            </div>
+          </div>
         </section>
 
       </div>

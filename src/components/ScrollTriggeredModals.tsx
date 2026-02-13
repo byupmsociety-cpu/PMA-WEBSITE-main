@@ -71,16 +71,19 @@ const ScrollTriggeredModals = () => {
               </div>
             </div>
             <DialogTitle className="text-center text-2xl">
-              The hackathon has begun!
+              Hackathon presentations are at the Kiln!
             </DialogTitle>
             <DialogDescription className="text-center">
-              View details and FAQ on the hackathon page.
+              Friday, Feb 13th, 2–5 PM. View the schedule and room assignments.
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-3 mt-4">
-            <Button size="lg" onClick={() => navigate("/hackathon")} className="gap-2">
+            <Button size="lg" onClick={() => window.open("https://docs.google.com/spreadsheets/d/1e_sVQZftfYrc-TiOKohjKHdkF12O8oao_diB6QjwRQc/edit?gid=0#gid=0", "_blank")} className="gap-2">
               <Rocket className="h-4 w-4" />
-              View details & FAQ
+              View presentation schedule
+            </Button>
+            <Button size="lg" variant="outline" onClick={() => navigate("/hackathon")} className="gap-2">
+              Hackathon details & FAQ
             </Button>
             <Button 
               size="lg" 
