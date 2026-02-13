@@ -142,14 +142,25 @@ const HackathonPage = () => {
               </motion.div>
             </div>
 
-            {/* Hackathon underway */}
+            {/* Submissions due today */}
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.35 }}
               className="text-blue-300 text-sm md:text-base font-medium mb-6"
             >
-              The hackathon is underway. View details below or see the <Link to="/hackathon/faq" className="text-white underline hover:no-underline">FAQ</Link> if you have questions.
+              Submissions are due today at 9:00 AM.{" "}
+              <a
+                href="https://docs.google.com/forms/d/e/1FAIpQLSe8zDVRJ7lW_40zlFgD9q6VfQuwQDbSUVXiH0l5CIUNLG7Iaw/viewform"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white underline hover:no-underline font-semibold"
+              >
+                Submit here
+              </a>
+              .
+              <br />
+              View details below or see the <Link to="/hackathon/faq" className="text-white underline hover:no-underline">FAQ</Link> if you have questions.
             </motion.p>
 
             {/* Cash Prizes */}
@@ -258,19 +269,21 @@ const HackathonPage = () => {
               transition={{ delay: 0.6 }}
               className="flex flex-col sm:flex-row items-center justify-center gap-4"
             >
-              <Link
-                to="/hackathon/faq"
+              <a
+                href="https://docs.google.com/forms/d/e/1FAIpQLSe8zDVRJ7lW_40zlFgD9q6VfQuwQDbSUVXiH0l5CIUNLG7Iaw/viewform"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="group relative inline-flex items-center gap-3 px-8 py-4 bg-white text-black rounded-full font-bold text-lg hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.5)] transition-all duration-300"
               >
-                View event details & FAQ
+                Submit your project (due 9:00 AM)
                 <Rocket className="w-5 h-5 group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <a
-                href="https://lu.ma/event/evt-26S8mILGH5NJMVJ"
+              </a>
+              <Link
+                to="/hackathon/faq"
                 className="text-blue-300 hover:text-white underline text-sm"
               >
-                Register on Luma (late signup)
-              </a>
+                View event details & FAQ
+              </Link>
             </motion.div>
 
           </div>
@@ -449,7 +462,18 @@ const HackathonPage = () => {
               <div className="h-px w-full md:w-px md:h-12 bg-white/10" />
               <div className="flex-1 space-y-1">
                 <h4 className="text-lg font-bold text-gray-300">Async Hacking</h4>
-                <p className="text-gray-500 text-sm">Everything due 9:00 AM Friday.</p>
+                <p className="text-gray-500 text-sm">
+                  Submissions due today at 9:00 AM.{" "}
+                  <a
+                    href="https://docs.google.com/forms/d/e/1FAIpQLSe8zDVRJ7lW_40zlFgD9q6VfQuwQDbSUVXiH0l5CIUNLG7Iaw/viewform"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-400 hover:text-blue-300 underline transition-colors"
+                  >
+                    Submit here
+                  </a>
+                  .
+                </p>
               </div>
             </TechCard>
 

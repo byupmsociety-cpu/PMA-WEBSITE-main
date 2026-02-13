@@ -167,17 +167,34 @@ const HomePage = () => {
 
               <AnimatedSection animation="fade-in" delay={300}>
                 <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mt-6">
-                  The <span className="font-semibold text-[#215096] dark:text-[#4299E1]">Product Hackathon is underway</span> (Feb 9–13). View details and find answers in our <Link to="/hackathon/faq" className="font-semibold text-[#215096] dark:text-[#4299E1] hover:underline">FAQ</Link>.
+                  <span className="font-semibold text-[#215096] dark:text-[#4299E1]">Submissions are due today at 9:00 AM.</span>{" "}
+                  <a
+                    href="https://docs.google.com/forms/d/e/1FAIpQLSe8zDVRJ7lW_40zlFgD9q6VfQuwQDbSUVXiH0l5CIUNLG7Iaw/viewform"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-semibold text-cyan-500 dark:text-white underline hover:opacity-90"
+                  >
+                    Submit here
+                  </a>
+                  . View details and find answers in our <Link to="/hackathon/faq" className="font-semibold text-[#215096] dark:text-[#4299E1] hover:underline">FAQ</Link>.
                 </p>
               </AnimatedSection>
 
               <AnimatedSection animation="fade-in" delay={600}>
                 <div className="mt-10 flex flex-col sm:flex-row gap-4">
-                  <Link
-                    to="/hackathon"
+                  <a
+                    href="https://docs.google.com/forms/d/e/1FAIpQLSe8zDVRJ7lW_40zlFgD9q6VfQuwQDbSUVXiH0l5CIUNLG7Iaw/viewform"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-[#215096] to-[#4299E1] rounded-xl !text-white font-bold text-lg hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl drop-shadow-md"
                   >
                     <Rocket className="w-6 h-6 mr-3" />
+                    Submit your project (due 9:00 AM)
+                  </a>
+                  <Link
+                    to="/hackathon"
+                    className="inline-flex items-center justify-center px-6 py-3 bg-transparent border border-gray-300 dark:border-white/20 rounded-lg text-gray-700 dark:text-white font-medium hover:bg-gray-100 dark:hover:bg-white/5 transition-all"
+                  >
                     View hackathon details & FAQ
                   </Link>
                   <a
