@@ -160,7 +160,7 @@ const HackathonPage = () => {
               </a>
               .{" "}
               <a
-                href="https://docs.google.com/spreadsheets/d/1e_sVQZftfYrc-TiOKohjKHdkF12O8oao_diB6QjwRQc/edit?gid=0#gid=0"
+                href="https://docs.google.com/spreadsheets/d/17e31qyT_WE3cUdUF38v_nZjErigb19Oi/edit?lm_source=event&lm_api_id=evt-26S8mILGH5NJMVJ&lm_medium=blast&gid=1934000929#gid=1934000929"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-white underline hover:no-underline font-semibold"
@@ -277,7 +277,7 @@ const HackathonPage = () => {
               className="flex flex-col items-center justify-center gap-4"
             >
               <a
-                href="https://docs.google.com/spreadsheets/d/1e_sVQZftfYrc-TiOKohjKHdkF12O8oao_diB6QjwRQc/edit?gid=0#gid=0"
+                href="https://docs.google.com/spreadsheets/d/17e31qyT_WE3cUdUF38v_nZjErigb19Oi/edit?lm_source=event&lm_api_id=evt-26S8mILGH5NJMVJ&lm_medium=blast&gid=1934000929#gid=1934000929"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group relative inline-flex items-center gap-3 px-8 py-4 bg-white text-black rounded-full font-bold text-lg hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.5)] transition-all duration-300"
@@ -505,7 +505,7 @@ const HackathonPage = () => {
                   </a>
                   .{" "}
                   <a
-                    href="https://docs.google.com/spreadsheets/d/1e_sVQZftfYrc-TiOKohjKHdkF12O8oao_diB6QjwRQc/edit?gid=0#gid=0"
+                    href="https://docs.google.com/spreadsheets/d/17e31qyT_WE3cUdUF38v_nZjErigb19Oi/edit?lm_source=event&lm_api_id=evt-26S8mILGH5NJMVJ&lm_medium=blast&gid=1934000929#gid=1934000929"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-400 hover:text-blue-300 underline transition-colors"
@@ -578,7 +578,7 @@ const HackathonPage = () => {
           <h2 className="text-3xl font-bold mb-8">See you at the Kiln!</h2>
           <div className="flex flex-col items-center justify-center gap-4">
             <a
-              href="https://docs.google.com/spreadsheets/d/1e_sVQZftfYrc-TiOKohjKHdkF12O8oao_diB6QjwRQc/edit?gid=0#gid=0"
+              href="https://docs.google.com/spreadsheets/d/17e31qyT_WE3cUdUF38v_nZjErigb19Oi/edit?lm_source=event&lm_api_id=evt-26S8mILGH5NJMVJ&lm_medium=blast&gid=1934000929#gid=1934000929"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-block bg-white text-black hover:bg-gray-200 text-lg px-12 py-5 font-bold rounded-full transition-colors"

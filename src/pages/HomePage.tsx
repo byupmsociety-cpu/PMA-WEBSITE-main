@@ -178,7 +178,7 @@ const HomePage = () => {
                   </a>
                   .</span>{" "}
                   <a
-                    href="https://docs.google.com/spreadsheets/d/1e_sVQZftfYrc-TiOKohjKHdkF12O8oao_diB6QjwRQc/edit?gid=0#gid=0"
+                    href="https://docs.google.com/spreadsheets/d/17e31qyT_WE3cUdUF38v_nZjErigb19Oi/edit?lm_source=event&lm_api_id=evt-26S8mILGH5NJMVJ&lm_medium=blast&gid=1934000929#gid=1934000929"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="font-semibold text-cyan-500 dark:text-white underline hover:opacity-90"
@@ -191,7 +191,7 @@ const HomePage = () => {
               <AnimatedSection animation="fade-in" delay={600}>
                 <div className="mt-10 flex flex-col sm:flex-row flex-wrap gap-4">
                   <a
-                    href="https://docs.google.com/spreadsheets/d/1e_sVQZftfYrc-TiOKohjKHdkF12O8oao_diB6QjwRQc/edit?gid=0#gid=0"
+                    href="https://docs.google.com/spreadsheets/d/17e31qyT_WE3cUdUF38v_nZjErigb19Oi/edit?lm_source=event&lm_api_id=evt-26S8mILGH5NJMVJ&lm_medium=blast&gid=1934000929#gid=1934000929"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-[#215096] to-[#4299E1] rounded-xl !text-white font-bold text-lg hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl drop-shadow-md"

@@ -78,7 +78,7 @@ const ScrollTriggeredModals = () => {
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-3 mt-4">
-            <Button size="lg" onClick={() => window.open("https://docs.google.com/spreadsheets/d/1e_sVQZftfYrc-TiOKohjKHdkF12O8oao_diB6QjwRQc/edit?gid=0#gid=0", "_blank")} className="gap-2">
+            <Button size="lg" onClick={() => window.open("https://docs.google.com/spreadsheets/d/17e31qyT_WE3cUdUF38v_nZjErigb19Oi/edit?lm_source=event&lm_api_id=evt-26S8mILGH5NJMVJ&lm_medium=blast&gid=1934000929#gid=1934000929", "_blank")} className="gap-2">
               <Rocket className="h-4 w-4" />
               View presentation schedule
             </Button>
