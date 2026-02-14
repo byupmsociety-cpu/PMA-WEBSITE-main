@@ -1,7 +1,6 @@
-import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Rocket, Users, Briefcase, Calendar, Zap, Layout, Target, Trophy } from 'lucide-react';
+import { Users, Briefcase, Calendar, Zap, Layout, Target, Trophy } from 'lucide-react';
 import { cn } from "@/lib/utils";
 
 // Custom TechCard Component
@@ -56,22 +55,6 @@ const SectionHeader = ({ title, subtitle }: { title: string, subtitle?: string }
 );
 
 const HackathonPage = () => {
-  // Load Luma checkout script
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://embed.lu.ma/checkout-button.js';
-    script.id = 'luma-checkout';
-    script.async = true;
-    document.body.appendChild(script);
-
-    return () => {
-      const existingScript = document.getElementById('luma-checkout');
-      if (existingScript) {
-        existingScript.remove();
-      }
-    };
-  }, []);
-
   return (
     <div className="min-h-screen bg-[#030712] text-white selection:bg-blue-500/30">
       {/* Background Decor */}
@@ -85,6 +68,16 @@ const HackathonPage = () => {
       <section className="relative pt-32 pb-24 overflow-hidden">
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-5xl mx-auto text-center">
+
+            {/* Hackathon Complete Badge */}
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="inline-flex items-center gap-2 mb-6 px-6 py-2 rounded-full bg-emerald-500/20 border border-emerald-500/40 backdrop-blur-sm"
+            >
+              <span className="text-emerald-400 text-sm font-mono tracking-widest uppercase font-semibold">Hackathon Complete</span>
+            </motion.div>
 
             {/* Presented By */}
             <motion.div
@@ -125,7 +118,7 @@ const HackathonPage = () => {
                 className="flex items-center gap-3"
               >
                 <Calendar className="text-white" />
-                <span>Feb 9th - 13th</span>
+                <span>Completed Feb 13th</span>
               </motion.div>
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
@@ -142,32 +135,14 @@ const HackathonPage = () => {
               </motion.div>
             </div>
 
-            {/* Presentation day info */}
+            {/* Post-event message */}
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.35 }}
-              className="text-blue-300 text-sm md:text-base font-medium mb-6"
+              className="text-blue-300 text-sm md:text-base font-medium mb-6 max-w-2xl mx-auto"
             >
-              Presentations are Friday, Feb 13th at the{" "}
-              <a
-                href="https://maps.app.goo.gl/JXtXjyco5ayW6tcs7"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white underline hover:no-underline font-semibold"
-              >
-                Kiln
-              </a>
-              .{" "}
-              <a
-                href="https://docs.google.com/spreadsheets/d/17e31qyT_WE3cUdUF38v_nZjErigb19Oi/edit?lm_source=event&lm_api_id=evt-26S8mILGH5NJMVJ&lm_medium=blast&gid=1934000929#gid=1934000929"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white underline hover:no-underline font-semibold"
-              >
-                View presentation schedule & room assignments
-              </a>
-              .
+              The hackathon has concluded. Thank you to all participants! We will soon be able to view the products and presentations of the top 6 finalists. Check back here for updates.
             </motion.p>
 
             {/* Cash Prizes */}
@@ -276,31 +251,15 @@ const HackathonPage = () => {
               transition={{ delay: 0.6 }}
               className="flex flex-col items-center justify-center gap-4"
             >
-              <a
-                href="https://docs.google.com/spreadsheets/d/17e31qyT_WE3cUdUF38v_nZjErigb19Oi/edit?lm_source=event&lm_api_id=evt-26S8mILGH5NJMVJ&lm_medium=blast&gid=1934000929#gid=1934000929"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group relative inline-flex items-center gap-3 px-8 py-4 bg-white text-black rounded-full font-bold text-lg hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.5)] transition-all duration-300"
-              >
-                View presentation schedule & room assignments
-                <Rocket className="w-5 h-5 group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform" />
-              </a>
-              <div className="flex flex-wrap items-center justify-center gap-4">
-                <a
-                  href="https://maps.app.goo.gl/JXtXjyco5ayW6tcs7"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-300 hover:text-white underline text-sm"
-                >
-                  Get directions to the Kiln
-                </a>
-                <Link
-                  to="/hackathon/faq"
-                  className="text-blue-300 hover:text-white underline text-sm"
-                >
-                  Event details & FAQ
-                </Link>
+              <div className="inline-flex items-center gap-3 px-8 py-4 bg-white/10 border border-white/20 rounded-full font-bold text-lg text-white/90">
+                Coming Soon: Top 6 Finalists&apos; Products & Presentations
               </div>
+              <Link
+                to="/hackathon/faq"
+                className="text-blue-300 hover:text-white underline text-sm"
+              >
+                Event details & FAQ
+              </Link>
             </motion.div>
 
           </div>
@@ -553,21 +512,17 @@ const HackathonPage = () => {
           </div>
         </section>
 
-        {/* Register Section */}
+        {/* Registration Closed */}
         <section className="max-w-4xl mx-auto">
-          <SectionHeader title="REGISTER" subtitle={undefined} />
-          <div className="w-full">
-            <iframe
-              src="https://lu.ma/embed/event/evt-26S8mILGH5NJMVJ/simple"
-              width="100%"
-              height="450"
-              frameBorder="0"
-              style={{ border: '1px solid #bfcbda88', borderRadius: '12px' }}
-              allow="fullscreen; payment"
-              aria-hidden="false"
-              tabIndex={0}
-            />
-          </div>
+          <SectionHeader title="REGISTRATION" subtitle={undefined} />
+          <TechCard className="text-center py-12">
+            <p className="text-lg text-white mb-4">
+              Registration is closed. The hackathon has concluded.
+            </p>
+            <p className="text-gray-400">
+              Check back soon to view the top 6 finalists&apos; products and presentations.
+            </p>
+          </TechCard>
         </section>
 
         {/* FAQ link */}
@@ -575,33 +530,16 @@ const HackathonPage = () => {
 
         {/* Footer CTA */}
         <section className="text-center pt-20">
-          <h2 className="text-3xl font-bold mb-8">See you at the Kiln!</h2>
-          <div className="flex flex-col items-center justify-center gap-4">
-            <a
-              href="https://docs.google.com/spreadsheets/d/17e31qyT_WE3cUdUF38v_nZjErigb19Oi/edit?lm_source=event&lm_api_id=evt-26S8mILGH5NJMVJ&lm_medium=blast&gid=1934000929#gid=1934000929"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block bg-white text-black hover:bg-gray-200 text-lg px-12 py-5 font-bold rounded-full transition-colors"
-            >
-              View presentation schedule
-            </a>
-            <div className="flex flex-wrap items-center justify-center gap-4">
-              <a
-                href="https://maps.app.goo.gl/JXtXjyco5ayW6tcs7"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-300 hover:text-white underline text-lg font-semibold"
-              >
-                Get directions to the Kiln
-              </a>
-              <Link
-                to="/hackathon/faq"
-                className="text-blue-300 hover:text-white underline text-lg font-semibold"
-              >
-                Event details & FAQ
-              </Link>
-            </div>
-          </div>
+          <h2 className="text-3xl font-bold mb-8">Thank you to all participants!</h2>
+          <p className="text-gray-400 text-lg mb-6">
+            Top 6 finalists&apos; projects coming soon.
+          </p>
+          <Link
+            to="/hackathon/faq"
+            className="text-blue-300 hover:text-white underline text-lg font-semibold"
+          >
+            Event details & FAQ
+          </Link>
         </section>
 
       </div>
