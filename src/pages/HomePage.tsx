@@ -1,6 +1,5 @@
 import React, { useRef, useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { Rocket } from "lucide-react";
 import AnimatedSection from "@/components/AnimatedSection";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -167,47 +166,35 @@ const HomePage = () => {
 
               <AnimatedSection animation="fade-in" delay={300}>
                 <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mt-6">
-                  <span className="font-semibold text-[#215096] dark:text-[#4299E1]">Presentations are Friday, Feb 13th at the{" "}
-                  <a
-                    href="https://maps.app.goo.gl/JXtXjyco5ayW6tcs7"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-semibold text-cyan-500 dark:text-white underline hover:opacity-90"
-                  >
-                    Kiln
-                  </a>
-                  .</span>{" "}
-                  <a
-                    href="https://docs.google.com/spreadsheets/d/17e31qyT_WE3cUdUF38v_nZjErigb19Oi/edit?lm_source=event&lm_api_id=evt-26S8mILGH5NJMVJ&lm_medium=blast&gid=1934000929#gid=1934000929"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-semibold text-cyan-500 dark:text-white underline hover:opacity-90"
-                  >
-                    View presentation schedule & room assignments
-                  </a>
+                  Empowering the next generation of product leaders through hands-on experience, industry connections,
+                  and community.
                 </p>
               </AnimatedSection>
 
               <AnimatedSection animation="fade-in" delay={600}>
-                <div className="mt-10 flex flex-col sm:flex-row flex-wrap gap-4">
+                <div className="mt-10 flex flex-col sm:flex-row gap-4">
                   <a
-                    href="https://docs.google.com/spreadsheets/d/17e31qyT_WE3cUdUF38v_nZjErigb19Oi/edit?lm_source=event&lm_api_id=evt-26S8mILGH5NJMVJ&lm_medium=blast&gid=1934000929#gid=1934000929"
+                    href="https://clubs.byu.edu/link/club/18295873486206095"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-[#215096] to-[#4299E1] rounded-xl !text-white font-bold text-lg hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl drop-shadow-md"
+                    className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-[#215096] to-[#4299E1] rounded-xl text-white font-bold text-lg hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
                   >
-                    <Rocket className="w-6 h-6 mr-3" />
-                    View presentation schedule & room assignments
+                    <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                      />
+                    </svg>
+                    Join BYU PMA
                   </a>
-                  <a
-                    href="https://maps.app.goo.gl/JXtXjyco5ayW6tcs7"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <Link
+                    to="/team"
                     className="inline-flex items-center justify-center px-6 py-3 bg-transparent border border-gray-300 dark:border-white/20 rounded-lg text-gray-700 dark:text-white font-medium hover:bg-gray-100 dark:hover:bg-white/5 transition-all"
                   >
-                    Get directions to the Kiln
-                  </a>
-  
+                    Meet Our Team
+                  </Link>
                 </div>
               </AnimatedSection>
             </div>
