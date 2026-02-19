@@ -39,11 +39,6 @@ const GamePage = () => {
   // const [, setLoading] = useState(false);
   const [cougarImage, setCougarImage] = useState<HTMLImageElement | null>(null);
 
-  // Airtable configuration
-  const AIRTABLE_API_KEY = 'pat32NdNyEvz1lH3s.a777c3f877a0b354eabf7e503872efd7ad4ecd0567e6d4c60d4cc6d56e219499';
-  const AIRTABLE_BASE_ID = 'app8MiB9XxERjKDqC';
-  const LEADERBOARD_TABLE_ID = 'tbllhjVqoNereN2Jq';
-
   // Dynamic game dimensions for fullscreen mobile
   const [gameDimensions, setGameDimensions] = useState({ width: 400, height: 600 });
   
@@ -71,15 +66,13 @@ const GamePage = () => {
   const GRAVITY = 0.3; // Slightly heavier gravity
   const JUMP_FORCE = -5.5; // Slightly stronger jump
 
-  // Fetch leaderboard from Airtable
+  // Fetch leaderboard from API
   const fetchLeaderboard = useCallback(async () => {
     try {
-      const response = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${LEADERBOARD_TABLE_ID}?sort%5B0%5D%5Bfield%5D=score&sort%5B0%5D%5Bdirection%5D=desc&maxRecords=5`, {
-        headers: {
-          'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-        },
+      const response = await fetch('/api/airtable/leaderboard', {
+        headers: { 'Content-Type': 'application/json' },
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         const players: Player[] = data.records.map((record: any) => ({
@@ -93,78 +86,29 @@ const GamePage = () => {
     } catch (error) {
       console.error('Error fetching leaderboard:', error);
     }
-  }, [AIRTABLE_BASE_ID, LEADERBOARD_TABLE_ID, AIRTABLE_API_KEY]);
+  }, []);
 
-  // Submit score to Airtable with smart replacement logic
+  // Submit score via API (server handles create/update logic)
   const submitScore = useCallback(async (firstName: string, lastName: string, playerEmail: string, score: number) => {
     try {
-      const fullName = `${firstName} ${lastName}`;
-      
-      // First, check if this player already exists in the leaderboard
-      const existingResponse = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${LEADERBOARD_TABLE_ID}?filterByFormula=AND({name}='${fullName}',{email}='${playerEmail}')`, {
-        headers: {
-          'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-        },
+      const response = await fetch('/api/airtable/leaderboard', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          email: playerEmail,
+          score,
+        }),
       });
-      
-      if (existingResponse.ok) {
-        const existingData = await existingResponse.json();
-        
-        if (existingData.records.length > 0) {
-          // Player exists, check if new score is higher
-          const existingRecord = existingData.records[0];
-          const existingScore = existingRecord.fields.score || 0;
-          
-          if (score > existingScore) {
-            // Update the existing record with the higher score
-            const updateResponse = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${LEADERBOARD_TABLE_ID}/${existingRecord.id}`, {
-              method: 'PATCH',
-              headers: {
-                'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                fields: {
-                  score: score
-                }
-              }),
-            });
-            
-            if (updateResponse.ok) {
-              // Refresh leaderboard after updating
-              setTimeout(() => fetchLeaderboard(), 100);
-            }
-          }
-          // If score is not higher, do nothing (don't update)
-        } else {
-          // Player doesn't exist, create new record
-          const createResponse = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${LEADERBOARD_TABLE_ID}`, {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              records: [{
-                fields: {
-                  name: fullName,
-                  email: playerEmail,
-                  score: score
-                }
-              }]
-            }),
-          });
-          
-          if (createResponse.ok) {
-            // Refresh leaderboard after creating
-            setTimeout(() => fetchLeaderboard(), 100);
-          }
-        }
+
+      if (response.ok) {
+        setTimeout(() => fetchLeaderboard(), 100);
       }
     } catch (error) {
       console.error('Error submitting score:', error);
     }
-  }, [AIRTABLE_BASE_ID, LEADERBOARD_TABLE_ID, AIRTABLE_API_KEY, fetchLeaderboard]);
+  }, [fetchLeaderboard]);
 
   // Email validation function
   const validateEmail = (email: string): boolean => {

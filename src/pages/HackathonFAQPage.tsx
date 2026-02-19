@@ -4,9 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-const AIRTABLE_FAQ_URL = 'https://api.airtable.com/v0/app8MiB9XxERjKDqC/FAQ';
-const AIRTABLE_TOKEN = 'pat32NdNyEvz1lH3s.a777c3f877a0b354eabf7e503872efd7ad4ecd0567e6d4c60d4cc6d56e219499';
-
 type FAQEntry = { id: string; question: string; answer: string; order?: number };
 
 const URL_REGEX = /(https?:\/\/[^\s]+)/g;
@@ -84,11 +81,8 @@ const HackathonFAQPage = () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await fetch(AIRTABLE_FAQ_URL, {
-          headers: {
-            Authorization: `Bearer ${AIRTABLE_TOKEN}`,
-            'Content-Type': 'application/json',
-          },
+        const response = await fetch('/api/airtable/faq', {
+          headers: { 'Content-Type': 'application/json' },
         });
 
         if (!response.ok) {

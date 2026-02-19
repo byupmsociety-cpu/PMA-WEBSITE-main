@@ -23,6 +23,10 @@ npm i
 npm run dev
 ```
 
+**Testing Airtable integration locally**
+
+Events, team, FAQ, and leaderboard data come from Airtable. Add `AIRTABLE_API_KEY` to `.env`, then run `npm run dev`. A Vite plugin handles `/api/airtable/*` requests in development. On Vercel, the same logic runs via serverless functions.
+
 **Edit a file directly in GitHub**
 
 - Navigate to the desired file(s).
