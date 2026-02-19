@@ -38,11 +38,6 @@ const recruitingMilestones = [
   },
 ];
 
-// Airtable configuration (using same config as EventsPage)
-const AIRTABLE_API_KEY = "pat32NdNyEvz1lH3s.a777c3f877a0b354eabf7e503872efd7ad4ecd0567e6d4c60d4cc6d56e219499";
-const AIRTABLE_BASE_ID = "app8MiB9XxERjKDqC";
-const EVENTS_TABLE_ID = "tblsZMV8hbA285Lay"; // Using the actual working table ID from EventsPage
-
 interface Event {
   id: string;
   title: string;
@@ -72,12 +67,8 @@ const HomePage = () => {
     try {
       setIsLoadingEvents(true);
 
-      // Get events that are upcoming (date >= today)
-      const response = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${EVENTS_TABLE_ID}`, {
-        headers: {
-          Authorization: `Bearer ${AIRTABLE_API_KEY}`,
-          "Content-Type": "application/json",
-        },
+      const response = await fetch("/api/airtable/events", {
+        headers: { "Content-Type": "application/json" },
       });
 
       if (response.ok) {
@@ -121,7 +112,7 @@ const HomePage = () => {
     } finally {
       setIsLoadingEvents(false);
     }
-  }, [AIRTABLE_BASE_ID, EVENTS_TABLE_ID, AIRTABLE_API_KEY]);
+  }, []);
 
   // Show event banner after 3 seconds (unless dismissed in this session)
   useEffect(() => {

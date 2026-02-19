@@ -32,11 +32,8 @@ const EventsPage = () => {
         setLoading(true);
         setError(null);
         
-        const response = await fetch('https://api.airtable.com/v0/app8MiB9XxERjKDqC/tblsZMV8hbA285Lay', {
-          headers: {
-            'Authorization': 'Bearer pat32NdNyEvz1lH3s.a777c3f877a0b354eabf7e503872efd7ad4ecd0567e6d4c60d4cc6d56e219499',
-            'Content-Type': 'application/json'
-          }
+        const response = await fetch('/api/airtable/events', {
+          headers: { 'Content-Type': 'application/json' },
         });
 
         if (!response.ok) {
