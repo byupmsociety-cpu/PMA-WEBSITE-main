@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import AnimatedSection from '@/components/AnimatedSection';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,62 +8,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-
-interface Event {
-  id: string;
-  title: string;
-  date: string;
-  description: string;
-  location: string;
-  status?: string;
-  img?: string; // URL to image/flyer attachment
-}
+import { useEvents, type Event } from '@/hooks/useEvents';
 
 const EventsPage = () => {
-  const [events, setEvents] = useState<Event[]>([]);
   const [filter, setFilter] = useState('upcoming');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [selectedFlyer, setSelectedFlyer] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchEventsData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        const response = await fetch('/api/airtable/events', {
-          headers: { 'Content-Type': 'application/json' },
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        
-        // Transform Airtable data to our Event format
-        const transformedEvents = data.records.map((record: any) => ({
-          id: record.id,
-          title: record.fields.title || '',
-          date: record.fields.date || '',
-          description: record.fields.description || '',
-          location: record.fields.location || '',
-          status: record.fields.status || 'upcoming',
-          img: record.fields.img?.[0]?.url || '' // Get first attachment URL from img field
-        }));
-
-        setEvents(transformedEvents);
-      } catch (err) {
-        console.error('Error fetching events data:', err);
-        setError('Failed to load events data. Please try again later.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchEventsData();
-  }, []);
+  const { data: events = [], isLoading: loading, error, refetch } = useEvents();
 
   // Format date nicely
   // const formatDate = (dateString: string) => {
@@ -214,9 +165,9 @@ const EventsPage = () => {
                 Upcoming <span className="text-gradient">Events</span>
               </h1>
               <div className="bg-red-500/20 border border-red-500/30 rounded-lg p-6">
-                <p className="text-red-300">{error}</p>
+                <p className="text-red-300">Failed to load events data. Please try again later.</p>
                 <button 
-                  onClick={() => window.location.reload()} 
+                  onClick={() => refetch()} 
                   className="mt-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition-colors"
                 >
                   Try Again
