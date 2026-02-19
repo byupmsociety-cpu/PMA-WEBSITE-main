@@ -57,9 +57,16 @@ export const ROUTE_META: Record<string, { title: string; description: string }> 
 
 const DEFAULT_META = ROUTE_META["/"];
 
-/** Get meta for path; uses exact match or fallback to default (e.g. 404). */
+/** Meta for 404 (unknown paths). Used for document.title and og/twitter when route is not found. */
+export const NOT_FOUND_META = {
+  title: "Page Not Found | BYU PMA",
+  description:
+    "The page you're looking for doesn't exist or may have been moved. Return to BYU Product Management Association.",
+};
+
+/** Get meta for path; exact match for known routes, NOT_FOUND_META for unknown (404). */
 export function getMetaForPath(pathname: string): { title: string; description: string } {
-  return ROUTE_META[pathname] ?? DEFAULT_META;
+  return ROUTE_META[pathname] ?? NOT_FOUND_META;
 }
 
 /** Canonical base URL for OG and sitemap (no trailing slash). */

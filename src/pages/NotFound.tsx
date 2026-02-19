@@ -5,13 +5,6 @@ const NotFound = () => {
   const location = useLocation();
 
   useEffect(() => {
-    document.title = "Page Not Found | BYU PMA";
-    return () => {
-      document.title = "BYU Product Management Association";
-    };
-  }, []);
-
-  useEffect(() => {
     console.error(
       "404 Error: User attempted to access non-existent route:",
       location.pathname
