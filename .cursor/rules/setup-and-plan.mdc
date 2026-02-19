@@ -1,0 +1,16 @@
+---
+description: Run git setup (clean justin-* branches, sync main, create branch) then plan; remind PMA GitHub for PR/merge
+alwaysApply: true
+---
+
+# Setup-and-plan workflow
+
+When the user pastes the setup template (or a message that clearly follows it: clean branches, checkout main, pull, create branch, then plan):
+
+1. **Run the git steps in order.** Use the terminal. Request user approval for destructive commands (branch deletes).
+2. **Branch cleanup:** Delete only branches matching `justin-*` (local first, then remote with `git push origin --delete <branch>` for each). Never delete `main` or non-justin branches.
+3. **Sync main:** `git checkout main` then `git pull origin main`.
+4. **New branch:** Create and checkout a branch named `justin-<relevant-name>` (short, kebab-case from the user's task, e.g. `justin-fix-nav`).
+5. **Plan only:** After setup, output a plan for the user's actual request. Do not implement until they confirm.
+
+When the user indicates they are done with changes, remind them to push the branch and create/merge the PR in PMA GitHub only (no personal GitHub step).
