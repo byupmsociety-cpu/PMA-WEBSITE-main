@@ -48,7 +48,7 @@ const Footer = () => {
             <p className="text-gray-600 dark:text-gray-400 text-sm mb-2">TNRB W310</p>
             <p className="text-gray-600 dark:text-gray-400 text-sm mb-2">Brigham Young University</p>
             <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">Provo, UT 84602</p>
-            <a href="mailto:pma@byu.edu" className="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-white transition-colors text-sm">pm-assoc@byu.edu</a>
+            <a href="mailto:pm-assoc@byu.edu" className="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-white transition-colors text-sm">pm-assoc@byu.edu</a>
           </div>
         </div>
         <div className="mt-12 pt-8 border-t border-gray-200 dark:border-white/10 text-center">
