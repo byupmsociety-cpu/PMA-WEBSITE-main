@@ -1,0 +1,39 @@
+# Agent setup and plan (paste this into Cursor Agent)
+
+Do the following in order, then create a **plan only** (no implementation) for the request at the bottom.
+
+## Step 1 – Clean branches
+
+- **Local:** Delete every local branch that matches `justin-*`. Do not delete `main` or any other branch that does not start with `justin-`.
+- **Remote:** For each of those deleted local branches, if it exists on `origin`, delete it with `git push origin --delete <branch>`.
+- Skip any step if there are no such branches.
+
+## Step 2 – Sync main
+
+- Checkout `main`.
+- Run `git pull origin main`.
+
+## Step 3 – New branch
+
+- Create and checkout a new branch named `justin-<relevant-name>`, where the name is a short, kebab-case description derived from the task described below (e.g. `justin-fix-nav`, `justin-add-hackathon-page`).
+
+## Step 4 – Plan
+
+- After the above, make a **plan only** (no code changes yet) for the following request:
+
+---
+
+**[INSERT YOUR PROMPT / TASK DESCRIPTION BELOW]**
+
+
+
+---
+
+---
+
+# End of workflow (when changes are ready)
+
+1. Push the current branch to `origin`: `git push -u origin <branch>`.
+2. Open **PMA GitHub only**: https://github.com/byupmsociety-cpu/PMA-WEBSITE-main
+3. Create the PR from your branch into `main` and merge there. Do not open personal GitHub first.
+r
