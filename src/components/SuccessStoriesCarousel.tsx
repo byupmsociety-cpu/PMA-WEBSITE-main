@@ -22,20 +22,28 @@ const SuccessStoriesCarousel = () => {
   }, []);
 
   const loadSuccessStories = async () => {
-    const { data, error } = await supabase
-      .from("success_stories")
-      .select("*")
-      .eq("is_featured", true)
-      .order("created_at", { ascending: false });
+    try {
+      const { data, error } = await supabase
+        .from("success_stories")
+        .select("*")
+        .eq("is_featured", true)
+        .order("created_at", { ascending: false });
 
-    if (error) {
-      console.error("Error loading success stories:", error);
+      if (error) {
+        console.error("Error loading success stories:", error);
+        setStories([]);
+        setLoading(false);
+        return;
+      }
+
+      setStories(data || []);
+    } catch (err) {
+      // Handles network errors (e.g. ERR_NAME_NOT_RESOLVED, failed fetch)
+      console.warn("Success stories unavailable (Supabase may be misconfigured):", err);
+      setStories([]);
+    } finally {
       setLoading(false);
-      return;
     }
-
-    setStories(data || []);
-    setLoading(false);
   };
 
   const nextStory = () => {
