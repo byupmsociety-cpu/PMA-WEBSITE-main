@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useCallback } from "react";
+import React, { useRef, useEffect, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import AnimatedSection from "@/components/AnimatedSection";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,6 +9,7 @@ import PersonaWizard from "@/components/PersonaWizard";
 import SuccessStoriesCarousel from "@/components/SuccessStoriesCarousel";
 import ScrollTriggeredModals from "@/components/ScrollTriggeredModals";
 import PersonaTailoredContent from "@/components/PersonaTailoredContent";
+import { useEvents, type Event } from "@/hooks/useEvents";
 
 // Recruiting Timeline data
 const recruitingMilestones = [
@@ -38,81 +39,29 @@ const recruitingMilestones = [
   },
 ];
 
-interface Event {
-  id: string;
-  title: string;
-  description: string;
-  date: string;
-  location: string;
-  status?: string;
-}
+const FALLBACK_EVENT: Event = {
+  id: "fallback",
+  title: "PMA Workshop Series",
+  description: "Join us for our PM Workshop Series - Learn from industry experts",
+  date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+  location: "BYU Campus",
+  status: "upcoming",
+};
 
 const HomePage = () => {
   const [showEventBanner, setShowEventBanner] = useState(false);
-  const [upcomingEvent, setUpcomingEvent] = useState<Event | null>(null);
-  const [isLoadingEvents, setIsLoadingEvents] = useState(true);
 
-  // Fallback event for when API fails
-  const fallbackEvent: Event = {
-    id: "fallback",
-    title: "PMA Workshop Series",
-    description: "Join us for our PM Workshop Series - Learn from industry experts",
-    date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // Next week
-    location: "BYU Campus",
-    status: "upcoming",
-  };
+  const { data: events = [], isLoading: isLoadingEvents, isError } = useEvents();
 
-  // Fetch upcoming events from Airtable
-  const fetchUpcomingEvents = useCallback(async () => {
-    try {
-      setIsLoadingEvents(true);
-
-      const response = await fetch("/api/airtable/events", {
-        headers: { "Content-Type": "application/json" },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.records && data.records.length > 0) {
-          // Transform Airtable data to our Event format (same as EventsPage)
-          const transformedEvents = data.records.map((record: any) => ({
-            id: record.id,
-            title: record.fields.title || "",
-            date: record.fields.date || "",
-            description: record.fields.description || "",
-            location: record.fields.location || "",
-            status: record.fields.status || "upcoming",
-          }));
-
-          // Find the next upcoming event
-          const now = new Date();
-          const upcomingEvents = transformedEvents
-            .filter((event: Event) => new Date(event.date) >= now)
-            .sort((a: Event, b: Event) => new Date(a.date).getTime() - new Date(b.date).getTime());
-
-          if (upcomingEvents.length > 0) {
-            setUpcomingEvent(upcomingEvents[0]);
-          } else {
-            // No upcoming events found, use fallback
-            setUpcomingEvent(fallbackEvent);
-          }
-        } else {
-          // No events found, use fallback
-          setUpcomingEvent(fallbackEvent);
-        }
-      } else {
-        // API error (403, 404, etc.), use fallback
-        console.warn(`Airtable API error: ${response.status} ${response.statusText}`);
-        setUpcomingEvent(fallbackEvent);
-      }
-    } catch (error) {
-      console.error("Error fetching events:", error);
-      // Network error, use fallback
-      setUpcomingEvent(fallbackEvent);
-    } finally {
-      setIsLoadingEvents(false);
-    }
-  }, []);
+  // Derive next upcoming event from cached events (or use fallback)
+  const upcomingEvent = useMemo(() => {
+    if (isError || !events.length) return FALLBACK_EVENT;
+    const now = new Date();
+    const upcoming = events
+      .filter((e) => new Date(e.date) >= now)
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    return upcoming[0] ?? FALLBACK_EVENT;
+  }, [events, isError]);
 
   // Show event banner after 3 seconds (unless dismissed in this session)
   useEffect(() => {
@@ -128,11 +77,6 @@ const HomePage = () => {
 
     return () => clearTimeout(timer);
   }, []);
-
-  // Fetch events on component mount
-  useEffect(() => {
-    fetchUpcomingEvents();
-  }, [fetchUpcomingEvents]);
 
   const [selectedPersona, setSelectedPersona] = useState<string | null>("curious");
 
