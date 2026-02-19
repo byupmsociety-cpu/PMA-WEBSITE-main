@@ -27,6 +27,10 @@ npm run dev
 
 Events, team, FAQ, and leaderboard data come from Airtable. Add `AIRTABLE_API_KEY` to `.env`, then run `npm run dev`. A Vite plugin handles `/api/airtable/*` requests in development. On Vercel, the same logic runs via serverless functions.
 
+**Production / custom domain (SEO)**
+
+For a custom domain, set `VITE_SITE_URL` (e.g. `https://your-domain.com`) in your build environment. It is used for per-route Open Graph URLs and for the sitemap. Running `npm run build` generates `public/sitemap.xml` and updates `public/robots.txt` with the correct Sitemap URL.
+
 **Edit a file directly in GitHub**
 
 - Navigate to the desired file(s).

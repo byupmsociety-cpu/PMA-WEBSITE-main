@@ -16,6 +16,7 @@ import NotFound from "./pages/NotFound";
 import Navigation from "./components/Navigation";
 import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollToTop";
+import RouteMeta from "./components/RouteMeta";
 import GamePage from './pages/GamePage';
 import AuthPage from "./pages/AuthPage";
 import DashboardPage from "./pages/DashboardPage";
@@ -33,6 +34,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <ScrollToTop />
+          <RouteMeta />
           <Navigation />
           <Routes>
             <Route path="/" element={<HomePage />} />
