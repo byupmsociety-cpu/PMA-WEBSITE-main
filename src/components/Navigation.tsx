@@ -4,7 +4,8 @@ import ThemeToggle from './ThemeToggle';
 import { Button } from './ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import AuthModal from './AuthModal';
-import { User } from '@supabase/supabase-js';
+import { UserCircle } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,7 +13,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { UserCircle } from 'lucide-react';
 
 const Navigation = () => {
   const location = useLocation();
@@ -22,8 +22,7 @@ const Navigation = () => {
   const [activeLink, setActiveLink] = useState('/');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
-  const [firstName, setFirstName] = useState<string>('');
+  const { user, profile, isAdmin, isSuperAdmin } = useAuth();
   
   // Handle scroll behavior to hide/show navbar
   useEffect(() => {
@@ -41,40 +40,6 @@ const Navigation = () => {
   useEffect(() => {
     setActiveLink(location.pathname);
   }, [location.pathname]);
-
-  // Check auth status and load profile
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        loadProfile(session.user.id);
-      }
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        loadProfile(session.user.id);
-      } else {
-        setFirstName('');
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const loadProfile = async (userId: string) => {
-    const { data } = await supabase
-      .from("profiles")
-      .select("full_name")
-      .eq("user_id", userId)
-      .single();
-    
-    if (data?.full_name) {
-      const name = data.full_name.split(' ')[0];
-      setFirstName(name);
-    }
-  };
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -157,16 +122,26 @@ const Navigation = () => {
                     <Button variant="ghost" size="sm" className="gap-2">
                       <Avatar className="h-6 w-6">
                         <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                          {firstName ? firstName[0].toUpperCase() : <UserCircle className="h-4 w-4" />}
+                          {profile?.full_name
+                            ? profile.full_name.split(" ")[0][0].toUpperCase()
+                            : <UserCircle className="h-4 w-4" />}
                         </AvatarFallback>
                       </Avatar>
-                      <span>{firstName || 'Profile'}</span>
+                      <span>{profile?.full_name?.split(" ")[0] || 'Profile'}</span>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48 bg-popover">
+                    <DropdownMenuItem onClick={() => navigate('/profile')} className="cursor-pointer">
+                      Profile
+                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => navigate('/dashboard')} className="cursor-pointer">
                       Dashboard
                     </DropdownMenuItem>
+                    {(isAdmin || isSuperAdmin) && (
+                      <DropdownMenuItem onClick={() => navigate('/admin')} className="cursor-pointer">
+                        Admin
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
                       Sign Out
                     </DropdownMenuItem>
@@ -241,6 +216,15 @@ const Navigation = () => {
                     <>
                       <button
                         onClick={() => {
+                          navigate('/profile');
+                          setMobileMenuOpen(false);
+                        }}
+                        className="block w-full text-left px-4 py-3 text-base font-medium rounded-md transition-colors text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                      >
+                        Profile
+                      </button>
+                      <button
+                        onClick={() => {
                           navigate('/dashboard');
                           setMobileMenuOpen(false);
                         }}
@@ -248,6 +232,17 @@ const Navigation = () => {
                       >
                         Dashboard
                       </button>
+                      {(isAdmin || isSuperAdmin) && (
+                        <button
+                          onClick={() => {
+                            navigate('/admin');
+                            setMobileMenuOpen(false);
+                          }}
+                          className="block w-full text-left px-4 py-3 text-base font-medium rounded-md transition-colors text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                        >
+                          Admin
+                        </button>
+                      )}
                       <button
                         onClick={handleSignOut}
                         className="block w-full text-left px-4 py-3 text-base font-medium rounded-md transition-colors text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800/50"
