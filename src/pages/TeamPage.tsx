@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import AnimatedSection from "@/components/AnimatedSection";
+import { supabase } from "@/integrations/supabase/client";
 
 interface TeamMember {
   id: string;
@@ -7,7 +8,7 @@ interface TeamMember {
   role: string;
   bio: string;
   image: string;
-  email: string;
+  email?: string;
   linkedin?: string;
   order?: number;
 }
@@ -24,41 +25,28 @@ const TeamPage: React.FC = () => {
         setLoading(true);
         setError(null);
 
-        const response = await fetch("/api/airtable/team", {
-          headers: { "Content-Type": "application/json" },
-        });
+        const { data, error: supabaseError } = await supabase
+          .from("team_members")
+          .select("id, name, position, bio, image_url, priority")
+          .order("priority", { ascending: true })
+          .order("name", { ascending: true });
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+        if (supabaseError) {
+          throw supabaseError;
         }
 
-        const data = await response.json();
+        const transformedTeam: TeamMember[] =
+          data?.map((member) => ({
+            id: member.id,
+            name: member.name ?? "",
+            role: member.position ?? "",
+            bio: member.bio ?? "",
+            image: member.image_url ?? "/img/placeholder.svg",
+            email: undefined,
+            linkedin: undefined,
+            order: member.priority ?? undefined,
+          })) ?? [];
 
-        // Transform Airtable data to our TeamMember format
-        const transformedTeam = data.records.map((record: any) => {
-          // Handle Airtable attachment field for images
-          let imageUrl = "";
-          if (record.fields.img && record.fields.img.length > 0) {
-            // Airtable stores images as attachment objects
-            imageUrl = record.fields.img[0].url;
-          }
-
-          const idVal = record.fields.ID ?? record.fields.id;
-          const order = typeof idVal === "number" ? idVal : typeof idVal === "string" ? parseInt(idVal, 10) : undefined;
-
-          return {
-            id: record.id,
-            name: record.fields.name || "",
-            role: record.fields.role || "",
-            bio: record.fields.bio || "",
-            image: imageUrl,
-            email: record.fields.email || "",
-            linkedin: record.fields.linkedin || "",
-            order: !isNaN(order as number) ? order : undefined,
-          };
-        });
-
-        transformedTeam.sort((a, b) => (a.order ?? Infinity) - (b.order ?? Infinity));
         setTeam(transformedTeam);
       } catch (err) {
         console.error("Error fetching team data:", err);

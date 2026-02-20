@@ -23,9 +23,9 @@ npm i
 npm run dev
 ```
 
-**Testing Airtable integration locally**
+**Supabase Setup**
 
-Events, team, FAQ, and leaderboard data come from Airtable. Add `AIRTABLE_API_KEY` to `.env`, then run `npm run dev`. A Vite plugin handles `/api/airtable/*` requests in development. On Vercel, the same logic runs via serverless functions.
+Events, team, FAQ, and leaderboard data come from Supabase. Add `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` to `.env`, then run `npm run dev`. The app connects directly to Supabase using the Supabase client library.
 
 **Production / custom domain (SEO)**
 

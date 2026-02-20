@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 
 interface GameState {
   isPlaying: boolean;
@@ -66,49 +67,55 @@ const GamePage = () => {
   const GRAVITY = 0.3; // Slightly heavier gravity
   const JUMP_FORCE = -5.5; // Slightly stronger jump
 
-  // Fetch leaderboard from API
+  // Fetch leaderboard from Supabase
   const fetchLeaderboard = useCallback(async () => {
     try {
-      const response = await fetch('/api/airtable/leaderboard', {
-        headers: { 'Content-Type': 'application/json' },
-      });
+      const { data, error } = await supabase
+        .from('leaderboard_scores')
+        .select('name, email, score, created_at')
+        .order('score', { ascending: false })
+        .limit(5);
 
-      if (response.ok) {
-        const data = await response.json();
-        const players: Player[] = data.records.map((record: any) => ({
-          name: record.fields.name || 'Anonymous',
-          email: record.fields.email || '',
-          score: record.fields.score || 0,
-          date: record.createdTime || new Date().toISOString()
-        }));
-        setLeaderboard(players);
+      if (error) {
+        throw error;
       }
+
+      const players: Player[] =
+        data?.map((row) => ({
+          name: row.name || 'Anonymous',
+          email: row.email || '',
+          score: row.score || 0,
+          date: row.created_at || new Date().toISOString(),
+        })) ?? [];
+
+      setLeaderboard(players);
     } catch (error) {
       console.error('Error fetching leaderboard:', error);
     }
   }, []);
 
-  // Submit score via API (server handles create/update logic)
-  const submitScore = useCallback(async (firstName: string, lastName: string, playerEmail: string, score: number) => {
-    try {
-      const response = await fetch('/api/airtable/leaderboard', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          firstName,
-          lastName,
-          email: playerEmail,
-          score,
-        }),
-      });
+  // Submit score via Supabase RPC (server-side upsert logic)
+  const submitScore = useCallback(
+    async (firstName: string, lastName: string, playerEmail: string, score: number) => {
+      try {
+        const fullName = `${firstName} ${lastName}`.trim();
+        const { error } = await supabase.rpc('upsert_leaderboard_score', {
+          p_email: playerEmail,
+          p_name: fullName,
+          p_score: score,
+        });
 
-      if (response.ok) {
+        if (error) {
+          throw error;
+        }
+
         setTimeout(() => fetchLeaderboard(), 100);
+      } catch (error) {
+        console.error('Error submitting score:', error);
       }
-    } catch (error) {
-      console.error('Error submitting score:', error);
-    }
-  }, [fetchLeaderboard]);
+    },
+    [fetchLeaderboard]
+  );
 
   // Email validation function
   const validateEmail = (email: string): boolean => {

@@ -95,7 +95,7 @@ const AdminDashboardPage = () => {
             </CardHeader>
             <CardContent className="space-y-3">
               <p className="text-sm text-muted-foreground">
-                Manage PMA events in Supabase (future replacement for Airtable).
+                Manage PMA events in Supabase.
               </p>
               <Link
                 to="/admin/events"

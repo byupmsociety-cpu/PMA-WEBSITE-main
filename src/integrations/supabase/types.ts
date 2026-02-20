@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      faq_items: {
+        Row: {
+          answer: string
+          created_at: string
+          id: string
+          is_public: boolean
+          question: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          answer: string
+          created_at?: string
+          id?: string
+          is_public?: boolean
+          question: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          answer?: string
+          created_at?: string
+          id?: string
+          is_public?: boolean
+          question?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       approved_pma_members: {
         Row: {
           added_at: string
@@ -294,6 +324,30 @@ export type Database = {
           },
         ]
       }
+      leaderboard_scores: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          name: string
+          score: number
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          name: string
+          score: number
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          score?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -303,6 +357,20 @@ export type Database = {
       is_approved_pma_member: {
         Args: { email_address: string }
         Returns: boolean
+      }
+      upsert_leaderboard_score: {
+        Args: {
+          p_email: string
+          p_name: string
+          p_score: number
+        }
+        Returns: {
+          id: string
+          name: string
+          email: string
+          score: number
+          created_at: string
+        }
       }
     }
     Enums: {

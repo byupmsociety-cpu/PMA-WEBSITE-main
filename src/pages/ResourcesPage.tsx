@@ -401,8 +401,8 @@ const ResourcesPage = () => {
       clickCounts[key].count++;
     });
 
-    // Default resources to always show (3 defaults)
-    const defaultResources = ["PMF Labs", "Lovable.dev", "Leland+"];
+    // Default resources to always show (6 defaults)
+    const defaultResources = ["PMF Labs", "Lovable.dev", "Leland+", "Cursor", "APM Season", "Jobright"];
 
     // Get top 5 clicked resources (excluding defaults)
     const topClicked = Object.entries(clickCounts)

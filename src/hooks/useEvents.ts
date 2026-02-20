@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface Event {
   id: string;
@@ -7,17 +8,6 @@ export interface Event {
   description: string;
   location: string;
   status?: string;
-}
-
-interface AirtableRecord {
-  id: string;
-  fields: {
-    title?: string;
-    date?: string;
-    description?: string;
-    location?: string;
-    status?: string;
-  };
 }
 
 export function useEvents() {
@@ -30,27 +20,27 @@ export function useEvents() {
       setIsLoading(true);
       setError(null);
 
-      const response = await fetch("/api/airtable/events", {
-        headers: { "Content-Type": "application/json" },
-      });
+      const { data: events, error: supabaseError } = await supabase
+        .from("events")
+        .select("id, title, description, start_time, end_time, location, is_public, registration_link")
+        .eq("is_public", true)
+        .order("start_time", { ascending: true });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      if (supabaseError) {
+        throw supabaseError;
       }
 
-      const json = await response.json();
-      const records: AirtableRecord[] = json.records ?? [];
+      const mappedEvents: Event[] =
+        events?.map((event) => ({
+          id: event.id,
+          title: event.title ?? "",
+          date: event.start_time ?? "",
+          description: event.description ?? "",
+          location: event.location ?? "",
+          status: event.is_public ? "upcoming" : "hidden",
+        })) ?? [];
 
-      const events: Event[] = records.map((record) => ({
-        id: record.id,
-        title: record.fields.title ?? "",
-        date: record.fields.date ?? "",
-        description: record.fields.description ?? "",
-        location: record.fields.location ?? "",
-        status: record.fields.status ?? "upcoming",
-      }));
-
-      setData(events);
+      setData(mappedEvents);
     } catch (err) {
       console.error("Error fetching events:", err);
       setError(err instanceof Error ? err.message : "Failed to load events. Please try again later.");
