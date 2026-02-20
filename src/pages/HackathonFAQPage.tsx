@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
 
 type FAQEntry = { id: string; question: string; answer: string; order?: number };
 
@@ -81,41 +82,23 @@ const HackathonFAQPage = () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await fetch('/api/airtable/faq', {
-          headers: { 'Content-Type': 'application/json' },
-        });
+        const { data, error: supabaseError } = await supabase
+          .from('faq_items')
+          .select('id, question, answer, sort_order, is_public')
+          .eq('is_public', true)
+          .order('sort_order', { ascending: true });
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+        if (supabaseError) {
+          throw supabaseError;
         }
 
-        const data = await response.json();
-        const orderFields = ['ID', 'id', 'Number', 'Order', '#'];
-        const getOrder = (fields: Record<string, unknown>): number | undefined => {
-          for (const name of orderFields) {
-            const val = fields[name];
-            if (typeof val === 'number' && !isNaN(val)) return val;
-            if (typeof val === 'string') {
-              const n = parseInt(val, 10);
-              if (!isNaN(n)) return n;
-            }
-          }
-          return undefined;
-        };
-
-        const entries: FAQEntry[] = (data.records || []).map((record: { id: string; fields: Record<string, unknown> }) => {
-          const fields = record.fields || {};
-          const question = (fields.Question as string) ?? (fields.question as string) ?? '';
-          const answer = (fields.Answer as string) ?? (fields.answer as string) ?? '';
-          const order = getOrder(fields);
-          return { id: record.id, question, answer, order };
-        }).filter((e: FAQEntry) => e.question || e.answer);
-
-        entries.sort((a, b) => {
-          const aOrd = a.order ?? Infinity;
-          const bOrd = b.order ?? Infinity;
-          return aOrd - bOrd;
-        });
+        const entries: FAQEntry[] =
+          data?.map((row) => ({
+            id: row.id,
+            question: row.question ?? '',
+            answer: row.answer ?? '',
+            order: row.sort_order ?? undefined,
+          })).filter((e) => e.question || e.answer) ?? [];
 
         setFaqs(entries);
       } catch (err) {

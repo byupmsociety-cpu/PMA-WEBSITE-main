@@ -185,7 +185,7 @@ const AdminEventsPage = () => {
           <div>
             <h1 className="text-2xl font-bold">Events</h1>
             <p className="text-muted-foreground text-sm">
-              Manage PMA events stored in Supabase. Public-facing pages can be migrated here from Airtable later.
+              Manage PMA events stored in Supabase.
             </p>
           </div>
           <Button variant="outline" size="sm" onClick={() => navigate("/admin")}>
