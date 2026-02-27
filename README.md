@@ -27,6 +27,19 @@ npm run dev
 
 Events, team, FAQ, and leaderboard data come from Supabase. Add `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` to `.env`, then run `npm run dev`. The app connects directly to Supabase using the Supabase client library.
 
+**Admin / Super-admin bootstrap**
+
+The admin dashboard (`/admin`) and super-admin features (Users & Roles at `/admin/users`) require users with `admin` or `super-admin` roles. The migration `20260227000001_seed_super_admin.sql` creates a default super-admin account:
+
+- **Email:** byupmsociety@gmail.com
+- **Password:** superadminPM123
+
+This account bypasses the @byu.edu signup restriction since it is created directly in the database. To promote additional super-admins, run in Supabase SQL Editor:
+
+```sql
+UPDATE public.profiles SET role = 'super-admin' WHERE email = 'your-email@byu.edu';
+```
+
 **Production / custom domain (SEO)**
 
 For a custom domain, set `VITE_SITE_URL` (e.g. `https://your-domain.com`) in your build environment. It is used for per-route Open Graph URLs and for the sitemap. Running `npm run build` generates `public/sitemap.xml` and updates `public/robots.txt` with the correct Sitemap URL.

@@ -44,8 +44,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .single();
 
     if (error) {
-      console.error("Error loading profile", error);
-      setProfile(null);
+      // Profile may not exist (e.g. trigger failed). Try to repair by inserting.
+      const { error: insertError } = await supabase.from("profiles").insert({
+        user_id: currentUser.id,
+        email: currentUser.email ?? null,
+        full_name: currentUser.user_metadata?.full_name ?? null,
+        role: "guest",
+        is_pma_member: false,
+      });
+
+      if (insertError) {
+        // Duplicate = profile was created by another request; retry load.
+        if (insertError.code === "23505") {
+          const { data: retryData, error: retryError } = await supabase
+            .from("profiles")
+            .select("id, user_id, full_name, email, role, is_pma_member")
+            .eq("user_id", currentUser.id)
+            .single();
+          if (!retryError && retryData) {
+            setProfile({
+              id: retryData.id,
+              user_id: retryData.user_id,
+              full_name: retryData.full_name,
+              email: retryData.email,
+              role: (retryData.role ?? "guest") as Role,
+              is_pma_member: retryData.is_pma_member ?? null,
+            });
+            return;
+          }
+        }
+        console.error("Error loading profile", error);
+        setProfile(null);
+        return;
+      }
+      // Insert succeeded; load the new profile.
+      await loadProfile(currentUser);
       return;
     }
 
