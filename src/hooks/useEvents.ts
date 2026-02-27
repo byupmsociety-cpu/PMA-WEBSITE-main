@@ -42,8 +42,13 @@ export function useEvents() {
 
       setData(mappedEvents);
     } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to load events. Please try again later.";
       console.error("Error fetching events:", err);
-      setError(err instanceof Error ? err.message : "Failed to load events. Please try again later.");
+      // Include Supabase error details when available for debugging
+      if (err && typeof err === "object" && "message" in err) {
+        console.error("Events fetch details:", (err as { message?: string; code?: string }).message);
+      }
+      setError(message);
       setData([]);
     } finally {
       setIsLoading(false);

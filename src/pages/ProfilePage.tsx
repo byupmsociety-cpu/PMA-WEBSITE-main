@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 const ProfilePage = () => {
-  const { user, profile, loading, isGuest, isAdmin, isSuperAdmin } = useAuth();
+  const { user, profile, loading, isGuest, isAdmin, isSuperAdmin, refreshProfile } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -15,7 +15,8 @@ const ProfilePage = () => {
     }
   }, [loading, user, navigate]);
 
-  if (loading || !profile) {
+  // Loading state
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
@@ -23,7 +24,38 @@ const ProfilePage = () => {
     );
   }
 
-  const roleLabel = profile.role.toUpperCase();
+  // User exists but profile failed to load - show error with retry
+  if (user && !profile) {
+    return (
+      <div className="min-h-screen bg-background pt-24 pb-12 px-4 flex items-center justify-center">
+        <Card className="max-w-md w-full">
+          <CardHeader>
+            <CardTitle>Profile unavailable</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-muted-foreground">
+              We couldn't load your profile. This can happen right after signup—please try again. If the problem persists, contact PMA support.
+            </p>
+            <div className="flex gap-2">
+              <Button onClick={() => refreshProfile()}>
+                Try again
+              </Button>
+              <Button variant="outline" onClick={() => navigate("/dashboard")}>
+                Go to Dashboard
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Not authenticated
+  if (!user) {
+    return null; // useEffect will redirect to /auth
+  }
+
+  const roleLabel = (profile?.role ?? "guest").toUpperCase();
 
   return (
     <div className="min-h-screen bg-background pt-24 pb-12 px-4">

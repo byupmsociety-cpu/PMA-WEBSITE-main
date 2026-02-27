@@ -165,7 +165,9 @@ const EventsPage = () => {
                 Upcoming <span className="text-gradient">Events</span>
               </h1>
               <div className="bg-red-500/20 border border-red-500/30 rounded-lg p-6">
-                <p className="text-red-300">Failed to load events data. Please try again later.</p>
+                <p className="text-red-300">
+                  {error || "Failed to load events data. Please try again later."}
+                </p>
                 <button 
                   onClick={() => refetch()} 
                   className="mt-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition-colors"

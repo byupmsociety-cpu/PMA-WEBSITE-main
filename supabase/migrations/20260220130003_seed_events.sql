@@ -27,5 +27,4 @@ Teams will present their AI-built MVPs to a panel of industry professional judge
 **Sign-up required**', '2026-02-27 12:00:00-07:00', NULL, 'TBA', true, NULL),
   ('Recruiting Workshop', 'Optimize your job search strategy. We''ll cover resume tailoring, LinkedIn networking, and how to navigate the specific hiring cycles of major tech firms.', '2026-03-11 19:00:00-07:00', NULL, 'TBA', true, NULL),
   ('Personal Project Build Night', 'Bring your ideas to life! Join us for a dedicated session to work on your portfolio projects with mentors available to help you troubleshoot and refine your product.', '2026-03-25 19:00:00-07:00', NULL, 'TBA', true, NULL),
-  ('Closing Social', 'Celebrate the end of the semester with the PMA community. Join us for food, games, and a chance to connect with peers before finals.', '2026-04-08 19:00:00-06:00', NULL, 'TBA', true, NULL)
-ON CONFLICT DO NOTHING;
+  ('Closing Social', 'Celebrate the end of the semester with the PMA community. Join us for food, games, and a chance to connect with peers before finals.', '2026-04-08 19:00:00-06:00', NULL, 'TBA', true, NULL);

@@ -50,8 +50,23 @@ const FALLBACK_EVENT: Event = {
 
 const HomePage = () => {
   const [showEventBanner, setShowEventBanner] = useState(false);
+  const carouselRef = useRef<HTMLDivElement>(null);
 
   const { data: events = [], isLoading: isLoadingEvents, isError } = useEvents();
+
+  // Wheel handler for horizontal scroll - must use passive: false to call preventDefault
+  useEffect(() => {
+    const el = carouselRef.current;
+    if (!el) return;
+    const handler = (e: WheelEvent) => {
+      if (e.deltaY !== 0) {
+        e.preventDefault();
+        el.scrollLeft += e.deltaY;
+      }
+    };
+    el.addEventListener("wheel", handler, { passive: false });
+    return () => el.removeEventListener("wheel", handler);
+  }, []);
 
   // Derive next upcoming event from cached events (or use fallback)
   const upcomingEvent = useMemo(() => {
@@ -171,14 +186,8 @@ const HomePage = () => {
         <div className="container mx-auto px-4 md:px-6">
           <div className="overflow-hidden">
             <div
+              ref={carouselRef}
               className="flex space-x-8 animate-scroll items-center hover:overflow-x-auto hover-scroll-pause"
-              onWheel={(e) => {
-                if (e.deltaY !== 0) {
-                  e.preventDefault();
-                  const container = e.currentTarget;
-                  container.scrollLeft += e.deltaY;
-                }
-              }}
             >
               {[...Array(2)].map((_, i) => (
                 <div key={i} className="contents">
