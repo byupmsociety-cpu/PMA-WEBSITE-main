@@ -325,6 +325,11 @@ const ResourcesPage = () => {
   const [selectedPaidResource, setSelectedPaidResource] = useState<{ title: string; url: string } | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
 
+  // Scroll to top when switching category or search view
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [selectedCategory, searchQuery]);
+
   useEffect(() => {
     window.scrollTo(0, 0);
     fetchTopResources();
@@ -387,82 +392,26 @@ const ResourcesPage = () => {
     setIsPmaMember(profile?.is_pma_member ?? false);
   };
 
-  const fetchTopResources = async () => {
-    // Get click counts from the database
-    const { data: clickData } = await supabase.from("resource_clicks").select("resource_title, category_id");
-
-    // Count clicks per resource
-    const clickCounts: Record<string, { count: number; categoryId: string }> = {};
-    clickData?.forEach((click) => {
-      const key = click.resource_title;
-      if (!clickCounts[key]) {
-        clickCounts[key] = { count: 0, categoryId: click.category_id };
-      }
-      clickCounts[key].count++;
-    });
-
-    // Default resources to always show (6 defaults)
+  const fetchTopResources = () => {
+    // Always show these 6 curated resources (no DB dependency)
     const defaultResources = ["PMF Labs", "Lovable.dev", "Leland+", "Cursor", "APM Season", "Jobright"];
-
-    // Get top 5 clicked resources (excluding defaults)
-    const topClicked = Object.entries(clickCounts)
-      .sort(([, a], [, b]) => b.count - a.count)
-      .filter(([title]) => !defaultResources.includes(title))
-      .slice(0, 5)
-      .map(([title, data]) => ({ title, ...data }));
-
-    // Build final list: defaults first, then top clicked
     const finalResources: Array<{ resource: Resource; category: Category; clicks: number }> = [];
 
-    // Add default resources
     categories.forEach((category) => {
-      // Check resources directly on category
       category.resources?.forEach((resource) => {
         if (defaultResources.includes(resource.title)) {
-          finalResources.push({
-            resource,
-            category,
-            clicks: clickCounts[resource.title]?.count || 0,
-          });
+          finalResources.push({ resource, category, clicks: 0 });
         }
       });
-      
-      // Check resources in subcategories
       category.subcategories?.forEach((subcategory) => {
         subcategory.resources.forEach((resource) => {
           if (defaultResources.includes(resource.title)) {
-            finalResources.push({
-              resource,
-              category,
-              clicks: clickCounts[resource.title]?.count || 0,
-            });
+            finalResources.push({ resource, category, clicks: 0 });
           }
         });
       });
     });
 
-    // Add top clicked resources
-    topClicked.forEach(({ title, categoryId, count }) => {
-      const category = categories.find((c) => c.id === categoryId);
-      let resource: Resource | undefined;
-      
-      // Check resources directly on category
-      resource = category?.resources?.find((r) => r.title === title);
-      
-      // If not found, check subcategories
-      if (!resource && category?.subcategories) {
-        for (const subcategory of category.subcategories) {
-          resource = subcategory.resources.find((r) => r.title === title);
-          if (resource) break;
-        }
-      }
-      
-      if (resource && category) {
-        finalResources.push({ resource, category, clicks: count });
-      }
-    });
-
-    // Show up to 8 resources total (3 defaults + 5 top clicked)
     setTopResources(finalResources);
   };
 
@@ -478,8 +427,6 @@ const ResourcesPage = () => {
       resource_title: resource.title,
       category_id: categoryId,
     });
-    // Refresh top resources after tracking click
-    fetchTopResources();
   };
 
   const searchResults = searchQuery
@@ -566,13 +513,13 @@ const ResourcesPage = () => {
           </div>
         </AnimatedSection>
 
-        {/* Most Used Resources Carousel */}
+        {/* Most Useful Resources Carousel */}
         {!selectedCategory && !searchQuery && topResources.length > 0 && (
           <AnimatedSection animation="fade-in">
             <div className="max-w-6xl mx-auto mb-12">
               <div className="flex items-center gap-2 mb-4">
                 <TrendingUp className="w-4 h-4 text-primary" />
-                <h2 className="text-lg font-bold">Most Used by Students</h2>
+                <h2 className="text-lg font-bold">Most Useful Resources</h2>
               </div>
               <Carousel className="w-full">
                 <CarouselContent>

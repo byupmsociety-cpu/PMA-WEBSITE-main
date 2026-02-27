@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 
 const Navigation = () => {
   const location = useLocation();
@@ -24,9 +25,10 @@ const Navigation = () => {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const { user, profile, isAdmin, isSuperAdmin } = useAuth();
   
-  // Handle scroll behavior to hide/show navbar
+  // Handle scroll behavior to hide/show navbar (disabled when mobile menu is open)
   useEffect(() => {
     const handleScroll = () => {
+      if (mobileMenuOpen) return; // Keep header visible while menu is open
       const currentScrollPos = window.pageYOffset;
       setVisible(prevScrollPos > currentScrollPos || currentScrollPos < 10);
       setPrevScrollPos(currentScrollPos);
@@ -34,16 +36,20 @@ const Navigation = () => {
     
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [prevScrollPos]);
+  }, [prevScrollPos, mobileMenuOpen]);
   
   // Set active link based on current path
   useEffect(() => {
     setActiveLink(location.pathname);
   }, [location.pathname]);
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    setFirstName('');
+  const handleSignOut = () => {
+    setMobileMenuOpen(false);
+    // Use scope: 'local' so we clear the session even when the server has issues (e.g. RLS, 500s)
+    supabase.auth.signOut({ scope: "local" }).finally(() => {
+      // Force full reload to clear any stale React state
+      window.location.href = "/";
+    });
   };
 
   // Close mobile menu when clicking on a link
@@ -142,7 +148,7 @@ const Navigation = () => {
                         Admin
                       </DropdownMenuItem>
                     )}
-                    <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
+                    <DropdownMenuItem onSelect={handleSignOut} className="cursor-pointer">
                       Sign Out
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -174,12 +180,18 @@ const Navigation = () => {
               </button>
             </div>
           </div>
-          
-          {/* Mobile Menu */}
-          <div className={`md:hidden transition-all duration-300 ease-in-out ${
-            mobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0 overflow-hidden'
-          }`}>
-            <nav className="py-4 border-t border-gray-200 dark:border-white/10">
+        </div>
+      </div>
+
+      {/* Mobile Menu Sheet - overlay panel, portal-rendered, body scroll locked */}
+      <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+        <SheetContent
+          side="right"
+          className="z-[60] w-[85%] max-w-sm flex flex-col p-0"
+        >
+          <SheetTitle className="sr-only">Navigation menu</SheetTitle>
+          <div className="flex flex-col h-full">
+            <nav className="flex-1 overflow-y-auto p-6 pt-14">
               <ul className="space-y-2">
                 {links.map((link) => (
                   <li key={link.path}>
@@ -252,7 +264,10 @@ const Navigation = () => {
                     </>
                   ) : (
                     <button
-                      onClick={() => setAuthModalOpen(true)}
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        setAuthModalOpen(true);
+                      }}
                       className="block w-full text-left px-4 py-3 text-base font-medium rounded-md transition-colors text-primary dark:text-white bg-blue-50 dark:bg-blue-900/20"
                     >
                       Sign In
@@ -261,9 +276,12 @@ const Navigation = () => {
                 </li>
               </ul>
             </nav>
+            <div className="p-4 border-t border-gray-200 dark:border-white/10">
+              <ThemeToggle />
+            </div>
           </div>
-        </div>
-      </div>
+        </SheetContent>
+      </Sheet>
       
       <AuthModal 
         isOpen={authModalOpen}
