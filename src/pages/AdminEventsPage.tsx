@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
+import { getAdminErrorMessage } from "@/lib/admin-utils";
 
 interface AdminEvent {
   id: string;
@@ -26,7 +27,10 @@ const AdminEventsPage = () => {
   const { toast } = useToast();
 
   const [events, setEvents] = useState<AdminEvent[]>([]);
+  const [loadingData, setLoadingData] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [savingId, setSavingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
   const [newEvent, setNewEvent] = useState({
     title: "",
@@ -51,6 +55,8 @@ const AdminEventsPage = () => {
   }, [loading, user, isAdmin, isSuperAdmin, navigate]);
 
   const loadEvents = async () => {
+    setLoadingData(true);
+    setLoadError(null);
     const { data, error } = await supabase
       .from("events")
       .select("id, title, description, start_time, end_time, location, is_public, registration_link")
@@ -58,15 +64,16 @@ const AdminEventsPage = () => {
 
     if (error) {
       console.error("Error loading events", error);
+      const friendlyMsg = getAdminErrorMessage(error);
+      setLoadError(friendlyMsg);
       toast({
         title: "Error loading events",
-        description: error.message,
+        description: friendlyMsg,
         variant: "destructive",
       });
-      return;
-    }
-
-    setEvents(
+    } else {
+      setLoadError(null);
+      setEvents(
       (data ?? []).map((e: any) => ({
         id: e.id,
         title: e.title,
@@ -77,7 +84,9 @@ const AdminEventsPage = () => {
         is_public: e.is_public,
         registration_link: e.registration_link,
       }))
-    );
+      );
+    }
+    setLoadingData(false);
   };
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -97,7 +106,7 @@ const AdminEventsPage = () => {
     if (error) {
       toast({
         title: "Error creating event",
-        description: error.message,
+        description: getAdminErrorMessage(error),
         variant: "destructive",
       });
     } else {
@@ -138,7 +147,7 @@ const AdminEventsPage = () => {
     if (error) {
       toast({
         title: "Error saving event",
-        description: error.message,
+        description: getAdminErrorMessage(error),
         variant: "destructive",
       });
     } else {
@@ -153,12 +162,13 @@ const AdminEventsPage = () => {
   };
 
   const handleDelete = async (id: string) => {
+    setDeletingId(id);
     const { error } = await supabase.from("events").delete().eq("id", id);
 
     if (error) {
       toast({
         title: "Error deleting event",
-        description: error.message,
+        description: getAdminErrorMessage(error),
         variant: "destructive",
       });
     } else {
@@ -168,6 +178,7 @@ const AdminEventsPage = () => {
       });
       await loadEvents();
     }
+    setDeletingId(null);
   };
 
   if (loading) {
@@ -255,6 +266,19 @@ const AdminEventsPage = () => {
         </Card>
 
         <div className="space-y-3">
+          {loadingData ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+          ) : loadError ? (
+            <div className="flex flex-col items-center gap-3 py-12">
+              <p className="text-sm text-destructive text-center">{loadError}</p>
+              <Button variant="outline" size="sm" onClick={() => void loadEvents()}>
+                Retry
+              </Button>
+            </div>
+          ) : (
+          <>
           {events.map((evt) => (
             <Card key={evt.id}>
               <CardContent className="pt-4 space-y-3">
@@ -351,7 +375,7 @@ const AdminEventsPage = () => {
                   <Button
                     size="sm"
                     onClick={() => handleUpdate(evt)}
-                    disabled={savingId === evt.id}
+                    disabled={savingId === evt.id || deletingId === evt.id}
                   >
                     {savingId === evt.id ? "Saving..." : "Save"}
                   </Button>
@@ -359,8 +383,9 @@ const AdminEventsPage = () => {
                     size="sm"
                     variant="outline"
                     onClick={() => handleDelete(evt.id)}
+                    disabled={savingId === evt.id || deletingId === evt.id}
                   >
-                    Delete
+                    {deletingId === evt.id ? "Deleting..." : "Delete"}
                   </Button>
                 </div>
               </CardContent>
@@ -370,6 +395,8 @@ const AdminEventsPage = () => {
             <p className="text-sm text-muted-foreground">
               No events yet. Add your first event above.
             </p>
+          )}
+          </>
           )}
         </div>
       </div>

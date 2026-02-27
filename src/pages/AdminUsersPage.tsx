@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { getAdminErrorMessage } from "@/lib/admin-utils";
 
 type Role = "super-admin" | "admin" | "user" | "guest";
 
@@ -24,6 +25,8 @@ const AdminUsersPage = () => {
   const { toast } = useToast();
 
   const [rows, setRows] = useState<AdminUserRow[]>([]);
+  const [loadingData, setLoadingData] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [savingId, setSavingId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -39,6 +42,8 @@ const AdminUsersPage = () => {
   }, [loading, user, isAdmin, isSuperAdmin, navigate]);
 
   const loadUsers = async () => {
+    setLoadingData(true);
+    setLoadError(null);
     const { data, error } = await supabase
       .from("profiles")
       .select("id, full_name, email, role, is_pma_member")
@@ -46,15 +51,16 @@ const AdminUsersPage = () => {
 
     if (error) {
       console.error("Error loading users", error);
+      const friendlyMsg = getAdminErrorMessage(error);
+      setLoadError(friendlyMsg);
       toast({
         title: "Error loading users",
-        description: error.message,
+        description: friendlyMsg,
         variant: "destructive",
       });
-      return;
-    }
-
-    const mapped: AdminUserRow[] =
+    } else {
+      setLoadError(null);
+      const mapped: AdminUserRow[] =
       data?.map((row: any) => ({
         id: row.id,
         full_name: row.full_name,
@@ -62,8 +68,9 @@ const AdminUsersPage = () => {
         role: (row.role ?? "guest") as Role,
         is_pma_member: row.is_pma_member ?? null,
       })) ?? [];
-
-    setRows(mapped);
+      setRows(mapped);
+    }
+    setLoadingData(false);
   };
 
   const updateRole = async (id: string, newRole: Role) => {
@@ -76,7 +83,7 @@ const AdminUsersPage = () => {
     if (error) {
       toast({
         title: "Error updating role",
-        description: error.message,
+        description: getAdminErrorMessage(error),
         variant: "destructive",
       });
     } else {
@@ -110,7 +117,7 @@ const AdminUsersPage = () => {
           <div>
             <h1 className="text-2xl font-bold">Users & Roles</h1>
             <p className="text-muted-foreground text-sm">
-              Super admins can manage all roles. Admins can promote guests to users.
+              Super-admins can assign any role. Admins can assign admin, user, or guest (super-admin is super-admin only).
             </p>
           </div>
           <Button variant="outline" size="sm" onClick={() => navigate("/admin")}>
@@ -119,10 +126,22 @@ const AdminUsersPage = () => {
         </div>
 
         <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <CardTitle>All Users</CardTitle>
+            {loadError && (
+              <Button variant="outline" size="sm" onClick={() => void loadUsers()}>
+                Retry
+              </Button>
+            )}
           </CardHeader>
           <CardContent className="space-y-2 overflow-x-auto">
+            {loadingData ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              </div>
+            ) : loadError ? (
+              <p className="py-4 text-center text-sm text-destructive">{loadError}</p>
+            ) : (
             <table className="w-full text-sm">
               <thead className="text-xs text-muted-foreground border-b">
                 <tr>
@@ -143,8 +162,9 @@ const AdminUsersPage = () => {
                       {row.email || <span className="text-muted-foreground">N/A</span>}
                     </td>
                     <td className="py-2 pr-2">
-                      {isSuperAdmin ? (
+                      {(isAdmin || isSuperAdmin) && (isSuperAdmin || row.role !== "super-admin") ? (
                         <Select
+                          key={row.id + row.role}
                           defaultValue={row.role}
                           onValueChange={(val) => updateRole(row.id, val as Role)}
                           disabled={savingId === row.id}
@@ -153,7 +173,9 @@ const AdminUsersPage = () => {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="super-admin">super-admin</SelectItem>
+                            {isSuperAdmin && (
+                              <SelectItem value="super-admin">super-admin</SelectItem>
+                            )}
                             <SelectItem value="admin">admin</SelectItem>
                             <SelectItem value="user">user</SelectItem>
                             <SelectItem value="guest">guest</SelectItem>
@@ -171,15 +193,8 @@ const AdminUsersPage = () => {
                       )}
                     </td>
                     <td className="py-2 pr-2">
-                      {isAdmin && !isSuperAdmin && row.role === "guest" && (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          disabled={savingId === row.id}
-                          onClick={() => handlePromoteGuestToUser(row)}
-                        >
-                          Promote to user
-                        </Button>
+                      {savingId === row.id && (
+                        <span className="text-xs text-muted-foreground">Saving...</span>
                       )}
                     </td>
                   </tr>
@@ -193,6 +208,7 @@ const AdminUsersPage = () => {
                 )}
               </tbody>
             </table>
+            )}
           </CardContent>
         </Card>
       </div>

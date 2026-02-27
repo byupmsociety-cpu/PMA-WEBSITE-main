@@ -1,7 +1,37 @@
-
+import { useState } from 'react';
 import AnimatedSection from '@/components/AnimatedSection';
+import { useToast } from '@/hooks/use-toast';
 
 const ContactPage = () => {
+  const { toast } = useToast();
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    subject: '',
+    message: '',
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const { firstName, lastName, email, subject, message } = formData;
+    const body = [
+      `Name: ${firstName} ${lastName}`,
+      `Email: ${email}`,
+      `Subject: ${subject}`,
+      '',
+      message,
+    ].join('\n');
+    const mailtoUrl = `mailto:pm-assoc@byu.edu?subject=${encodeURIComponent(subject || 'PMA Website Contact')}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailtoUrl;
+
+    toast({
+      title: 'Message prepared',
+      description: 'Your email client will open with your message. Please click Send to complete. We typically respond within 1–2 business days.',
+    });
+
+    setFormData({ firstName: '', lastName: '', email: '', subject: '', message: '' });
+  };
   return (
     <div className="min-h-screen pt-24 pb-20 bg-background text-foreground">
       <div className="container mx-auto px-4 md:px-6">
@@ -82,15 +112,18 @@ const ContactPage = () => {
           
             <AnimatedSection animation="slide-up" delay={200}>
               <div className="bg-card/80 border border-border rounded-lg p-6 backdrop-blur-sm">
-                <h2 className="text-2xl font-bold mb-6 text-card-foreground">Send us a Message</h2>
-                <form>
+                <h2 className="text-2xl font-bold mb-2 text-card-foreground">Send us a Message</h2>
+                <p className="text-sm text-muted-foreground mb-6">We typically respond within 1–2 business days.</p>
+                <form onSubmit={handleSubmit}>
                   <div className="grid grid-cols-1 gap-6">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label htmlFor="first-name" className="block text-sm font-medium text-muted-foreground mb-1">First Name</label>
                         <input 
                           type="text" 
-                          id="first-name" 
+                          id="first-name"
+                          value={formData.firstName}
+                          onChange={(e) => setFormData((p) => ({ ...p, firstName: e.target.value }))}
                           className="block w-full bg-muted/50 border border-border rounded-md px-4 py-3 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" 
                           placeholder="John"
                         />
@@ -99,7 +132,9 @@ const ContactPage = () => {
                         <label htmlFor="last-name" className="block text-sm font-medium text-muted-foreground mb-1">Last Name</label>
                         <input 
                           type="text" 
-                          id="last-name" 
+                          id="last-name"
+                          value={formData.lastName}
+                          onChange={(e) => setFormData((p) => ({ ...p, lastName: e.target.value }))}
                           className="block w-full bg-muted/50 border border-border rounded-md px-4 py-3 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" 
                           placeholder="Doe"
                         />
@@ -110,7 +145,10 @@ const ContactPage = () => {
                       <label htmlFor="email" className="block text-sm font-medium text-muted-foreground mb-1">Email</label>
                       <input 
                         type="email" 
-                        id="email" 
+                        id="email"
+                        value={formData.email}
+                        onChange={(e) => setFormData((p) => ({ ...p, email: e.target.value }))}
+                        required
                         className="block w-full bg-muted/50 border border-border rounded-md px-4 py-3 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" 
                         placeholder="johndoe@example.com"
                       />
@@ -120,7 +158,9 @@ const ContactPage = () => {
                       <label htmlFor="subject" className="block text-sm font-medium text-muted-foreground mb-1">Subject</label>
                       <input 
                         type="text" 
-                        id="subject" 
+                        id="subject"
+                        value={formData.subject}
+                        onChange={(e) => setFormData((p) => ({ ...p, subject: e.target.value }))}
                         className="block w-full bg-muted/50 border border-border rounded-md px-4 py-3 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" 
                         placeholder="How can we help you?"
                       />
@@ -129,11 +169,14 @@ const ContactPage = () => {
                     <div>
                       <label htmlFor="message" className="block text-sm font-medium text-muted-foreground mb-1">Message</label>
                       <textarea 
-                        id="message" 
+                        id="message"
+                        value={formData.message}
+                        onChange={(e) => setFormData((p) => ({ ...p, message: e.target.value }))}
+                        required
                         rows={6} 
                         className="block w-full bg-muted/50 border border-border rounded-md px-4 py-3 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" 
                         placeholder="Your message..."
-                      ></textarea>
+                      />
                     </div>
                     
                     <div>

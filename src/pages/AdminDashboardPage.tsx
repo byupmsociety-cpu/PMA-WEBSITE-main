@@ -36,24 +36,22 @@ const AdminDashboardPage = () => {
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
-          {isSuperAdmin && (
-            <Card className="hover:border-primary/60 transition-colors">
-              <CardHeader>
-                <CardTitle>Users & Roles</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <p className="text-sm text-muted-foreground">
-                  View all users and manage their roles and PMA membership status.
-                </p>
-                <Link
-                  to="/admin/users"
-                  className="inline-flex text-sm font-medium text-primary hover:underline"
-                >
-                  Open Users Management
-                </Link>
-              </CardContent>
-            </Card>
-          )}
+          <Card className="hover:border-primary/60 transition-colors">
+            <CardHeader>
+              <CardTitle>Users & Roles</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <p className="text-sm text-muted-foreground">
+                View all users and manage their roles and PMA membership status.
+              </p>
+              <Link
+                to="/admin/users"
+                className="inline-flex text-sm font-medium text-primary hover:underline"
+              >
+                Open Users Management
+              </Link>
+            </CardContent>
+          </Card>
 
           <Card className="hover:border-primary/60 transition-colors">
             <CardHeader>
