@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { getAdminErrorMessage } from "@/lib/admin-utils";
 
 type DefaultRole = "user" | "admin";
 
@@ -25,9 +26,12 @@ const AdminApprovedEmailsPage = () => {
   const { toast } = useToast();
 
   const [rows, setRows] = useState<ApprovedEmailRow[]>([]);
+  const [loadingData, setLoadingData] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [newEmail, setNewEmail] = useState("");
   const [newRole, setNewRole] = useState<DefaultRole>("user");
   const [saving, setSaving] = useState(false);
+  const [savingRoleId, setSavingRoleId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading) {
@@ -42,6 +46,8 @@ const AdminApprovedEmailsPage = () => {
   }, [loading, user, isAdmin, isSuperAdmin, navigate]);
 
   const loadRows = async () => {
+    setLoadingData(true);
+    setLoadError(null);
     const { data, error } = await supabase
       .from("approved_pma_members")
       .select("id, email, default_role, added_at, used_at")
@@ -49,24 +55,26 @@ const AdminApprovedEmailsPage = () => {
 
     if (error) {
       console.error("Error loading approved emails", error);
+      const friendlyMsg = getAdminErrorMessage(error);
+      setLoadError(friendlyMsg);
       toast({
         title: "Error loading list",
-        description: error.message,
+        description: friendlyMsg,
         variant: "destructive",
       });
-      return;
+    } else {
+      setLoadError(null);
+      const mapped: ApprovedEmailRow[] =
+        data?.map((row: any) => ({
+          id: row.id,
+          email: row.email,
+          default_role: (row.default_role ?? "user") as DefaultRole,
+          added_at: row.added_at,
+          used_at: row.used_at ?? null,
+        })) ?? [];
+      setRows(mapped);
     }
-
-    const mapped: ApprovedEmailRow[] =
-      data?.map((row: any) => ({
-        id: row.id,
-        email: row.email,
-        default_role: (row.default_role ?? "user") as DefaultRole,
-        added_at: row.added_at,
-        used_at: row.used_at ?? null,
-      })) ?? [];
-
-    setRows(mapped);
+    setLoadingData(false);
   };
 
   const handleAdd = async (e: React.FormEvent) => {
@@ -89,7 +97,7 @@ const AdminApprovedEmailsPage = () => {
     if (error) {
       toast({
         title: "Error adding email",
-        description: error.message,
+        description: getAdminErrorMessage(error),
         variant: "destructive",
       });
     } else {
@@ -105,6 +113,29 @@ const AdminApprovedEmailsPage = () => {
     setSaving(false);
   };
 
+  const handleUpdateDefaultRole = async (id: string, newRole: DefaultRole) => {
+    setSavingRoleId(id);
+    const { error } = await supabase
+      .from("approved_pma_members")
+      .update({ default_role: newRole })
+      .eq("id", id);
+
+    if (error) {
+      toast({
+        title: "Error updating role",
+        description: getAdminErrorMessage(error),
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Role updated",
+        description: "Default role has been updated.",
+      });
+      await loadRows();
+    }
+    setSavingRoleId(null);
+  };
+
   const handleDelete = async (id: string) => {
     const { error } = await supabase
       .from("approved_pma_members")
@@ -114,7 +145,7 @@ const AdminApprovedEmailsPage = () => {
     if (error) {
       toast({
         title: "Error deleting email",
-        description: error.message,
+        description: getAdminErrorMessage(error),
         variant: "destructive",
       });
     } else {
@@ -179,10 +210,22 @@ const AdminApprovedEmailsPage = () => {
         </Card>
 
         <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <CardTitle>Current List</CardTitle>
+            {loadError && (
+              <Button variant="outline" size="sm" onClick={() => void loadRows()}>
+                Retry
+              </Button>
+            )}
           </CardHeader>
           <CardContent className="space-y-2 overflow-x-auto">
+            {loadingData ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              </div>
+            ) : loadError ? (
+              <p className="py-4 text-center text-sm text-destructive">{loadError}</p>
+            ) : (
             <table className="w-full text-sm">
               <thead className="text-xs text-muted-foreground border-b">
                 <tr>
@@ -198,7 +241,19 @@ const AdminApprovedEmailsPage = () => {
                   <tr key={row.id} className="border-b last:border-0">
                     <td className="py-2 pr-2 font-mono text-xs">{row.email}</td>
                     <td className="py-2 pr-2">
-                      <Badge>{row.default_role}</Badge>
+                      <Select
+                        value={row.default_role}
+                        onValueChange={(val) => handleUpdateDefaultRole(row.id, val as DefaultRole)}
+                        disabled={savingRoleId === row.id}
+                      >
+                        <SelectTrigger className="h-8 w-24">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="user">user</SelectItem>
+                          <SelectItem value="admin">admin</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </td>
                     <td className="py-2 pr-2 text-xs text-muted-foreground">
                       {new Date(row.added_at).toLocaleDateString()}
@@ -217,8 +272,9 @@ const AdminApprovedEmailsPage = () => {
                         size="sm"
                         variant="outline"
                         onClick={() => handleDelete(row.id)}
+                        disabled={savingRoleId === row.id}
                       >
-                        Remove
+                        {savingRoleId === row.id ? "Saving..." : "Remove"}
                       </Button>
                     </td>
                   </tr>
@@ -232,6 +288,7 @@ const AdminApprovedEmailsPage = () => {
                 )}
               </tbody>
             </table>
+            )}
           </CardContent>
         </Card>
       </div>

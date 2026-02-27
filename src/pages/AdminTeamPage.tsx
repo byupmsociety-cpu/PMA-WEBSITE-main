@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { getAdminErrorMessage } from "@/lib/admin-utils";
 
 interface TeamMember {
   id: string;
@@ -23,7 +24,10 @@ const AdminTeamPage = () => {
   const { toast } = useToast();
 
   const [members, setMembers] = useState<TeamMember[]>([]);
+  const [loadingData, setLoadingData] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [savingId, setSavingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
   const [newMember, setNewMember] = useState({
     name: "",
@@ -46,6 +50,8 @@ const AdminTeamPage = () => {
   }, [loading, user, isAdmin, isSuperAdmin, navigate]);
 
   const loadMembers = async () => {
+    setLoadingData(true);
+    setLoadError(null);
     const { data, error } = await supabase
       .from("team_members")
       .select("id, name, position, bio, image_url, priority")
@@ -53,24 +59,27 @@ const AdminTeamPage = () => {
 
     if (error) {
       console.error("Error loading team members", error);
+      const friendlyMsg = getAdminErrorMessage(error);
+      setLoadError(friendlyMsg);
       toast({
         title: "Error loading team members",
-        description: error.message,
+        description: friendlyMsg,
         variant: "destructive",
       });
-      return;
+    } else {
+      setLoadError(null);
+      setMembers(
+        (data ?? []).map((m: any) => ({
+          id: m.id,
+          name: m.name,
+          position: m.position,
+          bio: m.bio,
+          image_url: m.image_url,
+          priority: m.priority,
+        }))
+      );
     }
-
-    setMembers(
-      (data ?? []).map((m: any) => ({
-        id: m.id,
-        name: m.name,
-        position: m.position,
-        bio: m.bio,
-        image_url: m.image_url,
-        priority: m.priority,
-      }))
-    );
+    setLoadingData(false);
   };
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -88,7 +97,7 @@ const AdminTeamPage = () => {
     if (error) {
       toast({
         title: "Error creating member",
-        description: error.message,
+        description: getAdminErrorMessage(error),
         variant: "destructive",
       });
     } else {
@@ -125,7 +134,7 @@ const AdminTeamPage = () => {
     if (error) {
       toast({
         title: "Error saving member",
-        description: error.message,
+        description: getAdminErrorMessage(error),
         variant: "destructive",
       });
     } else {
@@ -140,12 +149,13 @@ const AdminTeamPage = () => {
   };
 
   const handleDelete = async (id: string) => {
+    setDeletingId(id);
     const { error } = await supabase.from("team_members").delete().eq("id", id);
 
     if (error) {
       toast({
         title: "Error deleting member",
-        description: error.message,
+        description: getAdminErrorMessage(error),
         variant: "destructive",
       });
     } else {
@@ -155,6 +165,7 @@ const AdminTeamPage = () => {
       });
       await loadMembers();
     }
+    setDeletingId(null);
   };
 
   if (loading) {
@@ -223,6 +234,19 @@ const AdminTeamPage = () => {
         </Card>
 
         <div className="space-y-3">
+          {loadingData ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+          ) : loadError ? (
+            <div className="flex flex-col items-center gap-3 py-12">
+              <p className="text-sm text-destructive text-center">{loadError}</p>
+              <Button variant="outline" size="sm" onClick={() => void loadMembers()}>
+                Retry
+              </Button>
+            </div>
+          ) : (
+          <>
           {members.map((m) => (
             <Card key={m.id}>
               <CardContent className="pt-4 space-y-3">
@@ -288,7 +312,7 @@ const AdminTeamPage = () => {
                   <Button
                     size="sm"
                     onClick={() => handleUpdate(m)}
-                    disabled={savingId === m.id}
+                    disabled={savingId === m.id || deletingId === m.id}
                   >
                     {savingId === m.id ? "Saving..." : "Save"}
                   </Button>
@@ -296,8 +320,9 @@ const AdminTeamPage = () => {
                     size="sm"
                     variant="outline"
                     onClick={() => handleDelete(m.id)}
+                    disabled={savingId === m.id || deletingId === m.id}
                   >
-                    Delete
+                    {deletingId === m.id ? "Deleting..." : "Delete"}
                   </Button>
                 </div>
               </CardContent>
@@ -307,6 +332,8 @@ const AdminTeamPage = () => {
             <p className="text-sm text-muted-foreground">
               No team members yet. Add your first member above.
             </p>
+          )}
+          </>
           )}
         </div>
       </div>
