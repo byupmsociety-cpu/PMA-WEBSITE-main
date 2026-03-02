@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -21,9 +19,7 @@ interface ApprovedEmailRow {
   is_disabled: boolean;
 }
 
-const AdminApprovedEmailsPage = () => {
-  const { user, isAdmin, isSuperAdmin, loading } = useAuth();
-  const navigate = useNavigate();
+export default function ApprovedEmailsPanel() {
   const { toast } = useToast();
 
   const [rows, setRows] = useState<ApprovedEmailRow[]>([]);
@@ -38,16 +34,8 @@ const AdminApprovedEmailsPage = () => {
   const [uploadingCsv, setUploadingCsv] = useState(false);
 
   useEffect(() => {
-    if (!loading) {
-      if (!user) {
-        navigate("/auth");
-      } else if (!isAdmin && !isSuperAdmin) {
-        navigate("/");
-      } else {
-        void loadRows();
-      }
-    }
-  }, [loading, user, isAdmin, isSuperAdmin, navigate]);
+    void loadRows();
+  }, []);
 
   const loadRows = async () => {
     setLoadingData(true);
@@ -273,29 +261,9 @@ const AdminApprovedEmailsPage = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-background pt-24 pb-12 px-4">
-      <div className="container max-w-4xl mx-auto space-y-6">
-        <div className="flex items-center justify-between gap-2">
-          <div>
-            <h1 className="text-2xl font-bold">Pre-approved Emails</h1>
-            <p className="text-muted-foreground text-sm">
-              Control which BYU emails are auto-approved as PMA users or admins on signup.
-            </p>
-          </div>
-          <Button variant="outline" size="sm" onClick={() => navigate("/admin")}>
-            Back to Admin
-          </Button>
-        </div>
-
+    <div className="space-y-6">
+      <div className="grid gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>Add Pre-approved Email</CardTitle>
@@ -327,13 +295,12 @@ const AdminApprovedEmailsPage = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Bulk Upload from CSV</CardTitle>
+            <CardTitle>Bulk Upload (CSV)</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <p className="text-sm text-muted-foreground">
-              Upload a CSV with a header row that includes an <code>email</code> column
-              (e.g. <code>Name,Email</code>). Only new <span className="font-mono">@byu.edu</span> addresses
-              will be added; existing entries are left unchanged.
+              Upload a CSV with a header row containing an <code>email</code> column (e.g. <code>Name,Email</code>).
+              Only new <span className="font-mono">@byu.edu</span> addresses are added.
             </p>
             <form onSubmit={handleCsvUpload} className="flex flex-col sm:flex-row gap-3 items-start">
               <Input
@@ -359,24 +326,25 @@ const AdminApprovedEmailsPage = () => {
             </form>
           </CardContent>
         </Card>
+      </div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0">
-            <CardTitle>Current List</CardTitle>
-            {loadError && (
-              <Button variant="outline" size="sm" onClick={() => void loadRows()}>
-                Retry
-              </Button>
-            )}
-          </CardHeader>
-          <CardContent className="space-y-2 overflow-x-auto">
-            {loadingData ? (
-              <div className="flex items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              </div>
-            ) : loadError ? (
-              <p className="py-4 text-center text-sm text-destructive">{loadError}</p>
-            ) : (
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0">
+          <CardTitle>Current List</CardTitle>
+          {loadError ? (
+            <Button variant="outline" size="sm" onClick={() => void loadRows()}>
+              Retry
+            </Button>
+          ) : null}
+        </CardHeader>
+        <CardContent className="space-y-2 overflow-x-auto">
+          {loadingData ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+          ) : loadError ? (
+            <p className="py-4 text-center text-sm text-destructive">{loadError}</p>
+          ) : (
             <table className="w-full text-sm">
               <thead className="text-xs text-muted-foreground border-b">
                 <tr>
@@ -450,20 +418,17 @@ const AdminApprovedEmailsPage = () => {
                 ))}
                 {rows.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="py-4 text-center text-muted-foreground text-sm">
+                    <td colSpan={6} className="py-4 text-center text-muted-foreground text-sm">
                       No pre-approved emails yet.
                     </td>
                   </tr>
                 )}
               </tbody>
             </table>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
-};
-
-export default AdminApprovedEmailsPage;
+}
 

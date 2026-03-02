@@ -11,6 +11,8 @@ interface Profile {
   email: string | null;
   role: Role;
   is_pma_member: boolean | null;
+  is_blocked: boolean;
+  deleted_at: string | null;
 }
 
 interface AuthContextValue {
@@ -21,6 +23,7 @@ interface AuthContextValue {
   isAdmin: boolean;
   isUser: boolean;
   isGuest: boolean;
+  isBlocked: boolean;
   refreshProfile: () => Promise<void>;
 }
 
@@ -39,7 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const { data, error } = await supabase
       .from("profiles")
-      .select("id, user_id, full_name, email, role, is_pma_member")
+      .select("id, user_id, full_name, email, role, is_pma_member, is_blocked, deleted_at")
       .eq("user_id", currentUser.id)
       .single();
 
@@ -58,7 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (insertError.code === "23505") {
           const { data: retryData, error: retryError } = await supabase
             .from("profiles")
-            .select("id, user_id, full_name, email, role, is_pma_member")
+            .select("id, user_id, full_name, email, role, is_pma_member, is_blocked, deleted_at")
             .eq("user_id", currentUser.id)
             .single();
           if (!retryError && retryData) {
@@ -69,6 +72,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               email: retryData.email,
               role: (retryData.role ?? "guest") as Role,
               is_pma_member: retryData.is_pma_member ?? null,
+              is_blocked: retryData.is_blocked ?? false,
+              deleted_at: retryData.deleted_at ?? null,
             });
             return;
           }
@@ -89,6 +94,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       email: data.email,
       role: (data.role ?? "guest") as Role,
       is_pma_member: data.is_pma_member ?? null,
+      is_blocked: data.is_blocked ?? false,
+      deleted_at: data.deleted_at ?? null,
     });
   };
 
@@ -104,10 +111,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     init();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      (_event, session) => {
         const currentUser = session?.user ?? null;
         setUser(currentUser);
-        await loadProfile(currentUser);
+        // Defer Supabase calls to avoid auth-js#762 deadlock
+        setTimeout(() => loadProfile(currentUser), 0);
       }
     );
 
@@ -121,16 +129,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await loadProfile(currentUser ?? null);
   };
 
-  const role: Role = (profile?.role ?? "guest") as Role;
+  const isBlocked = !!(profile && (profile.is_blocked || profile.deleted_at));
+  const effectiveRole: Role = isBlocked ? "guest" : (profile?.role ?? "guest");
 
   const value: AuthContextValue = {
     user,
     profile,
     loading,
-    isSuperAdmin: role === "super-admin",
-    isAdmin: role === "admin" || role === "super-admin",
-    isUser: role === "user" || role === "admin" || role === "super-admin",
-    isGuest: role === "guest",
+    isSuperAdmin: effectiveRole === "super-admin",
+    isAdmin: effectiveRole === "admin" || effectiveRole === "super-admin",
+    isUser: effectiveRole === "user" || effectiveRole === "admin" || effectiveRole === "super-admin",
+    isGuest: effectiveRole === "guest",
+    isBlocked,
     refreshProfile,
   };
 

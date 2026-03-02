@@ -4,15 +4,19 @@ import ThemeToggle from './ThemeToggle';
 import { Button } from './ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import AuthModal from './AuthModal';
-import { UserCircle } from 'lucide-react';
+import { ChevronDown, LayoutDashboard, LogOut, Shield, User, UserCircle, Lock } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 
 const Navigation = () => {
@@ -23,7 +27,8 @@ const Navigation = () => {
   const [activeLink, setActiveLink] = useState('/');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
-  const { user, profile, isAdmin, isSuperAdmin } = useAuth();
+  const { user, profile, isAdmin, isSuperAdmin, isGuest, isBlocked, loading: authLoading } = useAuth();
+  const showGuestBanner = location.pathname === '/dashboard' && isGuest && !authLoading;
   
   // Handle scroll behavior to hide/show navbar (disabled when mobile menu is open)
   useEffect(() => {
@@ -45,10 +50,20 @@ const Navigation = () => {
 
   const handleSignOut = () => {
     setMobileMenuOpen(false);
-    // Use scope: 'local' so we clear the session even when the server has issues (e.g. RLS, 500s)
-    supabase.auth.signOut({ scope: "local" }).finally(() => {
-      // Force full reload to clear any stale React state
+    const reload = () => {
+      // If signOut hung, clear Supabase auth from localStorage so we don't reload still-logged-in
+      Object.keys(localStorage).forEach((key) => {
+        if (key.includes("-auth-token") || key.startsWith("sb-")) {
+          localStorage.removeItem(key);
+        }
+      });
       window.location.href = "/";
+    };
+    // Fallback if signOut hangs (e.g. due to auth-js#762 deadlock)
+    const timeout = setTimeout(reload, 2000);
+    supabase.auth.signOut({ scope: "local" }).finally(() => {
+      clearTimeout(timeout);
+      reload();
     });
   };
 
@@ -60,20 +75,36 @@ const Navigation = () => {
 
   const links = [
     { name: 'Home', path: '/' },
-    { name: 'Hackathon', path: '/hackathon', featured: true },
     { name: 'Events', path: '/events' },
     { name: 'Resources', path: '/resources' },
     { name: 'Discover PM', path: '/discover' },
     { name: 'Contact', path: '/contact' }
   ];
+
+  const displayName =
+    profile?.full_name?.trim() ||
+    user?.user_metadata?.full_name?.trim() ||
+    user?.email?.split("@")[0] ||
+    "Account";
+
+  const displayEmail = profile?.email || user?.email || "";
+
+  const roleLabel = isBlocked
+    ? "BLOCKED"
+    : isSuperAdmin
+      ? "SUPER ADMIN"
+      : isAdmin
+        ? "ADMIN"
+        : "MEMBER";
   
   return (
+    <>
     <header 
       className={`fixed w-full z-50 transition-transform duration-300 ${
         visible ? 'translate-y-0' : '-translate-y-full'
       }`}
     >
-      <div className="backdrop-blur-lg bg-white/90 dark:bg-black/40 border-b border-gray-200 dark:border-white/10 shadow-sm">
+      <div className="backdrop-blur-lg bg-white/90 dark:bg-black/40 border-b border-border shadow-sm">
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex items-center justify-between h-16">
             <Link to="/" className="flex items-center">
@@ -105,7 +136,7 @@ const Navigation = () => {
                       <Link
                         to={link.path}
                         className={`relative px-1 py-2 text-sm font-medium transition-colors
-                        ${activeLink === link.path ? 'text-primary dark:text-white' : 'text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-white'}
+                        ${activeLink === link.path ? 'text-primary dark:text-white' : 'text-muted-foreground hover:text-primary'}
                         after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0
                         after:bg-gradient-to-r after:from-[#215096] after:to-[#4299E1] after:origin-bottom-right
                         after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left
@@ -125,31 +156,102 @@ const Navigation = () => {
               {user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild className="hidden md:flex">
-                    <Button variant="ghost" size="sm" className="gap-2">
-                      <Avatar className="h-6 w-6">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="gap-2 px-2 hover:bg-accent/60"
+                    >
+                      <Avatar className="h-7 w-7">
                         <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                          {profile?.full_name
-                            ? profile.full_name.split(" ")[0][0].toUpperCase()
+                          {displayName
+                            ? displayName[0]?.toUpperCase()
                             : <UserCircle className="h-4 w-4" />}
                         </AvatarFallback>
                       </Avatar>
-                      <span>{profile?.full_name?.split(" ")[0] || 'Profile'}</span>
+                      <span className="max-w-[140px] truncate">{displayName}</span>
+                      <ChevronDown className="h-4 w-4 text-muted-foreground" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48 bg-popover">
-                    <DropdownMenuItem onClick={() => navigate('/profile')} className="cursor-pointer">
-                      Profile
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate('/dashboard')} className="cursor-pointer">
-                      Dashboard
-                    </DropdownMenuItem>
-                    {(isAdmin || isSuperAdmin) && (
-                      <DropdownMenuItem onClick={() => navigate('/admin')} className="cursor-pointer">
-                        Admin
-                      </DropdownMenuItem>
+                  <DropdownMenuContent align="end" className="w-72">
+                    <DropdownMenuLabel className="p-2">
+                      <div className="flex items-start gap-3">
+                        <Avatar className="h-10 w-10">
+                          <AvatarFallback className="bg-primary/10 text-primary">
+                            {displayName[0]?.toUpperCase() || "U"}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="min-w-0 flex-1 space-y-1">
+                          <div className="flex items-center justify-between gap-2">
+                            <p className="text-sm font-semibold leading-none truncate">
+                              {displayName}
+                            </p>
+                            {isBlocked ? (
+                              <Badge variant="destructive" className="shrink-0">
+                                BLOCKED
+                              </Badge>
+                            ) : (
+                              <Badge variant="secondary" className="shrink-0">
+                                {roleLabel}
+                              </Badge>
+                            )}
+                          </div>
+                          {displayEmail ? (
+                            <p className="text-xs text-muted-foreground truncate">
+                              {displayEmail}
+                            </p>
+                          ) : null}
+                          {!isBlocked && profile?.is_pma_member ? (
+                            <p className="text-[11px] text-muted-foreground">
+                              Paying/verified PMA member
+                            </p>
+                          ) : null}
+                        </div>
+                      </div>
+                    </DropdownMenuLabel>
+
+                    <DropdownMenuSeparator />
+
+                    <DropdownMenuGroup>
+                      {!isBlocked && !isSuperAdmin && (
+                        <DropdownMenuItem onClick={() => navigate('/dashboard')} className="cursor-pointer gap-2">
+                          <LayoutDashboard className="h-4 w-4 text-muted-foreground" />
+                          Dashboard
+                        </DropdownMenuItem>
+                      )}
+                      {!isBlocked && (
+                        <DropdownMenuItem onClick={() => navigate('/profile')} className="cursor-pointer gap-2">
+                          <User className="h-4 w-4 text-muted-foreground" />
+                          Profile
+                        </DropdownMenuItem>
+                      )}
+                      {isBlocked && (
+                        <DropdownMenuItem onClick={() => navigate('/blocked')} className="cursor-pointer gap-2">
+                          <Lock className="h-4 w-4 text-muted-foreground" />
+                          Access restricted
+                        </DropdownMenuItem>
+                      )}
+                    </DropdownMenuGroup>
+
+                    {(isAdmin || isSuperAdmin) && !isBlocked && (
+                      <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuGroup>
+                          <DropdownMenuItem onClick={() => navigate('/admin')} className="cursor-pointer gap-2">
+                            <Shield className="h-4 w-4 text-muted-foreground" />
+                            Admin dashboard
+                          </DropdownMenuItem>
+                        </DropdownMenuGroup>
+                      </>
                     )}
-                    <DropdownMenuItem onSelect={handleSignOut} className="cursor-pointer">
-                      Sign Out
+
+                    <DropdownMenuSeparator />
+
+                    <DropdownMenuItem
+                      onSelect={handleSignOut}
+                      className="cursor-pointer gap-2 text-destructive focus:text-destructive"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      Sign out
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -164,7 +266,7 @@ const Navigation = () => {
                 </Button>
               )}
               <button
-                className="md:hidden text-gray-700 dark:text-white p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                className="md:hidden text-foreground p-2 rounded-md hover:bg-muted transition-colors"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 aria-label="Toggle mobile menu"
               >
@@ -214,7 +316,7 @@ const Navigation = () => {
                         className={`block px-4 py-3 text-base font-medium rounded-md transition-colors ${
                           activeLink === link.path
                             ? 'text-primary dark:text-white bg-blue-50 dark:bg-blue-900/20'
-                            : 'text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800/50'
+                            : 'text-muted-foreground hover:text-primary hover:bg-muted'
                         }`}
                         onClick={() => handleLinkClick(link.path)}
                       >
@@ -231,33 +333,35 @@ const Navigation = () => {
                           navigate('/profile');
                           setMobileMenuOpen(false);
                         }}
-                        className="block w-full text-left px-4 py-3 text-base font-medium rounded-md transition-colors text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                        className="block w-full text-left px-4 py-3 text-base font-medium rounded-md transition-colors text-muted-foreground hover:text-primary hover:bg-muted"
                       >
                         Profile
                       </button>
-                      <button
-                        onClick={() => {
-                          navigate('/dashboard');
-                          setMobileMenuOpen(false);
-                        }}
-                        className="block w-full text-left px-4 py-3 text-base font-medium rounded-md transition-colors text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800/50"
-                      >
-                        Dashboard
-                      </button>
+                      {!isSuperAdmin && (
+                        <button
+                          onClick={() => {
+                            navigate('/dashboard');
+                            setMobileMenuOpen(false);
+                          }}
+                          className="block w-full text-left px-4 py-3 text-base font-medium rounded-md transition-colors text-muted-foreground hover:text-primary hover:bg-muted"
+                        >
+                          Dashboard
+                        </button>
+                      )}
                       {(isAdmin || isSuperAdmin) && (
                         <button
                           onClick={() => {
                             navigate('/admin');
                             setMobileMenuOpen(false);
                           }}
-                          className="block w-full text-left px-4 py-3 text-base font-medium rounded-md transition-colors text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                          className="block w-full text-left px-4 py-3 text-base font-medium rounded-md transition-colors text-muted-foreground hover:text-primary hover:bg-muted"
                         >
-                          Admin
+                          {isSuperAdmin ? 'Admin Dashboard' : 'Admin'}
                         </button>
                       )}
                       <button
                         onClick={handleSignOut}
-                        className="block w-full text-left px-4 py-3 text-base font-medium rounded-md transition-colors text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                        className="block w-full text-left px-4 py-3 text-base font-medium rounded-md transition-colors text-muted-foreground hover:text-primary hover:bg-muted"
                       >
                         Sign Out
                       </button>
@@ -276,7 +380,7 @@ const Navigation = () => {
                 </li>
               </ul>
             </nav>
-            <div className="p-4 border-t border-gray-200 dark:border-white/10">
+            <div className="p-4 border-t border-border">
               <ThemeToggle />
             </div>
           </div>
@@ -288,6 +392,24 @@ const Navigation = () => {
         onClose={() => setAuthModalOpen(false)}
       />
     </header>
+
+    {/* Guest banner: fixed at top when header hidden, sits below header when visible */}
+    {showGuestBanner && (
+      <div 
+        className={`fixed left-0 right-0 z-40 border-b border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/50 shadow-sm transition-all duration-300 ${
+          visible ? 'top-16' : 'top-0'
+        }`}
+      >
+        <div className="container mx-auto px-4 md:px-6 py-3 flex items-center gap-2">
+          <Lock className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
+          <p className="text-sm text-amber-900 dark:text-amber-100">
+            You need to be a paying/verified PMA member to get full access to your dashboard.
+            Upgrade your membership to track progress, earn badges, and unlock all features.
+          </p>
+        </div>
+      </div>
+    )}
+    </>
   );
 };
 

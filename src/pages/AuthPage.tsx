@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -17,36 +17,24 @@ const AuthPage = () => {
   const [persona, setPersona] = useState<"curious" | "starting" | "recruiting">("curious");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check if user is already logged in
+    // Check if user is already logged in - always take them to dashboard
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
-        // Redirect back to resources with the resource param if it exists
-        const resource = searchParams.get("resource");
-        if (resource) {
-          navigate(`/resources?resource=${resource}`);
-        } else {
-          navigate("/dashboard");
-        }
+        navigate("/dashboard");
       }
     });
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
-        const resource = searchParams.get("resource");
-        if (resource) {
-          navigate(`/resources?resource=${resource}`);
-        } else {
-          navigate("/dashboard");
-        }
+        navigate("/dashboard");
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate, searchParams]);
+  }, [navigate]);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();

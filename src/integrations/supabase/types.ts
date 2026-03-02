@@ -47,18 +47,69 @@ export type Database = {
       approved_pma_members: {
         Row: {
           added_at: string
+          added_by: string | null
+          default_role: string
           email: string
           id: string
+          is_disabled: boolean
+          used_at: string | null
         }
         Insert: {
           added_at?: string
+          added_by?: string | null
+          default_role?: string
           email: string
           id?: string
+          is_disabled?: boolean
+          used_at?: string | null
         }
         Update: {
           added_at?: string
+          added_by?: string | null
+          default_role?: string
           email?: string
           id?: string
+          is_disabled?: boolean
+          used_at?: string | null
+        }
+        Relationships: []
+      }
+      events: {
+        Row: {
+          created_at: string
+          description: string | null
+          end_time: string | null
+          id: string
+          is_public: boolean
+          location: string | null
+          registration_link: string | null
+          start_time: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          end_time?: string | null
+          id?: string
+          is_public?: boolean
+          location?: string | null
+          registration_link?: string | null
+          start_time: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          end_time?: string | null
+          id?: string
+          is_public?: boolean
+          location?: string | null
+          registration_link?: string | null
+          start_time?: string
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -129,14 +180,17 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string
+          deleted_at: string | null
           email: string | null
           full_name: string | null
           id: string
+          is_blocked: boolean
           is_pma_member: boolean | null
           membership_verified_at: string | null
           onboarding_completed: boolean | null
           persona: Database["public"]["Enums"]["user_persona"] | null
           progress_percentage: number | null
+          role: string
           school_year: string | null
           updated_at: string
           user_id: string
@@ -144,14 +198,17 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           created_at?: string
+          deleted_at?: string | null
           email?: string | null
           full_name?: string | null
           id?: string
+          is_blocked?: boolean
           is_pma_member?: boolean | null
           membership_verified_at?: string | null
           onboarding_completed?: boolean | null
           persona?: Database["public"]["Enums"]["user_persona"] | null
           progress_percentage?: number | null
+          role?: string
           school_year?: string | null
           updated_at?: string
           user_id: string
@@ -159,17 +216,59 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           created_at?: string
+          deleted_at?: string | null
           email?: string | null
           full_name?: string | null
           id?: string
+          is_blocked?: boolean
           is_pma_member?: boolean | null
           membership_verified_at?: string | null
           onboarding_completed?: boolean | null
           persona?: Database["public"]["Enums"]["user_persona"] | null
           progress_percentage?: number | null
+          role?: string
           school_year?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      team_members: {
+        Row: {
+          bio: string | null
+          created_at: string
+          email: string | null
+          id: string
+          image_url: string | null
+          linkedin_url: string | null
+          name: string
+          position: string | null
+          priority: number | null
+          updated_at: string
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          image_url?: string | null
+          linkedin_url?: string | null
+          name: string
+          position?: string | null
+          priority?: number | null
+          updated_at?: string
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          image_url?: string | null
+          linkedin_url?: string | null
+          name?: string
+          position?: string | null
+          priority?: number | null
+          updated_at?: string
         }
         Relationships: []
       }

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -13,6 +14,7 @@ interface AuthModalProps {
 }
 
 const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
+  const navigate = useNavigate();
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,14 +24,16 @@ const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) {
+      // Only redirect when modal is open (user just signed in via modal), not on token refresh etc.
+      if (session?.user && isOpen) {
         onSuccess?.();
         onClose();
+        navigate("/dashboard");
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [onClose, onSuccess]);
+  }, [isOpen, onClose, onSuccess, navigate]);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,7 +54,7 @@ const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/resources`,
+        emailRedirectTo: `${window.location.origin}/dashboard`,
         data: {
           full_name: fullName,
         },
@@ -99,7 +103,15 @@ const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={(open) => {
+      if (!open) {
+        setEmail("");
+        setPassword("");
+        setFullName("");
+        setIsSignUp(false);
+      }
+      onClose();
+    }}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{isSignUp ? "Create an Account" : "Sign In"}</DialogTitle>
@@ -110,7 +122,7 @@ const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
           </DialogDescription>
         </DialogHeader>
         
-        <form onSubmit={isSignUp ? handleSignUp : handleSignIn} className="space-y-4">
+        <form onSubmit={isSignUp ? handleSignUp : handleSignIn} className="space-y-4" autoComplete="off">
           {isSignUp && (
             <div className="space-y-2">
               <Label htmlFor="fullName">Full Name</Label>
@@ -133,6 +145,7 @@ const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              autoComplete="off"
             />
           </div>
           <div className="space-y-2">
@@ -145,6 +158,7 @@ const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
+              autoComplete="off"
             />
           </div>
           <Button type="submit" className="w-full" disabled={loading}>
