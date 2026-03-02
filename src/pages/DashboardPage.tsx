@@ -25,6 +25,7 @@ import {
   ChevronDown
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Profile {
   persona: string | null;
@@ -87,6 +88,8 @@ const personaLabels = {
 };
 
 const DashboardPage = () => {
+  const { isGuest, isBlocked, loading: authLoading } = useAuth();
+  const isGuestRestricted = isGuest && !authLoading;
   const [profile, setProfile] = useState<Profile | null>(null);
   const [allSteps, setAllSteps] = useState<JourneyStep[]>([]);
   const [userBadges, setUserBadges] = useState<UserBadge[]>([]);
@@ -101,8 +104,15 @@ const DashboardPage = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    if (!authLoading && isBlocked) {
+      navigate("/blocked");
+      return;
+    }
+
+    if (authLoading) return;
+
     checkAuth();
-    
+
     // Listen for auth state changes and redirect if signed out
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_OUT' || !session) {
@@ -111,7 +121,7 @@ const DashboardPage = () => {
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [authLoading, isBlocked, navigate]);
 
   const checkAuth = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -563,7 +573,7 @@ const DashboardPage = () => {
   // Show persona selection if not set
   if (!profile?.persona) {
     return (
-      <div className="min-h-screen bg-background py-12 px-4">
+      <div className={`min-h-screen bg-background px-4 ${isGuestRestricted ? "pt-32 pb-12" : "pt-20 pb-12"}`}>
         <div className="container max-w-4xl mx-auto">
           <Card className="border-2 border-primary/20">
             <CardHeader className="text-center space-y-4">
@@ -580,8 +590,11 @@ const DashboardPage = () => {
             <CardContent className="space-y-6">
               <div className="grid gap-4">
                 <button
-                  onClick={() => updatePersona("curious")}
-                  className="p-6 rounded-lg border-2 border-border hover:border-primary hover:bg-primary/5 transition-all text-left space-y-2 group"
+                  onClick={() => !isGuestRestricted && updatePersona("curious")}
+                  disabled={isGuestRestricted}
+                  className={`p-6 rounded-lg border-2 border-border transition-all text-left space-y-2 group ${
+                    isGuestRestricted ? "opacity-60 cursor-not-allowed" : "hover:border-primary hover:bg-primary/5"
+                  }`}
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -595,8 +608,11 @@ const DashboardPage = () => {
                 </button>
 
                 <button
-                  onClick={() => updatePersona("starting")}
-                  className="p-6 rounded-lg border-2 border-border hover:border-primary hover:bg-primary/5 transition-all text-left space-y-2 group"
+                  onClick={() => !isGuestRestricted && updatePersona("starting")}
+                  disabled={isGuestRestricted}
+                  className={`p-6 rounded-lg border-2 border-border transition-all text-left space-y-2 group ${
+                    isGuestRestricted ? "opacity-60 cursor-not-allowed" : "hover:border-primary hover:bg-primary/5"
+                  }`}
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -610,8 +626,11 @@ const DashboardPage = () => {
                 </button>
 
                 <button
-                  onClick={() => updatePersona("recruiting")}
-                  className="p-6 rounded-lg border-2 border-border hover:border-primary hover:bg-primary/5 transition-all text-left space-y-2 group"
+                  onClick={() => !isGuestRestricted && updatePersona("recruiting")}
+                  disabled={isGuestRestricted}
+                  className={`p-6 rounded-lg border-2 border-border transition-all text-left space-y-2 group ${
+                    isGuestRestricted ? "opacity-60 cursor-not-allowed" : "hover:border-primary hover:bg-primary/5"
+                  }`}
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -676,8 +695,8 @@ const DashboardPage = () => {
                 <div className="flex items-start gap-3">
                   <Checkbox
                     checked={step.completed || sectionCompleted}
-                    onCheckedChange={() => toggleStepCompletion(step.id, step.completed || false)}
-                    disabled={sectionCompleted}
+                    onCheckedChange={() => !isGuestRestricted && toggleStepCompletion(step.id, step.completed || false)}
+                    disabled={sectionCompleted || isGuestRestricted}
                     className="mt-1"
                   />
                   <div className="flex-1 space-y-2">
@@ -709,7 +728,7 @@ const DashboardPage = () => {
   );
 
   return (
-    <div className="min-h-screen bg-background pt-20">
+    <div className={`min-h-screen bg-background ${isGuestRestricted ? "pt-32" : "pt-20"}`}>
       <div className="container max-w-7xl mx-auto py-8 px-4">
         <div className="grid lg:grid-cols-4 gap-8">
           {/* Left Sidebar */}
@@ -738,7 +757,7 @@ const DashboardPage = () => {
                         </AvatarFallback>
                       )}
                     </Avatar>
-                    {editingProfile && (
+                    {editingProfile && !isGuestRestricted && (
                       <label className="absolute bottom-0 right-0 p-2 bg-primary rounded-full cursor-pointer hover:bg-primary/90">
                         <input
                           type="file"
@@ -825,7 +844,13 @@ const DashboardPage = () => {
                           </p>
                         )}
                       </div>
-                      <Button size="sm" variant="outline" onClick={() => setEditingProfile(true)} className="w-full">
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        onClick={() => !isGuestRestricted && setEditingProfile(true)} 
+                        className="w-full"
+                        disabled={isGuestRestricted}
+                      >
                         Edit Profile
                       </Button>
                     </>
@@ -923,7 +948,12 @@ const DashboardPage = () => {
                       <h4 className="font-semibold text-sm">Share Your Story</h4>
                       <p className="text-xs text-muted-foreground">Inspire others by sharing your PM journey</p>
                     </div>
-                    <Button size="sm" className="w-full" onClick={() => navigate("/contact")}>
+                    <Button 
+                      size="sm" 
+                      className="w-full" 
+                      onClick={() => !isGuestRestricted && navigate("/contact")}
+                      disabled={isGuestRestricted}
+                    >
                       Submit Your Story
                     </Button>
                   </div>

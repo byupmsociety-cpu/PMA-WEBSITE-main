@@ -17,6 +17,8 @@ interface AdminUserRow {
   email: string | null;
   role: Role;
   is_pma_member: boolean | null;
+  is_blocked: boolean;
+  deleted_at: string | null;
 }
 
 const AdminUsersPage = () => {
@@ -46,7 +48,8 @@ const AdminUsersPage = () => {
     setLoadError(null);
     const { data, error } = await supabase
       .from("profiles")
-      .select("id, full_name, email, role, is_pma_member")
+      .select("id, full_name, email, role, is_pma_member, is_blocked, deleted_at")
+      .is("deleted_at", null)
       .order("full_name", { ascending: true });
 
     if (error) {
@@ -61,13 +64,15 @@ const AdminUsersPage = () => {
     } else {
       setLoadError(null);
       const mapped: AdminUserRow[] =
-      data?.map((row: any) => ({
-        id: row.id,
-        full_name: row.full_name,
-        email: row.email,
-        role: (row.role ?? "guest") as Role,
-        is_pma_member: row.is_pma_member ?? null,
-      })) ?? [];
+        data?.map((row: any) => ({
+          id: row.id,
+          full_name: row.full_name,
+          email: row.email,
+          role: (row.role ?? "guest") as Role,
+          is_pma_member: row.is_pma_member ?? null,
+          is_blocked: row.is_blocked ?? false,
+          deleted_at: row.deleted_at ?? null,
+        })) ?? [];
       setRows(mapped);
     }
     setLoadingData(false);
@@ -90,6 +95,63 @@ const AdminUsersPage = () => {
       toast({
         title: "Role updated",
         description: "User role has been updated.",
+      });
+      await loadUsers();
+    }
+
+    setSavingId(null);
+  };
+
+  const updateBlockedStatus = async (id: string, blocked: boolean) => {
+    setSavingId(id);
+    const { error } = await supabase
+      .from("profiles")
+      .update({ is_blocked: blocked })
+      .eq("id", id);
+
+    if (error) {
+      toast({
+        title: "Error updating status",
+        description: getAdminErrorMessage(error),
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: blocked ? "User blocked" : "User unblocked",
+        description: blocked
+          ? "This user can no longer access the dashboard or member resources."
+          : "This user can access the app again.",
+      });
+      await loadUsers();
+    }
+
+    setSavingId(null);
+  };
+
+  const softDeleteUser = async (row: AdminUserRow) => {
+    if (!window.confirm(`Delete profile for ${row.full_name || row.email || "this user"}? This will block access and hide them from the list.`)) {
+      return;
+    }
+
+    setSavingId(row.id);
+    const { error } = await supabase
+      .from("profiles")
+      .update({
+        is_blocked: true,
+        deleted_at: new Date().toISOString(),
+      })
+      .eq("id", row.id);
+
+    if (error) {
+      toast({
+        title: "Error deleting profile",
+        description: getAdminErrorMessage(error),
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Profile deleted",
+        description: "The user's profile has been removed and they can no longer access the app.",
       });
       await loadUsers();
     }
@@ -149,6 +211,7 @@ const AdminUsersPage = () => {
                   <th className="py-2 text-left">Email</th>
                   <th className="py-2 text-left">Role</th>
                   <th className="py-2 text-left">PMA Member</th>
+                  <th className="py-2 text-left">Status</th>
                   <th className="py-2 text-left">Actions</th>
                 </tr>
               </thead>
@@ -193,9 +256,51 @@ const AdminUsersPage = () => {
                       )}
                     </td>
                     <td className="py-2 pr-2">
-                      {savingId === row.id && (
-                        <span className="text-xs text-muted-foreground">Saving...</span>
+                      {row.is_blocked ? (
+                        <Badge variant="destructive">Blocked</Badge>
+                      ) : (
+                        <span className="text-xs text-muted-foreground text-[11px]">Active</span>
                       )}
+                    </td>
+                    <td className="py-2 pr-2">
+                      <div className="flex flex-wrap gap-2">
+                        <Button
+                          size="sm"
+                          variant={row.is_blocked ? "outline" : "destructive"}
+                          onClick={() => {
+                            if (!row.is_blocked) {
+                              const label = row.full_name || row.email || "this user";
+                              const confirmed = window.confirm(
+                                `Block access for ${label}? They will be unable to sign in or view member content until unblocked.`
+                              );
+                              if (!confirmed) return;
+                            }
+                            void updateBlockedStatus(row.id, !row.is_blocked);
+                          }}
+                          disabled={savingId === row.id}
+                        >
+                          {row.is_blocked ? "Unblock" : "Block"}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handlePromoteGuestToUser(row)}
+                          disabled={savingId === row.id || row.role !== "guest"}
+                        >
+                          Promote to user
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => softDeleteUser(row)}
+                          disabled={savingId === row.id}
+                        >
+                          Delete profile
+                        </Button>
+                        {savingId === row.id && (
+                          <span className="text-xs text-muted-foreground">Saving...</span>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}

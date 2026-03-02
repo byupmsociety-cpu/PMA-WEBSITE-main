@@ -48,7 +48,7 @@ const FAQItem = ({ question, answer }: { question: string; answer: string }) => 
         <span className="text-lg font-bold text-white group-hover:text-blue-400 transition-colors">{question}</span>
         <ChevronDown
           className={cn(
-            'text-gray-400 transition-transform duration-300',
+            'text-on-dark-muted transition-transform duration-300',
             isOpen ? 'rotate-180 text-blue-400' : ''
           )}
         />
@@ -62,7 +62,7 @@ const FAQItem = ({ question, answer }: { question: string; answer: string }) => 
             transition={{ duration: 0.3 }}
             className="overflow-hidden"
           >
-            <div className="pb-4 text-gray-400 text-sm leading-relaxed whitespace-pre-line">
+            <div className="pb-4 text-on-dark-muted text-sm leading-relaxed whitespace-pre-line">
               {linkifyAnswer(answer)}
             </div>
           </motion.div>
@@ -123,17 +123,17 @@ const HackathonFAQPage = () => {
       <div className="container mx-auto px-4 md:px-6 pt-32 pb-24 relative z-10">
         <Link
           to="/hackathon"
-          className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8"
+          className="inline-flex items-center gap-2 text-on-dark-muted hover:text-white transition-colors mb-8"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to hackathon
         </Link>
 
         <h1 className="text-3xl md:text-5xl font-bold mb-2 tracking-tight">Hackathon FAQ</h1>
-        <p className="text-slate-400 mb-12">Answers to common questions. We update this regularly.</p>
+        <p className="text-on-dark-muted mb-12">Answers to common questions. We update this regularly.</p>
 
         {loading && (
-          <div className="text-slate-400">Loading FAQ…</div>
+          <div className="text-on-dark-muted">Loading FAQ…</div>
         )}
 
         {error && (
@@ -141,7 +141,7 @@ const HackathonFAQPage = () => {
         )}
 
         {!loading && !error && faqs.length === 0 && (
-          <div className="text-slate-400">No FAQ entries yet. Check back soon.</div>
+          <div className="text-on-dark-muted">No FAQ entries yet. Check back soon.</div>
         )}
 
         {!loading && faqs.length > 0 && (

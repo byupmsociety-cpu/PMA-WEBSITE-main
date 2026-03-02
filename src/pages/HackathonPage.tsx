@@ -280,7 +280,7 @@ const HackathonPage = () => {
                 This hackathon gives you hands-on experience working in a product trio where you'll do actual PM work
                 like customer discovery, validating problems, and designing solutions.
               </p>
-              <p className="text-sm md:text-base text-gray-300 leading-relaxed">
+              <p className="text-sm md:text-base text-on-dark leading-relaxed">
                 You'll tackle real challenges directly modeled after actual case interviews from companies like{" "}
                 <span className="font-semibold text-white">Google</span>,{" "}
                 <span className="font-semibold text-white">Meta</span>, and{" "}
@@ -304,7 +304,7 @@ const HackathonPage = () => {
                 <Users size={24} />
               </div>
               <h3 className="text-xl font-bold mb-2">Cross-Functional</h3>
-              <p className="text-gray-400 text-sm leading-relaxed">
+              <p className="text-on-dark-muted text-sm leading-relaxed">
                 Learn to work cross-functionally. Collaborate with designers, PMs, and engineers.
               </p>
             </TechCard>
@@ -314,7 +314,7 @@ const HackathonPage = () => {
                 <Briefcase size={24} />
               </div>
               <h3 className="text-xl font-bold mb-2">Build Your Resume</h3>
-              <p className="text-gray-400 text-sm leading-relaxed">
+              <p className="text-on-dark-muted text-sm leading-relaxed">
                 Build a 0 to 1 project. Perfect experience for your portfolio and interviews.
               </p>
             </TechCard>
@@ -324,7 +324,7 @@ const HackathonPage = () => {
                 <Zap size={24} />
               </div>
               <h3 className="text-xl font-bold mb-2">Solve Real Problems</h3>
-              <p className="text-gray-400 text-sm leading-relaxed">
+              <p className="text-on-dark-muted text-sm leading-relaxed">
                 Tackle actual challenges. Create viable solutions that matter.
               </p>
             </TechCard>
@@ -334,7 +334,7 @@ const HackathonPage = () => {
                 <Target size={24} />
               </div>
               <h3 className="text-xl font-bold mb-2">Win Prizes</h3>
-              <p className="text-gray-400 text-sm leading-relaxed">
+              <p className="text-on-dark-muted text-sm leading-relaxed">
                 Compete for a prize pool of $1,000 for the first place team. Show off your skills and win big.
               </p>
             </TechCard>
@@ -350,7 +350,7 @@ const HackathonPage = () => {
                 <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                   <Users className="text-blue-400" size={20} /> Teams
                 </h3>
-                <ul className="space-y-3 text-gray-400 flex-1 mb-4">
+                <ul className="space-y-3 text-on-dark-muted flex-1 mb-4">
                   <li className="flex items-start gap-2">
                     <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-blue-500" />
                     <span>2-5 Members</span>
@@ -372,8 +372,8 @@ const HackathonPage = () => {
                   <Calendar className="text-purple-400" size={20} /> Duration
                 </h3>
                 <div className="flex-1 flex flex-col justify-center">
-                  <div className="text-5xl font-mono font-bold text-white mb-2">5<span className="text-lg text-gray-500 ml-2">DAYS</span></div>
-                  <p className="text-gray-400 text-sm">Mon-Fri Intense Sprint</p>
+                  <div className="text-5xl font-mono font-bold text-white mb-2">5<span className="text-lg text-on-dark-muted ml-2">DAYS</span></div>
+                  <p className="text-on-dark-muted text-sm">Mon-Fri Intense Sprint</p>
                 </div>
               </div>
             </TechCard>
@@ -384,7 +384,7 @@ const HackathonPage = () => {
                 <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
                   <Layout className="text-emerald-400" size={20} /> Deliverables
                 </h3>
-                <ul className="space-y-3 text-gray-400 flex-1">
+                <ul className="space-y-3 text-on-dark-muted flex-1">
                   <li className="flex items-start gap-2">
                     <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-emerald-500" />
                     <span>Working Prototype</span>
@@ -415,7 +415,7 @@ const HackathonPage = () => {
               <div className="h-px w-full md:w-px md:h-12 bg-white/10" />
               <div className="flex-1 space-y-1">
                 <h4 className="text-lg font-bold">Kickoff (Virtual)</h4>
-                <p className="text-gray-400 text-sm">
+                <p className="text-on-dark-muted text-sm">
                   Kickoff was Monday 6–7 PM. If you missed it, check Luma for the recording or event updates. Still want to join?{" "}
                   <a
                     href="https://lu.ma/event/evt-26S8mILGH5NJMVJ"
@@ -432,13 +432,13 @@ const HackathonPage = () => {
 
             <TechCard className="flex flex-col md:flex-row gap-6 md:items-center border-white/5 bg-white/5">
               <div className="min-w-[120px] text-center md:text-left">
-                <div className="text-sm text-gray-500 font-bold uppercase tracking-wider">Days 2-4</div>
-                <div className="text-2xl font-bold text-gray-400">Build</div>
+                <div className="text-sm text-on-dark-muted font-bold uppercase tracking-wider">Days 2-4</div>
+                <div className="text-2xl font-bold text-on-dark-muted">Build</div>
               </div>
               <div className="h-px w-full md:w-px md:h-12 bg-white/10" />
               <div className="flex-1 space-y-1">
-                <h4 className="text-lg font-bold text-gray-300">Async Hacking</h4>
-                <p className="text-gray-500 text-sm">
+                <h4 className="text-lg font-bold text-on-dark">Async Hacking</h4>
+                <p className="text-on-dark-muted text-sm">
                   Submission period closed. See you at presentations!
                 </p>
               </div>
@@ -452,7 +452,7 @@ const HackathonPage = () => {
               <div className="h-px w-full md:w-px md:h-12 bg-white/10" />
               <div className="flex-1 space-y-1">
                 <h4 className="text-lg font-bold">Presentations & Awards (In Person)</h4>
-                <p className="text-gray-400 text-sm">
+                <p className="text-on-dark-muted text-sm">
                   Friday 2–5 PM at the{" "}
                   <a
                     href="https://maps.app.goo.gl/JXtXjyco5ayW6tcs7"
@@ -519,7 +519,7 @@ const HackathonPage = () => {
             <p className="text-lg text-white mb-4">
               Registration is closed. The hackathon has concluded.
             </p>
-            <p className="text-gray-400">
+            <p className="text-on-dark-muted">
               Check back soon to view the top 6 finalists&apos; products and presentations.
             </p>
           </TechCard>
@@ -531,7 +531,7 @@ const HackathonPage = () => {
         {/* Footer CTA */}
         <section className="text-center pt-20">
           <h2 className="text-3xl font-bold mb-8">Thank you to all participants!</h2>
-          <p className="text-gray-400 text-lg mb-6">
+          <p className="text-on-dark-muted text-lg mb-6">
             Top 6 finalists&apos; projects coming soon.
           </p>
           <Link

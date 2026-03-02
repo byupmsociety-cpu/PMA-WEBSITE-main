@@ -366,7 +366,7 @@ const DiscoverPage = () => {
                   max={10}
                   step={1}
                 />
-                <div className="flex justify-between text-sm text-gray-400">
+                <div className="flex justify-between text-sm text-muted-foreground">
                   <span>No Experience</span>
                   <span>Professional</span>
                 </div>
@@ -409,7 +409,7 @@ const DiscoverPage = () => {
                         : answers.interests.filter((i) => i !== area.value);
                       setAnswers({ ...answers, interests: newInterests });
                     }}
-                    className="rounded border-gray-300"
+                    className="rounded border-border"
                   />
                   <Label htmlFor={area.value}>{area.label}</Label>
                 </div>
@@ -434,7 +434,7 @@ const DiscoverPage = () => {
                         : answers.skillFocus.filter((s) => s !== skill.value);
                       setAnswers({ ...answers, skillFocus: newSkills });
                     }}
-                    className="rounded border-gray-300"
+                    className="rounded border-border"
                   />
                   <Label htmlFor={skill.value}>{skill.label}</Label>
                 </div>
@@ -525,7 +525,7 @@ const DiscoverPage = () => {
 
           <div>
             <h4 className="text-xl font-semibold mb-3">Project Ideas</h4>
-            <ul className="list-disc list-inside space-y-2 text-gray-300">
+            <ul className="list-disc list-inside space-y-2 text-foreground">
               {roadmap.projects.map((item, index) => (
                 <li key={index}>{item}</li>
               ))}
@@ -534,7 +534,7 @@ const DiscoverPage = () => {
 
           <div>
             <h4 className="text-xl font-semibold mb-3">Internship Opportunities</h4>
-            <ul className="list-disc list-inside space-y-2 text-gray-300">
+            <ul className="list-disc list-inside space-y-2 text-foreground">
               {roadmap.internships.map((item, index) => (
                 <li key={index}>{item}</li>
               ))}
@@ -543,7 +543,7 @@ const DiscoverPage = () => {
 
           <div>
             <h4 className="text-xl font-semibold mb-3">Skills to Develop</h4>
-            <ul className="list-disc list-inside space-y-2 text-gray-300">
+            <ul className="list-disc list-inside space-y-2 text-foreground">
               {roadmap.skills.map((item, index) => (
                 <li key={index}>{item}</li>
               ))}
@@ -552,7 +552,7 @@ const DiscoverPage = () => {
 
           <div>
             <h4 className="text-xl font-semibold mb-3">Tools to Learn</h4>
-            <ul className="list-disc list-inside space-y-2 text-gray-300">
+            <ul className="list-disc list-inside space-y-2 text-foreground">
               {roadmap.tools.map((item, index) => (
                 <li key={index}>{item}</li>
               ))}
@@ -561,7 +561,7 @@ const DiscoverPage = () => {
 
           <div>
             <h4 className="text-xl font-semibold mb-3">PMA Events to Attend</h4>
-            <ul className="list-disc list-inside space-y-2 text-gray-300">
+            <ul className="list-disc list-inside space-y-2 text-foreground">
               {roadmap.events.map((item, index) => (
                 <li key={index}>{item}</li>
               ))}
@@ -570,7 +570,7 @@ const DiscoverPage = () => {
 
           <div>
             <h4 className="text-xl font-semibold mb-3">Alumni Connections</h4>
-            <ul className="list-disc list-inside space-y-2 text-gray-300">
+            <ul className="list-disc list-inside space-y-2 text-foreground">
               {roadmap.alumniConnections.map((item, index) => (
                 <li key={index}>{item}</li>
               ))}

@@ -138,13 +138,13 @@ const EventsPage = () => {
               <div key={index} className="bg-card/80 border border-border rounded-lg p-6 backdrop-blur-sm animate-pulse">
                 <div className="flex flex-col md:flex-row">
                   <div className="md:w-64 p-6 bg-gradient-to-br from-[#215096]/30 to-[#4299E1]/30">
-                    <div className="h-4 bg-gray-700 rounded mb-2"></div>
-                    <div className="h-3 bg-gray-700 rounded"></div>
+                    <div className="h-4 bg-muted rounded mb-2"></div>
+                    <div className="h-3 bg-muted rounded"></div>
                   </div>
                   <div className="flex-1 p-6">
-                    <div className="h-6 bg-gray-700 rounded mb-2"></div>
-                    <div className="h-4 bg-gray-700 rounded mb-2"></div>
-                    <div className="h-4 bg-gray-700 rounded w-3/4"></div>
+                    <div className="h-6 bg-muted rounded mb-2"></div>
+                    <div className="h-4 bg-muted rounded mb-2"></div>
+                    <div className="h-4 bg-muted rounded w-3/4"></div>
                   </div>
                 </div>
               </div>
@@ -327,12 +327,12 @@ const EventsPage = () => {
       {/* Flyer Modal */}
       {selectedFlyer && (
         <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-gray-900 rounded-lg max-w-4xl max-h-[90vh] w-full overflow-hidden">
-            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+          <div className="bg-background rounded-lg max-w-4xl max-h-[90vh] w-full overflow-hidden border border-border">
+            <div className="flex items-center justify-between p-4 border-b border-border">
               <h3 className="text-lg font-semibold">Event Attachment</h3>
               <button
                 onClick={() => setSelectedFlyer(null)}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                className="p-2 hover:bg-muted rounded-lg transition-colors"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -354,7 +354,7 @@ const EventsPage = () => {
                 />
               )}
             </div>
-            <div className="p-4 border-t border-gray-200 dark:border-gray-700 flex justify-end space-x-2">
+            <div className="p-4 border-t border-border flex justify-end space-x-2">
               <a
                 href={selectedFlyer}
                 target="_blank"
@@ -365,7 +365,7 @@ const EventsPage = () => {
               </a>
               <button
                 onClick={() => setSelectedFlyer(null)}
-                className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                className="px-4 py-2 bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-colors"
               >
                 Close
               </button>

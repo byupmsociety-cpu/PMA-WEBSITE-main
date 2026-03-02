@@ -8,6 +8,32 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { getAdminErrorMessage } from "@/lib/admin-utils";
+import { ImageUploadWithCrop } from "@/components/ImageUploadWithCrop";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetFooter,
+} from "@/components/ui/sheet";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Pencil, Trash2, Plus } from "lucide-react";
 
 interface TeamMember {
   id: string;
@@ -15,8 +41,20 @@ interface TeamMember {
   position: string | null;
   bio: string | null;
   image_url: string | null;
+  email: string | null;
+  linkedin_url: string | null;
   priority: number | null;
 }
+
+const emptyMember = {
+  name: "",
+  position: "",
+  bio: "",
+  image_url: null as string | null,
+  email: "",
+  linkedin_url: "",
+  priority: 0,
+};
 
 const AdminTeamPage = () => {
   const { user, isAdmin, isSuperAdmin, loading } = useAuth();
@@ -28,14 +66,12 @@ const AdminTeamPage = () => {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [savingId, setSavingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [creating, setCreating] = useState(false);
-  const [newMember, setNewMember] = useState({
-    name: "",
-    position: "",
-    bio: "",
-    image_url: "",
-    priority: 0,
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
+  const [formData, setFormData] = useState<typeof emptyMember>({
+    ...emptyMember,
   });
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading) {
@@ -54,7 +90,7 @@ const AdminTeamPage = () => {
     setLoadError(null);
     const { data, error } = await supabase
       .from("team_members")
-      .select("id, name, position, bio, image_url, priority")
+      .select("id, name, position, bio, image_url, email, linkedin_url, priority")
       .order("priority", { ascending: true });
 
     if (error) {
@@ -82,70 +118,86 @@ const AdminTeamPage = () => {
     setLoadingData(false);
   };
 
-  const handleCreate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setCreating(true);
-
-    const { error } = await supabase.from("team_members").insert({
-      name: newMember.name,
-      position: newMember.position || null,
-      bio: newMember.bio || null,
-      image_url: newMember.image_url || null,
-      priority: newMember.priority,
-    });
-
-    if (error) {
-      toast({
-        title: "Error creating member",
-        description: getAdminErrorMessage(error),
-        variant: "destructive",
-      });
-    } else {
-      toast({
-        title: "Team member created",
-        description: "The team member has been added.",
-      });
-      setNewMember({
-        name: "",
-        position: "",
-        bio: "",
-        image_url: "",
-        priority: 0,
-      });
-      await loadMembers();
-    }
-
-    setCreating(false);
+  const openAddSheet = () => {
+    setEditingMember(null);
+    setFormData({ ...emptyMember });
+    setSheetOpen(true);
   };
 
-  const handleUpdate = async (member: TeamMember) => {
-    setSavingId(member.id);
-    const { error } = await supabase
-      .from("team_members")
-      .update({
-        name: member.name,
-        position: member.position,
-        bio: member.bio,
-        image_url: member.image_url,
-        priority: member.priority,
-      })
-      .eq("id", member.id);
+  const openEditSheet = (member: TeamMember) => {
+    setEditingMember(member);
+    setFormData({
+      name: member.name,
+      position: member.position ?? "",
+      bio: member.bio ?? "",
+      image_url: member.image_url,
+      email: member.email ?? "",
+      linkedin_url: member.linkedin_url ?? "",
+      priority: member.priority ?? 0,
+    });
+    setSheetOpen(true);
+  };
 
-    if (error) {
-      toast({
-        title: "Error saving member",
-        description: getAdminErrorMessage(error),
-        variant: "destructive",
-      });
+  const closeSheet = () => {
+    setSheetOpen(false);
+    setEditingMember(null);
+    setFormData({ ...emptyMember });
+  };
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (editingMember) {
+      setSavingId(editingMember.id);
+      const { error } = await supabase
+        .from("team_members")
+        .update({
+          name: formData.name,
+          position: formData.position || null,
+          bio: formData.bio || null,
+          image_url: formData.image_url,
+          email: formData.email || null,
+          linkedin_url: formData.linkedin_url || null,
+          priority: formData.priority,
+        })
+        .eq("id", editingMember.id);
+
+      if (error) {
+        toast({
+          title: "Error saving",
+          description: getAdminErrorMessage(error),
+          variant: "destructive",
+        });
+      } else {
+        toast({ title: "Saved", description: "Team member updated." });
+        closeSheet();
+        await loadMembers();
+      }
+      setSavingId(null);
     } else {
-      toast({
-        title: "Saved",
-        description: "Team member updated.",
+      setSavingId("create");
+      const { error } = await supabase.from("team_members").insert({
+        name: formData.name,
+        position: formData.position || null,
+        bio: formData.bio || null,
+        image_url: formData.image_url,
+        email: formData.email || null,
+        linkedin_url: formData.linkedin_url || null,
+        priority: formData.priority,
       });
-      await loadMembers();
-    }
 
-    setSavingId(null);
+      if (error) {
+        toast({
+          title: "Error creating",
+          description: getAdminErrorMessage(error),
+          variant: "destructive",
+        });
+      } else {
+        toast({ title: "Team member created", description: "The team member has been added." });
+        closeSheet();
+        await loadMembers();
+      }
+      setSavingId(null);
+    }
   };
 
   const handleDelete = async (id: string) => {
@@ -154,19 +206,19 @@ const AdminTeamPage = () => {
 
     if (error) {
       toast({
-        title: "Error deleting member",
+        title: "Error deleting",
         description: getAdminErrorMessage(error),
         variant: "destructive",
       });
     } else {
-      toast({
-        title: "Deleted",
-        description: "Team member removed.",
-      });
+      toast({ title: "Deleted", description: "Team member removed." });
       await loadMembers();
     }
     setDeletingId(null);
+    setDeleteTargetId(null);
   };
+
+  const isSaving = savingId !== null;
 
   if (loading) {
     return (
@@ -179,167 +231,248 @@ const AdminTeamPage = () => {
   return (
     <div className="min-h-screen bg-background pt-24 pb-12 px-4">
       <div className="container max-w-5xl mx-auto space-y-6">
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold">Team Members</h1>
-            <p className="text-muted-foreground text-sm">
+            <p className="text-muted-foreground text-sm mt-0.5">
               Manage the PMA team members that appear on the website.
             </p>
           </div>
-          <Button variant="outline" size="sm" onClick={() => navigate("/admin")}>
-            Back to Admin
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={openAddSheet} size="sm">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Member
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => navigate("/admin")}>
+              Back to Admin
+            </Button>
+          </div>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Add Team Member</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleCreate} className="space-y-3">
-              <Input
-                placeholder="Name"
-                value={newMember.name}
-                onChange={(e) => setNewMember({ ...newMember, name: e.target.value })}
-                required
-              />
-              <Input
-                placeholder="Position"
-                value={newMember.position}
-                onChange={(e) => setNewMember({ ...newMember, position: e.target.value })}
-              />
-              <Textarea
-                placeholder="Short bio"
-                value={newMember.bio}
-                onChange={(e) => setNewMember({ ...newMember, bio: e.target.value })}
-              />
-              <Input
-                placeholder="Image URL"
-                value={newMember.image_url}
-                onChange={(e) => setNewMember({ ...newMember, image_url: e.target.value })}
-              />
-              <Input
-                type="number"
-                placeholder="Priority (lower shows first)"
-                value={newMember.priority}
-                onChange={(e) =>
-                  setNewMember({ ...newMember, priority: Number(e.target.value) || 0 })
-                }
-              />
-              <Button type="submit" disabled={creating}>
-                {creating ? "Creating..." : "Create"}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-
-        <div className="space-y-3">
-          {loadingData ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            </div>
-          ) : loadError ? (
-            <div className="flex flex-col items-center gap-3 py-12">
-              <p className="text-sm text-destructive text-center">{loadError}</p>
+            <CardTitle>All Team Members</CardTitle>
+            {loadError && (
               <Button variant="outline" size="sm" onClick={() => void loadMembers()}>
                 Retry
               </Button>
-            </div>
-          ) : (
-          <>
-          {members.map((m) => (
-            <Card key={m.id}>
-              <CardContent className="pt-4 space-y-3">
-                <Input
-                  className="font-semibold"
-                  value={m.name}
-                  onChange={(e) =>
-                    setMembers((prev) =>
-                      prev.map((row) =>
-                        row.id === m.id ? { ...row, name: e.target.value } : row
-                      )
-                    )
-                  }
-                />
-                <Input
-                  placeholder="Position"
-                  value={m.position ?? ""}
-                  onChange={(e) =>
-                    setMembers((prev) =>
-                      prev.map((row) =>
-                        row.id === m.id ? { ...row, position: e.target.value } : row
-                      )
-                    )
-                  }
-                />
-                <Textarea
-                  placeholder="Bio"
-                  value={m.bio ?? ""}
-                  onChange={(e) =>
-                    setMembers((prev) =>
-                      prev.map((row) =>
-                        row.id === m.id ? { ...row, bio: e.target.value } : row
-                      )
-                    )
-                  }
-                />
-                <Input
-                  placeholder="Image URL"
-                  value={m.image_url ?? ""}
-                  onChange={(e) =>
-                    setMembers((prev) =>
-                      prev.map((row) =>
-                        row.id === m.id ? { ...row, image_url: e.target.value } : row
-                      )
-                    )
-                  }
-                />
-                <Input
-                  type="number"
-                  placeholder="Priority"
-                  value={m.priority ?? 0}
-                  onChange={(e) =>
-                    setMembers((prev) =>
-                      prev.map((row) =>
-                        row.id === m.id
-                          ? { ...row, priority: Number(e.target.value) || 0 }
-                          : row
-                      )
-                    )
-                  }
-                />
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    onClick={() => handleUpdate(m)}
-                    disabled={savingId === m.id || deletingId === m.id}
-                  >
-                    {savingId === m.id ? "Saving..." : "Save"}
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleDelete(m.id)}
-                    disabled={savingId === m.id || deletingId === m.id}
-                  >
-                    {deletingId === m.id ? "Deleting..." : "Delete"}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-          {members.length === 0 && (
-            <p className="text-sm text-muted-foreground">
-              No team members yet. Add your first member above.
-            </p>
-          )}
-          </>
-          )}
-        </div>
+            )}
+          </CardHeader>
+          <CardContent>
+            {loadingData ? (
+              <div className="space-y-2">
+                {[...Array(5)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="h-14 bg-muted/50 rounded-md animate-pulse"
+                  />
+                ))}
+              </div>
+            ) : loadError ? (
+              <p className="py-8 text-center text-sm text-destructive">{loadError}</p>
+            ) : members.length === 0 ? (
+              <div className="py-12 text-center">
+                <p className="text-muted-foreground mb-4">No team members yet.</p>
+                <Button onClick={openAddSheet} size="sm">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add your first member
+                </Button>
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-16">Photo</TableHead>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Position</TableHead>
+                    <TableHead className="w-20">Priority</TableHead>
+                    <TableHead className="w-28 text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {members.map((m) => (
+                    <TableRow key={m.id}>
+                      <TableCell>
+                        <div className="h-12 w-12 rounded-md overflow-hidden bg-muted shrink-0">
+                          {m.image_url ? (
+                            <img
+                              src={m.image_url}
+                              alt={m.name}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <div className="h-full w-full flex items-center justify-center text-muted-foreground text-xs">
+                              —
+                            </div>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell className="font-medium">{m.name}</TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {m.position ?? "—"}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {m.priority ?? 0}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => openEditSheet(m)}
+                            disabled={savingId === m.id || deletingId === m.id}
+                            aria-label={`Edit ${m.name}`}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-destructive hover:text-destructive"
+                            onClick={() => setDeleteTargetId(m.id)}
+                            disabled={savingId === m.id || deletingId === m.id}
+                            aria-label={`Delete ${m.name}`}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </Card>
       </div>
+
+      {/* Add/Edit Sheet */}
+      <Sheet open={sheetOpen} onOpenChange={(open) => !open && closeSheet()}>
+        <SheetContent className="sm:max-w-lg overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>
+              {editingMember ? "Edit Team Member" : "Add Team Member"}
+            </SheetTitle>
+          </SheetHeader>
+          <form onSubmit={handleSave} className="space-y-4 py-4">
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium mb-1">
+                Name
+              </label>
+              <Input
+                id="name"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="position" className="block text-sm font-medium mb-1">
+                Position
+              </label>
+              <Input
+                id="position"
+                value={formData.position}
+                onChange={(e) => setFormData({ ...formData, position: e.target.value })}
+                placeholder="e.g. Co-President"
+              />
+            </div>
+            <div>
+              <label htmlFor="bio" className="block text-sm font-medium mb-1">
+                Bio
+              </label>
+              <Textarea
+                id="bio"
+                value={formData.bio}
+                onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+                rows={4}
+                placeholder="Short bio..."
+              />
+            </div>
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium mb-1">
+                Email
+              </label>
+              <Input
+                id="email"
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                placeholder="member@byu.edu"
+              />
+            </div>
+            <div>
+              <label htmlFor="linkedin_url" className="block text-sm font-medium mb-1">
+                LinkedIn URL
+              </label>
+              <Input
+                id="linkedin_url"
+                value={formData.linkedin_url}
+                onChange={(e) => setFormData({ ...formData, linkedin_url: e.target.value })}
+                placeholder="https://linkedin.com/in/username"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Photo</label>
+              <ImageUploadWithCrop
+                value={formData.image_url}
+                onChange={(url) => setFormData({ ...formData, image_url: url })}
+              />
+            </div>
+            <div>
+              <label htmlFor="priority" className="block text-sm font-medium mb-1">
+                Priority
+              </label>
+              <Input
+                id="priority"
+                type="number"
+                value={formData.priority}
+                onChange={(e) =>
+                  setFormData({ ...formData, priority: Number(e.target.value) || 0 })
+                }
+                placeholder="Lower shows first"
+              />
+            </div>
+            <SheetFooter className="pt-4">
+              <Button type="button" variant="outline" onClick={closeSheet}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isSaving}>
+                {isSaving ? "Saving..." : editingMember ? "Save" : "Create"}
+              </Button>
+            </SheetFooter>
+          </form>
+        </SheetContent>
+      </Sheet>
+
+      {/* Delete Confirmation */}
+      <AlertDialog
+        open={deleteTargetId !== null}
+        onOpenChange={(open) => !open && setDeleteTargetId(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete team member?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. The team member will be removed from
+              the website.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={!!deletingId}>Cancel</AlertDialogCancel>
+            <Button
+              variant="destructive"
+              disabled={!!deletingId}
+              onClick={() => deleteTargetId && handleDelete(deleteTargetId)}
+            >
+              {deletingId ? "Deleting..." : "Delete"}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
 
 export default AdminTeamPage;
-

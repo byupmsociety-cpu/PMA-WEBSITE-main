@@ -53,6 +53,30 @@ export const ROUTE_META: Record<string, { title: string; description: string }> 
     title: "Dashboard | BYU PMA",
     description: "Your BYU PMA dashboard and profile.",
   },
+  "/profile": {
+    title: "Profile | BYU PMA",
+    description: "Your BYU PMA profile and account details.",
+  },
+  "/blocked": {
+    title: "Access Restricted | BYU PMA",
+    description: "This account’s access has been restricted by an administrator.",
+  },
+  "/admin": {
+    title: "Admin Dashboard | BYU PMA",
+    description: "Administrative dashboard for managing PMA access and content.",
+  },
+  "/admin/access": {
+    title: "Access & Membership | BYU PMA",
+    description: "Manage users, roles, and pre-approved BYU emails for PMA.",
+  },
+  "/admin/team": {
+    title: "Admin Team | BYU PMA",
+    description: "Manage PMA Presidency team members shown on the website.",
+  },
+  "/admin/events": {
+    title: "Admin Events | BYU PMA",
+    description: "Manage PMA events shown on the website.",
+  },
 };
 
 const DEFAULT_META = ROUTE_META["/"];

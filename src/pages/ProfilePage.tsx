@@ -6,14 +6,16 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 const ProfilePage = () => {
-  const { user, profile, loading, isGuest, isAdmin, isSuperAdmin, refreshProfile } = useAuth();
+  const { user, profile, loading, isGuest, isAdmin, isSuperAdmin, isBlocked, refreshProfile } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!loading && !user) {
       navigate("/auth");
+    } else if (!loading && user && isBlocked) {
+      navigate("/blocked");
     }
-  }, [loading, user, navigate]);
+  }, [loading, user, isBlocked, navigate]);
 
   // Loading state
   if (loading) {
@@ -36,12 +38,15 @@ const ProfilePage = () => {
             <p className="text-muted-foreground">
               We couldn't load your profile. This can happen right after signup—please try again. If the problem persists, contact PMA support.
             </p>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Button onClick={() => refreshProfile()}>
                 Try again
               </Button>
               <Button variant="outline" onClick={() => navigate("/dashboard")}>
                 Go to Dashboard
+              </Button>
+              <Button variant="outline" onClick={() => navigate("/")}>
+                Go to Home
               </Button>
             </div>
           </CardContent>

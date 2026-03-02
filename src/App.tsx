@@ -20,16 +20,16 @@ import ScrollToTop from "./components/ScrollToTop";
 import RouteMeta from "./components/RouteMeta";
 import GamePage from './pages/GamePage';
 import AuthPage from "./pages/AuthPage";
-import DashboardPage from "./pages/DashboardPage";
+import DashboardRoute from "./components/DashboardRoute";
 import HackathonPage from "./pages/HackathonPage";
 import HackathonSharePage from "./pages/HackathonSharePage";
 import HackathonFAQPage from "./pages/HackathonFAQPage";
 import ProfilePage from "./pages/ProfilePage";
 import AdminDashboardPage from "./pages/AdminDashboardPage";
-import AdminUsersPage from "./pages/AdminUsersPage";
-import AdminApprovedEmailsPage from "./pages/AdminApprovedEmailsPage";
 import AdminTeamPage from "./pages/AdminTeamPage";
 import AdminEventsPage from "./pages/AdminEventsPage";
+import BlockedPage from "./pages/BlockedPage";
+import AdminAccessPage from "./pages/AdminAccessPage";
 
 const queryClient = new QueryClient();
 
@@ -57,10 +57,10 @@ const App = () => (
               <Route path="/game" element={<GamePage />} />
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/dashboard" element={<DashboardRoute />} />
+              <Route path="/blocked" element={<BlockedPage />} />
               <Route path="/admin" element={<AdminDashboardPage />} />
-              <Route path="/admin/users" element={<AdminUsersPage />} />
-              <Route path="/admin/approved-emails" element={<AdminApprovedEmailsPage />} />
+              <Route path="/admin/access" element={<AdminAccessPage />} />
               <Route path="/admin/team" element={<AdminTeamPage />} />
               <Route path="/admin/events" element={<AdminEventsPage />} />
               <Route path="*" element={<NotFound />} />

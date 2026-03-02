@@ -115,7 +115,7 @@ const HomePage = () => {
               </AnimatedSection>
 
               <AnimatedSection animation="fade-in" delay={300}>
-                <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mt-6">
+                <p className="text-xl md:text-2xl text-muted-foreground mt-6">
                   Empowering the next generation of product leaders through hands-on experience, industry connections,
                   and community.
                 </p>
@@ -141,7 +141,7 @@ const HomePage = () => {
                   </a>
                   <Link
                     to="/team"
-                    className="inline-flex items-center justify-center px-6 py-3 bg-transparent border border-gray-300 dark:border-white/20 rounded-lg text-gray-700 dark:text-white font-medium hover:bg-gray-100 dark:hover:bg-white/5 transition-all"
+                    className="inline-flex items-center justify-center px-6 py-3 bg-transparent border border-border rounded-lg text-foreground font-medium hover:bg-white/10 transition-all"
                   >
                     Meet Our Team
                   </Link>
@@ -152,24 +152,24 @@ const HomePage = () => {
             <AnimatedSection animation="slide-up" className="hidden lg:block">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-4">
-                  <div className="h-64 rounded-xl bg-gradient-to-br from-[#215096]/20 to-[#4299E1]/20 border border-gray-200 dark:border-white/10 p-1">
+                  <div className="h-64 rounded-xl bg-gradient-to-br from-[#215096]/20 to-[#4299E1]/20 border border-border p-1">
                     <div className="h-full w-full rounded-lg bg-white/50 dark:bg-black/50 backdrop-blur-sm overflow-hidden">
                       <img src="/img/Home1.png" alt="BYU PMA Event" className="h-full w-full object-cover" />
                     </div>
                   </div>
-                  <div className="h-40 rounded-xl bg-gradient-to-br from-[#4299E1]/20 to-[#215096]/20 border border-gray-200 dark:border-white/10 p-1">
+                  <div className="h-40 rounded-xl bg-gradient-to-br from-[#4299E1]/20 to-[#215096]/20 border border-border p-1">
                     <div className="h-full w-full rounded-lg bg-white/50 dark:bg-black/50 backdrop-blur-sm overflow-hidden">
                       <img src="/img/Home2.png" alt="BYU PMA Workshop" className="h-full w-full object-cover" />
                     </div>
                   </div>
                 </div>
                 <div className="space-y-4 mt-8">
-                  <div className="h-40 rounded-xl bg-gradient-to-br from-[#215096]/20 to-[#4299E1]/20 border border-gray-200 dark:border-white/10 p-1">
+                  <div className="h-40 rounded-xl bg-gradient-to-br from-[#215096]/20 to-[#4299E1]/20 border border-border p-1">
                     <div className="h-full w-full rounded-lg bg-white/50 dark:bg-black/50 backdrop-blur-sm overflow-hidden">
                       <img src="/img/Home3.png" alt="BYU PMA Networking" className="h-full w-full object-cover" />
                     </div>
                   </div>
-                  <div className="h-64 rounded-xl bg-gradient-to-br from-[#4299E1]/20 to-[#215096]/20 border border-gray-200 dark:border-white/10 p-1">
+                  <div className="h-64 rounded-xl bg-gradient-to-br from-[#4299E1]/20 to-[#215096]/20 border border-border p-1">
                     <div className="h-full w-full rounded-lg bg-white/50 dark:bg-black/50 backdrop-blur-sm overflow-hidden">
                       <img src="/img/Home4.png" alt="BYU PMA Team" className="h-full w-full object-cover" />
                     </div>
@@ -191,64 +191,64 @@ const HomePage = () => {
             >
               {[...Array(2)].map((_, i) => (
                 <div key={i} className="contents">
-                  <div className="h-24 w-48 bg-gray-700/20 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
+                  <div className="h-24 w-48 bg-muted/50 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
                     <img src="/img/amazon-logo.jpg" alt="Amazon" className="h-full w-full object-cover" />
                   </div>
-                  <div className="h-24 w-48 bg-gray-700/20 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
+                  <div className="h-24 w-48 bg-muted/50 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
                     <img src="/img/salesforce-logo.png" alt="Salesforce" className="h-full w-full object-cover" />
                   </div>
-                  <div className="h-24 w-48 bg-gray-700/20 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
+                  <div className="h-24 w-48 bg-muted/50 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
                     <img src="/img/lucid-logo.jpg" alt="Lucid Software" className="h-full w-full object-cover" />
                   </div>
-                  <div className="h-24 w-48 bg-gray-700/20 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
+                  <div className="h-24 w-48 bg-muted/50 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
                     <img src="/img/databricks-logo.png" alt="Databricks" className="h-full w-full object-cover" />
                   </div>
-                  <div className="h-24 w-48 bg-gray-700/20 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
+                  <div className="h-24 w-48 bg-muted/50 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
                     <img src="/img/domo-logo.png" alt="Domo" className="h-full w-full object-cover" />
                   </div>
-                  <div className="h-24 w-48 bg-gray-700/20 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
+                  <div className="h-24 w-48 bg-muted/50 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
                     <img src="/img/microsoft-logo.jpg" alt="Microsoft" className="h-full w-full object-cover" />
                   </div>
-                  <div className="h-24 w-48 bg-gray-700/20 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
+                  <div className="h-24 w-48 bg-muted/50 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
                     <img src="/img/podium-logo.png" alt="Podium" className="h-full w-full object-cover" />
                   </div>
-                  <div className="h-24 w-48 bg-gray-700/20 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
+                  <div className="h-24 w-48 bg-muted/50 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
                     <img src="/img/dell-logo.png" alt="Dell" className="h-full w-full object-cover" />
                   </div>
-                  <div className="h-24 w-48 bg-gray-700/20 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
+                  <div className="h-24 w-48 bg-muted/50 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
                     <img src="/img/google-logo.png" alt="Google" className="h-full w-full object-cover" />
                   </div>
-                  <div className="h-24 w-48 bg-gray-700/20 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
+                  <div className="h-24 w-48 bg-muted/50 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
                     <img src="/img/adobe-logo.png" alt="Adobe" className="h-full w-full object-cover" />
                   </div>
-                  <div className="h-24 w-48 bg-gray-700/20 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
+                  <div className="h-24 w-48 bg-muted/50 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
                     <img src="/img/qualtrics-logo.png" alt="Qualtrics" className="h-full w-full object-cover" />
                   </div>
-                  <div className="h-24 w-48 bg-gray-700/20 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
+                  <div className="h-24 w-48 bg-muted/50 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
                     <img src="/img/walmart-logo.png" alt="Walmart" className="h-full w-full object-cover" />
                   </div>
-                  <div className="h-24 w-48 bg-gray-700/20 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
+                  <div className="h-24 w-48 bg-muted/50 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
                     <img src="/img/weave-logo.jpg" alt="Weave" className="h-full w-full object-cover" />
                   </div>
-                  <div className="h-24 w-48 bg-gray-700/20 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
+                  <div className="h-24 w-48 bg-muted/50 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
                     <img src="/img/capitalone-logo.png" alt="Capital One" className="h-full w-full object-cover" />
                   </div>
-                  <div className="h-24 w-48 bg-gray-700/20 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
+                  <div className="h-24 w-48 bg-muted/50 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
                     <img src="/img/goldman-logo.png" alt="Goldman Sachs" className="h-full w-full object-cover" />
                   </div>
-                  <div className="h-24 w-48 bg-gray-700/20 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
+                  <div className="h-24 w-48 bg-muted/50 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
                     <img src="/img/disney-logo.jpg" alt="Disney" className="h-full w-full object-cover" />
                   </div>
-                  <div className="h-24 w-48 bg-gray-700/20 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
+                  <div className="h-24 w-48 bg-muted/50 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
                     <img src="/img/brevium-logo.png" alt="Brevium" className="h-full w-full object-cover" />
                   </div>
-                  <div className="h-24 w-48 bg-gray-700/20 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
+                  <div className="h-24 w-48 bg-muted/50 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
                     <img src="/img/pattern-logo.png" alt="Pattern" className="h-full w-full object-cover" />
                   </div>
-                  <div className="h-24 w-48 bg-gray-700/20 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
+                  <div className="h-24 w-48 bg-muted/50 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
                     <img src="/img/entrata-logo.png" alt="Entrata" className="h-full w-full object-contain" />
                   </div>
-                  <div className="h-24 w-48 bg-gray-700/20 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
+                  <div className="h-24 w-48 bg-muted/50 rounded-lg shadow-lg flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
                     <img src="/img/awardco-logo.png" alt="Awardco" className="h-full w-full object-cover" />
                   </div>
                 </div>
@@ -389,7 +389,7 @@ const HomePage = () => {
               <h2 className="text-3xl md:text-4xl font-bold mb-6">
                 About <span className="text-gradient">BYU PMA</span>
               </h2>
-              <p className="text-lg text-gray-600 dark:text-gray-300">
+              <p className="text-lg text-muted-foreground">
                 The Product Management Association at Brigham Young University is dedicated to helping students develop
                 the skills necessary to excel in the world of product management.
               </p>
@@ -398,7 +398,7 @@ const HomePage = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <AnimatedSection animation="slide-up" delay={100}>
-              <Card className="bg-white/80 dark:bg-black/40 border border-gray-200 dark:border-white/10 backdrop-blur-sm">
+              <Card className="bg-white/80 dark:bg-black/40 border border-border backdrop-blur-sm">
                 <CardContent className="p-6">
                   <div className="h-12 w-12 rounded-full bg-gradient-to-r from-[#4A90E2] to-[#87CEEB] flex items-center justify-center mb-6">
                     <svg
@@ -417,7 +417,7 @@ const HomePage = () => {
                     </svg>
                   </div>
                   <h3 className="text-xl font-bold mb-3">Community</h3>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-muted-foreground">
                     Join a network of like-minded students passionate about product management and technology.
                   </p>
                 </CardContent>
@@ -425,7 +425,7 @@ const HomePage = () => {
             </AnimatedSection>
 
             <AnimatedSection animation="slide-up" delay={200}>
-              <Card className="bg-white/80 dark:bg-black/40 border border-gray-200 dark:border-white/10 backdrop-blur-sm">
+              <Card className="bg-white/80 dark:bg-black/40 border border-border backdrop-blur-sm">
                 <CardContent className="p-6">
                   <div className="h-12 w-12 rounded-full bg-gradient-to-r from-[#215096] to-[#4299E1] flex items-center justify-center mb-6">
                     <svg
@@ -444,7 +444,7 @@ const HomePage = () => {
                     </svg>
                   </div>
                   <h3 className="text-xl font-bold mb-3">Education</h3>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-muted-foreground">
                     Access workshops, guest speakers, and resources to develop essential product management skills.
                   </p>
                 </CardContent>
@@ -452,7 +452,7 @@ const HomePage = () => {
             </AnimatedSection>
 
             <AnimatedSection animation="slide-up" delay={300}>
-              <Card className="bg-white/80 dark:bg-black/40 border border-gray-200 dark:border-white/10 backdrop-blur-sm">
+              <Card className="bg-white/80 dark:bg-black/40 border border-border backdrop-blur-sm">
                 <CardContent className="p-6">
                   <div className="h-12 w-12 rounded-full bg-gradient-to-r from-[#215096] to-[#4299E1] flex items-center justify-center mb-6">
                     <svg
@@ -471,7 +471,7 @@ const HomePage = () => {
                     </svg>
                   </div>
                   <h3 className="text-xl font-bold mb-3">Industry Access</h3>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-muted-foreground">
                     Connect with product leaders and companies for internships, job opportunities, and mentorship.
                   </p>
                 </CardContent>
@@ -482,7 +482,7 @@ const HomePage = () => {
           {/* New to Product Management Section */}
           <AnimatedSection animation="slide-up" delay={400}>
             <div className="mt-10 text-center">
-              <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
+              <h2 className="text-2xl font-bold text-foreground mb-4">
                 New to Product Management or want to learn more?
               </h2>
               <a
@@ -506,7 +506,7 @@ const HomePage = () => {
           <AnimatedSection animation="slide-up">
             <div className="max-w-3xl mx-auto text-center mb-16">
               <h2 className="text-3xl md:text-4xl font-bold mb-6">Club <span className="text-gradient">Impact</span></h2>
-              <p className="text-lg text-gray-300">
+              <p className="text-lg text-on-dark">
                 See how BYU PMA is making a difference in students' careers and professional development.
               </p>
             </div>
@@ -518,21 +518,21 @@ const HomePage = () => {
                 <div className="space-y-6">
                   <div className="bg-gradient-to-br from-[#4A90E2]/30 to-[#87CEEB]/30 rounded-2xl p-6 border border-white/10 backdrop-blur-sm">
                     <h3 className="text-4xl font-bold text-white mb-2">85%</h3>
-                    <p className="text-gray-300">of active members secured PM internships</p>
+                    <p className="text-on-dark">of active members secured PM internships</p>
                   </div>
                   <div className="bg-gradient-to-br from-[#87CEEB]/30 to-[#4A90E2]/30 rounded-2xl p-6 border border-white/10 backdrop-blur-sm">
                     <h3 className="text-4xl font-bold text-white mb-2">40+</h3>
-                    <p className="text-gray-300">workshop sessions per year</p>
+                    <p className="text-on-dark">workshop sessions per year</p>
                   </div>
                 </div>
                 <div className="space-y-6 mt-12">
                   <div className="bg-gradient-to-br from-[#4A90E2]/30 to-[#87CEEB]/30 rounded-2xl p-6 border border-white/10 backdrop-blur-sm">
                     <h3 className="text-4xl font-bold text-white mb-2">25+</h3>
-                    <p className="text-gray-300">companies recruited from our pool</p>
+                    <p className="text-on-dark">companies recruited from our pool</p>
                   </div>
                   <div className="bg-gradient-to-br from-[#87CEEB]/30 to-[#4A90E2]/30 rounded-2xl p-6 border border-white/10 backdrop-blur-sm">
                     <h3 className="text-4xl font-bold text-white mb-2">120+</h3>
-                    <p className="text-gray-300">active club members</p>
+                    <p className="text-on-dark">active club members</p>
                   </div>
                 </div>
               </div>
@@ -542,21 +542,21 @@ const HomePage = () => {
               <div className="space-y-8">
                 <div className="space-y-4">
                   <h3 className="text-2xl font-bold">Networking & Recruitment</h3>
-                  <p className="text-gray-300">
+                  <p className="text-on-dark">
                     We connect students with leading tech companies and product organizations through networking events, career fairs, and exclusive recruiting sessions.
                   </p>
                 </div>
                 
                 <div className="space-y-4">
                   <h3 className="text-2xl font-bold">Skill Development</h3>
-                  <p className="text-gray-300">
+                  <p className="text-on-dark">
                     Our workshops, case competitions, and hands-on projects help members develop critical PM skills like user research, roadmapping, and stakeholder management.
                   </p>
                 </div>
                 
                 <div className="space-y-4">
                   <h3 className="text-2xl font-bold">Resume & Interview Prep</h3>
-                  <p className="text-gray-300">
+                  <p className="text-on-dark">
                     Members receive personalized resume reviews, mock interviews, and practical advice from industry professionals to stand out in competitive PM roles.
                   </p>
                 </div>
@@ -575,7 +575,7 @@ const HomePage = () => {
           <AnimatedSection animation="slide-up">
             <div className="max-w-3xl mx-auto text-center mb-16">
               <h2 className="text-3xl md:text-4xl font-bold mb-6">Member <span className="text-gradient">Testimonials</span></h2>
-              <p className="text-lg text-gray-300">
+              <p className="text-lg text-on-dark">
                 Hear from our members about their experiences with BYU PMA.
               </p>
             </div>
@@ -587,12 +587,12 @@ const HomePage = () => {
                   <svg className="w-10 h-10 text-[#4A90E2] mb-4" fill="currentColor" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
                     <path d="M10 8c-2.209 0-4 1.791-4 4v10c0 2.209 1.791 4 4 4h12c2.209 0 4-1.791 4-4v-10c0-2.209-1.791-4-4-4h-12zM10 10h12c1.105 0 2 0.895 2 2v10c0 1.105-0.895 2-2 2h-12c-1.105 0-2-0.895-2-2v-10c0-1.105 0.895-2 2-2zM23.691 10.691c-0.292-0.292-0.767-0.292-1.059 0s-0.292 0.767 0 1.059c0.292 0.292 0.767 0.292 1.059 0s0.292-0.767 0-1.059zM17 12c-2.209 0-4 1.791-4 4s1.791 4 4 4 4-1.791 4-4-1.791-4-4-4zM17 14c1.105 0 2 0.895 2 2s-0.895 2-2 2-2-0.895-2-2 0.895-2 2-2z" />
                   </svg>
-                  <p className="text-gray-300 mb-6">"Joining BYU PMA was the best decision I made in college. The networking opportunities and case competitions prepared me for my PM internship at Microsoft."</p>
+                  <p className="text-on-dark mb-6">"Joining BYU PMA was the best decision I made in college. The networking opportunities and case competitions prepared me for my PM internship at Microsoft."</p>
                   <div className="flex items-center">
                     <div className="h-10 w-10 rounded-full bg-gradient-to-r from-[#4A90E2] to-[#87CEEB]"></div>
                     <div className="ml-4">
                       <p className="font-medium">Sarah Johnson</p>
-                      <p className="text-sm text-gray-400">Class of 2024</p>
+                      <p className="text-sm text-on-dark-muted">Class of 2024</p>
                     </div>
                   </div>
                 </CardContent>
@@ -605,12 +605,12 @@ const HomePage = () => {
                   <svg className="w-10 h-10 text-[#4A90E2] mb-4" fill="currentColor" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
                     <path d="M10 8c-2.209 0-4 1.791-4 4v10c0 2.209 1.791 4 4 4h12c2.209 0 4-1.791 4-4v-10c0-2.209-1.791-4-4-4h-12zM10 10h12c1.105 0 2 0.895 2 2v10c0 1.105-0.895 2-2 2h-12c-1.105 0-2-0.895-2-2v-10c0-1.105 0.895-2 2-2zM23.691 10.691c-0.292-0.292-0.767-0.292-1.059 0s-0.292 0.767 0 1.059c0.292 0.292 0.767 0.292 1.059 0s0.292-0.767 0-1.059zM17 12c-2.209 0-4 1.791-4 4s1.791 4 4 4 4-1.791 4-4-1.791-4-4-4zM17 14c1.105 0 2 0.895 2 2s-0.895 2-2 2-2-0.895-2-2 0.895-2 2-2z" />
                   </svg>
-                  <p className="text-gray-300 mb-6">"The resume workshops and mock interviews gave me the confidence to land my dream PM role. The community is supportive and the connections are invaluable."</p>
+                  <p className="text-on-dark mb-6">"The resume workshops and mock interviews gave me the confidence to land my dream PM role. The community is supportive and the connections are invaluable."</p>
                   <div className="flex items-center">
                     <div className="h-10 w-10 rounded-full bg-gradient-to-r from-[#4A90E2] to-[#87CEEB]"></div>
                     <div className="ml-4">
                       <p className="font-medium">David Chen</p>
-                      <p className="text-sm text-gray-400">Class of 2023</p>
+                      <p className="text-sm text-on-dark-muted">Class of 2023</p>
                     </div>
                   </div>
                 </CardContent>
@@ -623,12 +623,12 @@ const HomePage = () => {
                   <svg className="w-10 h-10 text-[#4A90E2] mb-4" fill="currentColor" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
                     <path d="M10 8c-2.209 0-4 1.791-4 4v10c0 2.209 1.791 4 4 4h12c2.209 0 4-1.791 4-4v-10c0-2.209-1.791-4-4-4h-12zM10 10h12c1.105 0 2 0.895 2 2v10c0 1.105-0.895 2-2 2h-12c-1.105 0-2-0.895-2-2v-10c0-1.105 0.895-2 2-2zM23.691 10.691c-0.292-0.292-0.767-0.292-1.059 0s-0.292 0.767 0 1.059c0.292 0.292 0.767 0.292 1.059 0s0.292-0.767 0-1.059zM17 12c-2.209 0-4 1.791-4 4s1.791 4 4 4 4-1.791 4-4-1.791-4-4-4zM17 14c1.105 0 2 0.895 2 2s-0.895 2-2 2-2-0.895-2-2 0.895-2 2-2z" />
                   </svg>
-                  <p className="text-gray-300 mb-6">"As someone with a technical background, BYU PMA helped me bridge the gap to product management. The mentorship and hands-on projects were game-changers."</p>
+                  <p className="text-on-dark mb-6">"As someone with a technical background, BYU PMA helped me bridge the gap to product management. The mentorship and hands-on projects were game-changers."</p>
                   <div className="flex items-center">
                     <div className="h-10 w-10 rounded-full bg-gradient-to-r from-[#4A90E2] to-[#87CEEB]"></div>
                     <div className="ml-4">
                       <p className="font-medium">Emma Rodriguez</p>
-                      <p className="text-sm text-gray-400">Class of 2025</p>
+                      <p className="text-sm text-on-dark-muted">Class of 2025</p>
                     </div>
                   </div>
                 </CardContent>
@@ -789,7 +789,7 @@ export function RecruitingTimeline() {
         <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-2 drop-shadow-lg">
           Recruiting <span className="text-gradient">Timeline</span>
         </h2>
-        <p className="text-lg text-gray-300 mb-0 font-medium"></p>
+        <p className="text-lg text-on-dark mb-0 font-medium"></p>
       </div>
       <div className="relative w-full max-w-xl flex flex-col items-center">
         {/* Vertical line */}
@@ -823,7 +823,7 @@ function Milestone({ milestone }: { milestone: { title: string; description: str
             className="ml-16 bg-black/70 border border-white/10 rounded-xl p-8 shadow-xl max-w-md"
           >
             <h3 className="text-2xl font-bold text-white mb-2">{milestone.title}</h3>
-            <p className="text-gray-300 text-base">{milestone.description}</p>
+            <p className="text-on-dark text-base">{milestone.description}</p>
           </motion.div>
         )}
       </AnimatePresence>

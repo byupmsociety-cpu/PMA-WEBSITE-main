@@ -21,7 +21,7 @@
     --secondary: 210 100% 66%;
     --secondary-foreground: 215 96% 32%;
     --muted: 210 40% 96%; /* light blue muted background */
-    --muted-foreground: 215 25% 27%;
+    --muted-foreground: 215 25% 18%; /* darker for WCAG AA contrast on light bg */
     --accent: 210 100% 66%;
     --accent-foreground: 215 96% 32%;
     --destructive: 0 84% 60%;
@@ -34,24 +34,24 @@
 
   .dark {
     /* Dark Mode - matching header navigation bg-black/40 */
-    --background: 0 0% 4%; /* very dark gray to match black/40 effect */
+    --background: 0 0% 6%; /* page floor */
     --foreground: 0 0% 98%;
-    --card: 0 0% 4%; /* very dark gray to match black/40 effect */
+    --card: 0 0% 11%; /* cards visibly lighter than background */
     --card-foreground: 0 0% 98%;
-    --popover: 0 0% 4%; /* very dark gray to match black/40 effect */
+    --popover: 0 0% 11%; /* match cards for consistency */
     --popover-foreground: 0 0% 98%;
     --primary: 210 100% 66%;
     --primary-foreground: 215 96% 32%;
     --secondary: 215 96% 32%;
     --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 4%; /* very dark gray to match black/40 effect */
-    --muted-foreground: 215 20% 65%;
+    --muted: 0 0% 9%; /* subtle surfaces and muted areas */
+    --muted-foreground: 215 15% 72%; /* lighter for WCAG AA contrast on dark bg */
     --accent: 210 100% 66%;
     --accent-foreground: 0 0% 98%;
     --destructive: 0 62% 30%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 8%; /* slightly lighter for borders */
-    --input: 0 0% 8%; /* slightly lighter for inputs */
+    --border: 0 0% 20%; /* clearly visible borders */
+    --input: 0 0% 14%; /* inputs stand out from background */
     --ring: 210 100% 66%;
   }
 }
@@ -84,6 +84,19 @@
   .text-gradient {
     @apply bg-gradient-to-r from-[#215096] to-[#4299E1] bg-clip-text text-transparent;
   }
+
+  /* Accessible gradient: both stops meet WCAG AA on light backgrounds */
+  .text-gradient-accessible {
+    @apply bg-gradient-to-r from-[#215096] to-[#2d6aa8] bg-clip-text text-transparent;
+  }
+
+  /* High-contrast text for dark backgrounds (WCAG AA) */
+  .text-on-dark {
+    color: rgba(255, 255, 255, 0.95);
+  }
+  .text-on-dark-muted {
+    color: rgba(255, 255, 255, 0.78);
+  }
   
   .animate-fade-in {
     @apply opacity-0 transition-opacity duration-700 ease-in;
@@ -100,6 +113,13 @@
   .animate-slide-up.in-view {
     @apply opacity-100 translate-y-0;
   }
+}
+
+/* For custom picker icons, hide native indicators (Chrome/Edge/WebKit) */
+input.has-picker-icon[type="date"]::-webkit-calendar-picker-indicator,
+input.has-picker-icon[type="time"]::-webkit-calendar-picker-indicator,
+input.has-picker-icon[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  opacity: 0;
 }
 
 /* Card Flip Animation */

@@ -337,11 +337,14 @@ const ResourcesPage = () => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchMembershipStatus(session.user.id);
-      } else {
-        setIsPmaMember(false);
-      }
+      // Defer Supabase calls to avoid auth-js#762 deadlock
+      setTimeout(() => {
+        if (session?.user) {
+          fetchMembershipStatus(session.user.id);
+        } else {
+          setIsPmaMember(false);
+        }
+      }, 0);
     });
 
     supabase.auth.getSession().then(({ data: { session } }) => {
