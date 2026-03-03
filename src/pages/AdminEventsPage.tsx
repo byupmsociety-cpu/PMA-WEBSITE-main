@@ -41,7 +41,8 @@ import {
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowUpDown, Calendar, Clock, Edit2, ExternalLink, Plus, Trash2 } from "lucide-react";
+import { ArrowUpDown, Calendar, Clock, Edit2, ExternalLink, Lightbulb, Plus, Trash2 } from "lucide-react";
+import { ImageUploadWithCrop } from "@/components/ImageUploadWithCrop";
 
 interface AdminEvent {
   id: string;
@@ -52,11 +53,21 @@ interface AdminEvent {
   location: string | null;
   is_public: boolean;
   registration_link: string | null;
+  image_url: string | null;
 }
 
 type TimeFilter = "upcoming" | "past" | "all";
 type StatusFilter = "all" | "published" | "draft";
 type SortDirection = "asc" | "desc";
+
+interface EventSuggestion {
+  id: string;
+  title: string;
+  description: string | null;
+  submitter_email: string | null;
+  created_at: string;
+  read_at: string | null;
+}
 
 const eventFormSchema = z
   .object({
@@ -133,6 +144,10 @@ const AdminEventsPage = () => {
   const startTimeRef = useRef<HTMLInputElement | null>(null);
   const endDateRef = useRef<HTMLInputElement | null>(null);
   const endTimeRef = useRef<HTMLInputElement | null>(null);
+  const [eventImageUrl, setEventImageUrl] = useState<string | null>(null);
+  const [suggestions, setSuggestions] = useState<EventSuggestion[]>([]);
+  const [loadingSuggestions, setLoadingSuggestions] = useState(true);
+  const [suggestionActionId, setSuggestionActionId] = useState<string | null>(null);
 
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventFormSchema),
@@ -156,6 +171,7 @@ const AdminEventsPage = () => {
         navigate("/");
       } else {
         void loadEvents();
+        void loadSuggestions();
       }
     }
   }, [loading, user, isAdmin, isSuperAdmin, navigate]);
@@ -165,7 +181,7 @@ const AdminEventsPage = () => {
     setLoadError(null);
     const { data, error } = await supabase
       .from("events")
-      .select("id, title, description, start_time, end_time, location, is_public, registration_link")
+      .select("id, title, description, start_time, end_time, location, is_public, registration_link, image_url")
       .order("start_time", { ascending: false });
 
     if (error) {
@@ -189,10 +205,86 @@ const AdminEventsPage = () => {
         location: e.location,
         is_public: e.is_public,
         registration_link: e.registration_link,
+        image_url: e.image_url ?? null,
       }))
       );
     }
     setLoadingData(false);
+  };
+
+  const loadSuggestions = async () => {
+    setLoadingSuggestions(true);
+    const { data, error } = await supabase
+      .from("event_suggestions")
+      .select("id, title, description, submitter_email, created_at, read_at")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error loading event suggestions", error);
+      toast({
+        title: "Error loading suggestions",
+        description: getAdminErrorMessage(error),
+        variant: "destructive",
+      });
+    } else {
+      setSuggestions(
+        (data ?? []).map((s: any) => ({
+          id: s.id,
+          title: s.title,
+          description: s.description,
+          submitter_email: s.submitter_email,
+          created_at: s.created_at,
+          read_at: s.read_at,
+        }))
+      );
+    }
+    setLoadingSuggestions(false);
+  };
+
+  const handleCreateEventFromSuggestion = (suggestion: EventSuggestion) => {
+    setEditingEvent(null);
+    setEventImageUrl(null);
+    form.reset({
+      title: suggestion.title,
+      description: suggestion.description ?? "",
+      start_time: "",
+      end_time: "",
+      location: "",
+      registration_link: "",
+      is_public: false,
+      event_type: "in_person",
+    });
+    setStartDate("");
+    setStartTimeOnly("");
+    setEndDate("");
+    setEndTimeOnly("");
+    setSheetOpen(true);
+  };
+
+  const handleMarkSuggestionRead = async (id: string) => {
+    setSuggestionActionId(id);
+    const { error } = await supabase
+      .from("event_suggestions")
+      .update({ read_at: new Date().toISOString() })
+      .eq("id", id);
+    setSuggestionActionId(null);
+    if (error) {
+      toast({ title: "Error", description: getAdminErrorMessage(error), variant: "destructive" });
+    } else {
+      await loadSuggestions();
+    }
+  };
+
+  const handleDeleteSuggestion = async (id: string) => {
+    setSuggestionActionId(id);
+    const { error } = await supabase.from("event_suggestions").delete().eq("id", id);
+    setSuggestionActionId(null);
+    if (error) {
+      toast({ title: "Error", description: getAdminErrorMessage(error), variant: "destructive" });
+    } else {
+      toast({ title: "Suggestion removed" });
+      await loadSuggestions();
+    }
   };
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -202,6 +294,7 @@ const AdminEventsPage = () => {
 
   const openCreateSheet = () => {
     setEditingEvent(null);
+    setEventImageUrl(null);
     form.reset({
       title: "",
       description: "",
@@ -221,6 +314,7 @@ const AdminEventsPage = () => {
 
   const openEditSheet = (evt: AdminEvent) => {
     setEditingEvent(evt);
+    setEventImageUrl(evt.image_url ?? null);
     const localStart = toLocalInputValue(evt.start_time);
     const localEnd = toLocalInputValue(evt.end_time);
     const [startDatePart, startTimePart] = localStart ? localStart.split("T") : ["", ""];
@@ -260,6 +354,7 @@ const AdminEventsPage = () => {
           location: values.location || null,
           is_public: false,
           registration_link: values.registration_link ? values.registration_link : null,
+          image_url: eventImageUrl || null,
         };
         const { error } = await supabase.from("events").insert(draftPayload);
         if (error) {
@@ -279,6 +374,7 @@ const AdminEventsPage = () => {
     }
     setSheetOpen(false);
     setEditingEvent(null);
+    setEventImageUrl(null);
   };
 
   const onSubmitForm = async (values: EventFormValues) => {
@@ -293,6 +389,7 @@ const AdminEventsPage = () => {
       location: values.location || (isVirtual ? "Online" : null),
       is_public: values.is_public,
       registration_link: values.registration_link ? values.registration_link : null,
+      image_url: eventImageUrl || null,
     };
 
     const { error } = editingEvent
@@ -679,6 +776,88 @@ const AdminEventsPage = () => {
           </CardContent>
         </Card>
 
+        <Card>
+          <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="space-y-1">
+              <CardTitle className="flex items-center gap-2">
+                <Lightbulb className="h-5 w-5" />
+                Event suggestions
+              </CardTitle>
+              <p className="text-xs text-muted-foreground">
+                Ideas submitted from the public events page. Create an event from a suggestion or mark as read.
+              </p>
+            </div>
+            <Button size="sm" variant="outline" onClick={() => loadSuggestions()} disabled={loadingSuggestions}>
+              Refresh
+            </Button>
+          </CardHeader>
+          <CardContent>
+            {loadingSuggestions ? (
+              <div className="flex justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+              </div>
+            ) : suggestions.length === 0 ? (
+              <p className="text-sm text-muted-foreground py-6 text-center">No event suggestions yet.</p>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Title</TableHead>
+                    <TableHead className="max-w-[200px]">Description</TableHead>
+                    <TableHead className="w-[140px]">Submitted</TableHead>
+                    <TableHead className="w-[180px]">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {suggestions.map((s) => (
+                    <TableRow key={s.id} className={s.read_at ? "opacity-75" : ""}>
+                      <TableCell className="font-medium">{s.title}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground max-w-[200px] truncate" title={s.description ?? undefined}>
+                        {s.description || "—"}
+                      </TableCell>
+                      <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
+                        {s.submitter_email && <span className="block truncate" title={s.submitter_email}>{s.submitter_email}</span>}
+                        <span>{new Date(s.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}</span>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleCreateEventFromSuggestion(s)}
+                            disabled={!!suggestionActionId}
+                          >
+                            Create event
+                          </Button>
+                          {!s.read_at && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleMarkSuggestionRead(s.id)}
+                              disabled={!!suggestionActionId}
+                            >
+                              Mark read
+                            </Button>
+                          )}
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="text-destructive"
+                            onClick={() => handleDeleteSuggestion(s.id)}
+                            disabled={!!suggestionActionId}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </Card>
+
         <Sheet
           open={sheetOpen}
           onOpenChange={(open) => {
@@ -689,10 +868,11 @@ const AdminEventsPage = () => {
             }
           }}
         >
-          <SheetContent side="right" className="w-full sm:max-w-xl space-y-4 min-w-0">
-            <SheetHeader>
+          <SheetContent side="right" className="flex h-full max-h-full w-full flex-col sm:max-w-xl min-w-0 p-0 gap-0">
+            <SheetHeader className="shrink-0 px-6 pt-12 pb-2">
               <SheetTitle>{editingEvent ? "Edit Event" : "New Event"}</SheetTitle>
             </SheetHeader>
+            <div className="flex-1 min-h-0 overflow-y-auto px-6 pb-6">
             <form
               onSubmit={form.handleSubmit(onSubmitForm)}
               className="space-y-3 mt-2 min-w-0 overflow-x-hidden"
@@ -716,6 +896,15 @@ const AdminEventsPage = () => {
                   placeholder="Short description shown on the events page"
                   rows={4}
                   {...form.register("description")}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Flyer / image</label>
+                <ImageUploadWithCrop
+                  bucket="event-images"
+                  filePrefix="event"
+                  value={eventImageUrl}
+                  onChange={setEventImageUrl}
                 />
               </div>
               <div className="space-y-3">
@@ -962,6 +1151,7 @@ const AdminEventsPage = () => {
                 </div>
               </SheetFooter>
             </form>
+            </div>
           </SheetContent>
         </Sheet>
 
