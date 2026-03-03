@@ -80,6 +80,7 @@ export type Database = {
           description: string | null
           end_time: string | null
           id: string
+          image_url: string | null
           is_public: boolean
           location: string | null
           registration_link: string | null
@@ -92,6 +93,7 @@ export type Database = {
           description?: string | null
           end_time?: string | null
           id?: string
+          image_url?: string | null
           is_public?: boolean
           location?: string | null
           registration_link?: string | null
@@ -104,12 +106,40 @@ export type Database = {
           description?: string | null
           end_time?: string | null
           id?: string
+          image_url?: string | null
           is_public?: boolean
           location?: string | null
           registration_link?: string | null
           start_time?: string
           title?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      event_suggestions: {
+        Row: {
+          id: string
+          title: string
+          description: string | null
+          submitter_email: string | null
+          created_at: string
+          read_at: string | null
+        }
+        Insert: {
+          id?: string
+          title: string
+          description?: string | null
+          submitter_email?: string | null
+          created_at?: string
+          read_at?: string | null
+        }
+        Update: {
+          id?: string
+          title?: string
+          description?: string | null
+          submitter_email?: string | null
+          created_at?: string
+          read_at?: string | null
         }
         Relationships: []
       }

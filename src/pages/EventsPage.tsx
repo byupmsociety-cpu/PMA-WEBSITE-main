@@ -8,12 +8,29 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import { useEvents, type Event } from '@/hooks/useEvents';
 
 const EventsPage = () => {
   const [filter, setFilter] = useState('upcoming');
   const [selectedFlyer, setSelectedFlyer] = useState<string | null>(null);
+  const [suggestionDialogOpen, setSuggestionDialogOpen] = useState(false);
+  const [suggestionTitle, setSuggestionTitle] = useState('');
+  const [suggestionDescription, setSuggestionDescription] = useState('');
+  const [suggestionEmail, setSuggestionEmail] = useState('');
+  const [suggestionSubmitting, setSuggestionSubmitting] = useState(false);
 
+  const { toast } = useToast();
   const { data: events = [], isLoading: loading, error, refetch } = useEvents();
 
   // Format date nicely
@@ -42,6 +59,11 @@ const EventsPage = () => {
       return date.toISOString();
     };
     
+    // Description with registration link so it appears in calendar event details
+    const detailsForCalendar = event.registrationLink
+      ? `${event.description}\n\nRegister: ${event.registrationLink}`
+      : event.description;
+    
     // Extract Google Meet link from description if present
     const meetLinkMatch = event.description.match(/(https:\/\/meet\.google\.com\/[a-z\-]+)/i);
     const meetLink = meetLinkMatch ? meetLinkMatch[1] : '';
@@ -54,7 +76,7 @@ const EventsPage = () => {
       action: 'TEMPLATE',
       text: event.title,
       dates: `${formatDateForCalendar(startDate)}/${formatDateForCalendar(endDate)}`,
-      details: event.description,
+      details: detailsForCalendar,
       location: fullLocation,
     });
     
@@ -65,7 +87,7 @@ const EventsPage = () => {
       subject: event.title,
       startdt: formatDateForOutlook(startDate),
       enddt: formatDateForOutlook(endDate),
-      body: event.description,
+      body: detailsForCalendar,
       location: fullLocation,
     });
     
@@ -75,9 +97,14 @@ const EventsPage = () => {
       title: event.title,
       st: formatDateForCalendar(startDate),
       et: formatDateForCalendar(endDate),
-      desc: event.description,
+      desc: detailsForCalendar,
       in_loc: fullLocation,
     });
+    
+    // Escape DESCRIPTION for iCal: backslash, semicolon, comma
+    const escapeIcsDescription = (s: string) =>
+      s.replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
+    const icsDescription = escapeIcsDescription(detailsForCalendar);
     
     // ICS file for Apple Calendar and others
     const icsContent = [
@@ -87,7 +114,7 @@ const EventsPage = () => {
       `DTSTART:${formatDateForCalendar(startDate)}`,
       `DTEND:${formatDateForCalendar(endDate)}`,
       `SUMMARY:${event.title}`,
-      `DESCRIPTION:${event.description}`,
+      `DESCRIPTION:${icsDescription}`,
       `LOCATION:${fullLocation}`,
       'END:VEVENT',
       'END:VCALENDAR',
@@ -246,7 +273,18 @@ const EventsPage = () => {
                             </svg>
                             {event.location}
                           </div>
-                          <DropdownMenu>
+                          <div className="flex flex-wrap items-center gap-2">
+                            {event.registrationLink && (
+                              <a
+                                href={event.registrationLink}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 bg-gradient-to-r from-[#215096] to-[#4299E1] !text-white hover:opacity-90 text-sm drop-shadow-md px-4 py-2 rounded-md font-medium"
+                              >
+                                Register on Luma
+                              </a>
+                            )}
+                            <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button className="inline-flex items-center gap-2 bg-gradient-to-r from-[#215096] to-[#4299E1] !text-white hover:opacity-90 text-sm drop-shadow-md">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
@@ -278,6 +316,7 @@ const EventsPage = () => {
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
+                          </div>
                         </div>
                         
                         {/* Event Image/Attachment - Right Side */}
@@ -315,12 +354,95 @@ const EventsPage = () => {
                   <h3 className="text-xl font-semibold mb-2 text-card-foreground">Have an event suggestion?</h3>
                   <p className="text-muted-foreground">We'd love to hear your ideas for future events and workshops!</p>
                 </div>
-                <button className="mt-4 md:mt-0 inline-flex items-center justify-center px-6 py-3 bg-transparent border border-border rounded-lg text-foreground font-medium hover:bg-muted/50 transition-all">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="mt-4 md:mt-0"
+                  onClick={() => setSuggestionDialogOpen(true)}
+                >
                   Submit Idea
-                </button>
+                </Button>
               </div>
             </div>
           </AnimatedSection>
+
+          {/* Submit idea dialog */}
+          <Dialog open={suggestionDialogOpen} onOpenChange={setSuggestionDialogOpen}>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Submit an event idea</DialogTitle>
+              </DialogHeader>
+              <form
+                className="space-y-4"
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  if (!suggestionTitle.trim()) {
+                    toast({ title: 'Title required', description: 'Please enter a title for your idea.', variant: 'destructive' });
+                    return;
+                  }
+                  setSuggestionSubmitting(true);
+                  const { error: submitError } = await supabase.from('event_suggestions').insert({
+                    title: suggestionTitle.trim(),
+                    description: suggestionDescription.trim() || null,
+                    submitter_email: suggestionEmail.trim() || null,
+                  });
+                  setSuggestionSubmitting(false);
+                  if (submitError) {
+                    toast({ title: 'Could not submit', description: submitError.message, variant: 'destructive' });
+                    return;
+                  }
+                  toast({ title: 'Thanks!', description: "We've received your idea and will consider it for future events." });
+                  setSuggestionDialogOpen(false);
+                  setSuggestionTitle('');
+                  setSuggestionDescription('');
+                  setSuggestionEmail('');
+                }}
+              >
+                <div className="space-y-2">
+                  <label htmlFor="suggestion-title" className="text-sm font-medium">Title</label>
+                  <Input
+                    id="suggestion-title"
+                    value={suggestionTitle}
+                    onChange={(e) => setSuggestionTitle(e.target.value)}
+                    placeholder="e.g. Workshop on product roadmapping"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="suggestion-description" className="text-sm font-medium">Description (optional)</label>
+                  <Textarea
+                    id="suggestion-description"
+                    value={suggestionDescription}
+                    onChange={(e) => setSuggestionDescription(e.target.value)}
+                    placeholder="Tell us more about your idea..."
+                    rows={3}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="suggestion-email" className="text-sm font-medium">Your email (optional)</label>
+                  <Input
+                    id="suggestion-email"
+                    type="email"
+                    value={suggestionEmail}
+                    onChange={(e) => setSuggestionEmail(e.target.value)}
+                    placeholder="you@byu.edu"
+                  />
+                </div>
+                <DialogFooter>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setSuggestionDialogOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={suggestionSubmitting}>
+                    {suggestionSubmitting ? 'Submitting...' : 'Submit idea'}
+                  </Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
         </AnimatedSection>
       </div>
       

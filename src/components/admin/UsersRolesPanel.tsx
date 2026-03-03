@@ -5,6 +5,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { getAdminErrorMessage } from "@/lib/admin-utils";
 
@@ -28,6 +38,8 @@ export default function UsersRolesPanel() {
   const [loadingData, setLoadingData] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [savingId, setSavingId] = useState<string | null>(null);
+  const [blockConfirm, setBlockConfirm] = useState<{ id: string; label: string } | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<AdminUserRow | null>(null);
 
   useEffect(() => {
     void loadUsers();
@@ -120,10 +132,13 @@ export default function UsersRolesPanel() {
   };
 
   const softDeleteUser = async (row: AdminUserRow) => {
-    const label = row.full_name || row.email || "this user";
-    if (!window.confirm(`Delete profile for ${label}? This will block access and hide them from the list.`)) {
-      return;
-    }
+    setDeleteConfirm(row);
+  };
+
+  const confirmSoftDelete = async () => {
+    const row = deleteConfirm;
+    if (!row) return;
+    setDeleteConfirm(null);
 
     setSavingId(row.id);
     const { error } = await supabase
@@ -245,12 +260,10 @@ export default function UsersRolesPanel() {
                         onClick={() => {
                           if (!row.is_blocked) {
                             const label = row.full_name || row.email || "this user";
-                            const confirmed = window.confirm(
-                              `Block access for ${label}? They will be unable to sign in or view member content until unblocked.`
-                            );
-                            if (!confirmed) return;
+                            setBlockConfirm({ id: row.id, label });
+                          } else {
+                            void updateBlockedStatus(row.id, false);
                           }
-                          void updateBlockedStatus(row.id, !row.is_blocked);
                         }}
                         disabled={savingId === row.id}
                       >
@@ -267,7 +280,7 @@ export default function UsersRolesPanel() {
                       <Button
                         size="sm"
                         variant="destructive"
-                        onClick={() => softDeleteUser(row)}
+                        onClick={() => setDeleteConfirm(row)}
                         disabled={savingId === row.id}
                       >
                         Delete profile
@@ -290,6 +303,61 @@ export default function UsersRolesPanel() {
           </table>
         )}
       </CardContent>
+
+      {/* Block confirmation */}
+      <AlertDialog open={!!blockConfirm} onOpenChange={(open) => !open && setBlockConfirm(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Block access?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Block access for {blockConfirm?.label ?? "this user"}? They will be unable to sign in or
+              view member content until unblocked.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={!!savingId}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={!!savingId}
+              onClick={(e) => {
+                e.preventDefault();
+                if (blockConfirm) {
+                  void updateBlockedStatus(blockConfirm.id, true);
+                  setBlockConfirm(null);
+                }
+              }}
+            >
+              {savingId ? "Saving..." : "Block"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete profile confirmation */}
+      <AlertDialog open={!!deleteConfirm} onOpenChange={(open) => !open && setDeleteConfirm(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete profile?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Delete profile for {deleteConfirm?.full_name || deleteConfirm?.email || "this user"}?
+              This will block access and hide them from the list.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={!!savingId}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={!!savingId}
+              onClick={(e) => {
+                e.preventDefault();
+                void confirmSoftDelete();
+              }}
+            >
+              {savingId ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 }

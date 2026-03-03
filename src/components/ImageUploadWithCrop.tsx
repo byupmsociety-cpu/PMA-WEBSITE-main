@@ -83,12 +83,21 @@ interface ImageUploadWithCropProps {
   value: string | null;
   onChange: (url: string | null) => void;
   disabled?: boolean;
+  /** Storage bucket id (default: "team-images") */
+  bucket?: string;
+  /** Prefix for uploaded filenames e.g. "team" -> team-uuid.jpg (default: "team") */
+  filePrefix?: string;
+  /** Crop aspect ratio (default: 1 for square) */
+  aspect?: number;
 }
 
 export function ImageUploadWithCrop({
   value,
   onChange,
   disabled = false,
+  bucket = "team-images",
+  filePrefix = "team",
+  aspect: aspectRatio = 1,
 }: ImageUploadWithCropProps) {
   const [cropDialogOpen, setCropDialogOpen] = useState(false);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
@@ -118,10 +127,10 @@ export function ImageUploadWithCrop({
     setUploading(true);
     try {
       const originalBlob = await getFullImageAsJpeg(url);
-      const originalFileName = `team-${uuid}-original.jpg`;
+      const originalFileName = `${filePrefix}-${uuid}-original.jpg`;
       const originalFile = new File([originalBlob], originalFileName, { type: "image/jpeg" });
       const { error } = await supabase.storage
-        .from("team-images")
+        .from(bucket)
         .upload(originalFileName, originalFile, { upsert: true });
       if (error) throw error;
       pendingUploadUuidRef.current = uuid;
@@ -162,7 +171,7 @@ export function ImageUploadWithCrop({
     const targetUrl = editingTargetUrlRef.current;
     const fileName =
       uuid
-        ? `team-${uuid}.jpg`
+        ? `${filePrefix}-${uuid}.jpg`
         : targetUrl
           ? targetUrl.slice(targetUrl.lastIndexOf("/") + 1).split("?")[0]
           : null;
@@ -182,13 +191,13 @@ export function ImageUploadWithCrop({
       const file = new File([blob], fileName, { type: "image/jpeg" });
 
       const { error } = await supabase.storage
-        .from("team-images")
+        .from(bucket)
         .upload(fileName, file, { upsert: true });
 
       if (error) throw error;
 
       const { data: { publicUrl } } = supabase.storage
-        .from("team-images")
+        .from(bucket)
         .getPublicUrl(fileName);
 
       onChange(publicUrl);
@@ -301,7 +310,7 @@ export function ImageUploadWithCrop({
                 image={imageSrc}
                 crop={crop}
                 zoom={zoom}
-                aspect={1}
+                aspect={aspectRatio}
                 onCropChange={setCrop}
                 onZoomChange={setZoom}
                 onCropComplete={onCropComplete}

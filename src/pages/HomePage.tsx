@@ -46,6 +46,7 @@ const FALLBACK_EVENT: Event = {
   date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
   location: "BYU Campus",
   status: "upcoming",
+  registrationLink: null,
 };
 
 const HomePage = () => {
@@ -731,6 +732,16 @@ const HomePage = () => {
                   >
                     Details
                   </Link>
+                  {upcomingEvent.registrationLink && (
+                    <a
+                      href={upcomingEvent.registrationLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-1.5 bg-primary text-primary-foreground rounded-lg font-medium text-xs hover:bg-primary/90 transition-colors whitespace-nowrap"
+                    >
+                      Register on Luma
+                    </a>
+                  )}
                   <button
                     onClick={() => {
                       setShowEventBanner(false);

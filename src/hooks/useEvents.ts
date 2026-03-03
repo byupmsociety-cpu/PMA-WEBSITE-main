@@ -8,6 +8,8 @@ export interface Event {
   description: string;
   location: string;
   status?: string;
+  img?: string | null;
+  registrationLink?: string | null;
 }
 
 export function useEvents() {
@@ -22,7 +24,7 @@ export function useEvents() {
 
       const { data: events, error: supabaseError } = await supabase
         .from("events")
-        .select("id, title, description, start_time, end_time, location, is_public, registration_link")
+        .select("id, title, description, start_time, end_time, location, is_public, registration_link, image_url")
         .eq("is_public", true)
         .order("start_time", { ascending: true });
 
@@ -38,6 +40,8 @@ export function useEvents() {
           description: event.description ?? "",
           location: event.location ?? "",
           status: event.is_public ? "upcoming" : "hidden",
+          img: event.image_url ?? null,
+          registrationLink: event.registration_link ?? null,
         })) ?? [];
 
       setData(mappedEvents);
