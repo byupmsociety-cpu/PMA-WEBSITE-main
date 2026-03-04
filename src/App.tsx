@@ -28,6 +28,7 @@ import ProfilePage from "./pages/ProfilePage";
 import AdminDashboardPage from "./pages/AdminDashboardPage";
 import AdminTeamPage from "./pages/AdminTeamPage";
 import AdminEventsPage from "./pages/AdminEventsPage";
+import AdminResourcesPage from "./pages/AdminResourcesPage";
 import BlockedPage from "./pages/BlockedPage";
 import AdminAccessPage from "./pages/AdminAccessPage";
 
@@ -63,6 +64,7 @@ const App = () => (
               <Route path="/admin/access" element={<AdminAccessPage />} />
               <Route path="/admin/team" element={<AdminTeamPage />} />
               <Route path="/admin/events" element={<AdminEventsPage />} />
+              <Route path="/admin/resources" element={<AdminResourcesPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <Footer />

@@ -15,8 +15,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import { getAdminErrorMessage } from "@/lib/admin-utils";
+import { MoreHorizontal } from "lucide-react";
 
 type Role = "super-admin" | "admin" | "user" | "guest";
 
@@ -166,11 +173,6 @@ export default function UsersRolesPanel() {
     setSavingId(null);
   };
 
-  const handlePromoteGuestToUser = async (row: AdminUserRow) => {
-    if (row.role !== "guest") return;
-    await updateRole(row.id, "user");
-  };
-
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0">
@@ -253,38 +255,33 @@ export default function UsersRolesPanel() {
                     )}
                   </td>
                   <td className="py-2 pr-2">
-                    <div className="flex flex-wrap gap-2">
-                      <Button
-                        size="sm"
-                        variant={row.is_blocked ? "outline" : "destructive"}
-                        onClick={() => {
-                          if (!row.is_blocked) {
-                            const label = row.full_name || row.email || "this user";
-                            setBlockConfirm({ id: row.id, label });
-                          } else {
-                            void updateBlockedStatus(row.id, false);
-                          }
-                        }}
-                        disabled={savingId === row.id}
-                      >
-                        {row.is_blocked ? "Unblock" : "Block"}
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handlePromoteGuestToUser(row)}
-                        disabled={savingId === row.id || row.role !== "guest"}
-                      >
-                        Promote to user
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => setDeleteConfirm(row)}
-                        disabled={savingId === row.id}
-                      >
-                        Delete profile
-                      </Button>
+                    <div className="flex items-center gap-2">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8" disabled={savingId === row.id}>
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={() => {
+                              if (!row.is_blocked) {
+                                setBlockConfirm({ id: row.id, label: row.full_name || row.email || "this user" });
+                              } else {
+                                void updateBlockedStatus(row.id, false);
+                              }
+                            }}
+                          >
+                            {row.is_blocked ? "Unblock" : "Block"}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="text-destructive focus:text-destructive"
+                            onClick={() => setDeleteConfirm(row)}
+                          >
+                            Delete profile
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                       {savingId === row.id && (
                         <span className="text-xs text-muted-foreground">Saving...</span>
                       )}
