@@ -77,6 +77,10 @@ export const ROUTE_META: Record<string, { title: string; description: string }> 
     title: "Admin Events | BYU PMA",
     description: "Manage PMA events shown on the website.",
   },
+  "/admin/resources": {
+    title: "Admin Resources | BYU PMA",
+    description: "Manage tools and resources shown on the Resources page.",
+  },
 };
 
 const DEFAULT_META = ROUTE_META["/"];

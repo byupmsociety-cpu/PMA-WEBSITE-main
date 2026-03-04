@@ -2,36 +2,36 @@ import { useState, useEffect } from "react";
 import AnimatedSection from "@/components/AnimatedSection";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { FileText, Linkedin, Building2, Coffee, Briefcase, Cpu, ArrowLeft, Search, TrendingUp, Star } from "lucide-react";
+import { FileText, Linkedin, Building2, Coffee, Briefcase, Cpu, ArrowLeft, Search, TrendingUp, Star, GraduationCap, BookOpen, Users, Lightbulb } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Badge } from "@/components/ui/badge";
 import { useSearchParams } from "react-router-dom";
 import { User } from "@supabase/supabase-js";
 import PaidResourceModal from "@/components/PaidResourceModal";
-import jobrightImg from "@/assets/jobright.jpg";
-import pmflabsImg from "@/assets/pmflabs.jpg";
-import linkedinGuideImg from "@/assets/linkedin-guide.jpg";
-import hubspotLinkedinImg from "@/assets/hubspot-linkedin.jpg";
-import glassdoorImg from "@/assets/glassdoor.jpg";
-import levelsFyiImg from "@/assets/levels-fyi.png";
-import coffeeChatImg from "@/assets/coffee-chat.jpg";
-import newgradJobsImg from "@/assets/newgrad-jobs.jpg";
-import internListImg from "@/assets/intern-list.jpg";
-import linkedinJobsImg from "@/assets/linkedin-jobs.jpg";
-import apmSeasonImg from "@/assets/apm-season.jpg";
-import lovableImg from "@/assets/lovable.png";
-import replitImg from "@/assets/replit.jpg";
-import base44Img from "@/assets/base44.jpg";
-import claudeCodeImg from "@/assets/claude-code.jpg";
-import azureAiImg from "@/assets/azure-ai.jpg";
-import huggingfaceImg from "@/assets/huggingface.jpg";
-import vertexAiImg from "@/assets/vertex-ai.jpg";
-import firebaseStudioImg from "@/assets/firebase-studio.jpg";
-import cursorImg from "@/assets/cursor.jpg";
-import relayImg from "@/assets/relay.jpg";
-import lelandImg from "@/assets/leland.png";
-import kiroImg from "@/assets/kiro.jpg";
+
+interface DbResourceCategory {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  icon: string;
+  color: string;
+  display_order: number;
+}
+
+interface DbResource {
+  id: string;
+  category_id: string;
+  subcategory: string | null;
+  title: string;
+  description: string;
+  url: string;
+  image_url: string;
+  tips: string[];
+  is_paid: boolean;
+  display_order: number;
+}
 
 interface Resource {
   title: string;
@@ -58,261 +58,18 @@ interface Category {
   subcategories?: Subcategory[];
 }
 
-const categories: Category[] = [
-  {
-    id: "ai-tools",
-    title: "AI Tools to Build",
-    description: "Build projects with cutting-edge AI tools",
-    icon: <Cpu className="w-6 h-6" />,
-    color: "from-violet-500 to-purple-500",
-    subcategories: [
-      {
-        id: "low-no-code",
-        title: "Low - No Code",
-        resources: [
-          {
-            title: "Lovable.dev",
-            description: "Create apps and websites by chatting with AI.",
-            url: "https://lovable.dev",
-            image: lovableImg,
-          },
-          {
-            title: "Replit",
-            description: "Collaborative coding platform with AI assistance.",
-            url: "https://replit.com",
-            image: replitImg,
-          },
-          {
-            title: "Base44",
-            description: "No-code platform for building modern applications.",
-            url: "https://base44.com",
-            image: base44Img,
-          },
-          {
-            title: "Firebase Studio",
-            description: "Accelerate development with AI agents.",
-            url: "https://firebase.studio",
-            image: firebaseStudioImg,
-          },
-          {
-            title: "Kiro.dev",
-            description: "AI-powered no-code platform for building applications.",
-            url: "https://kiro.dev",
-            image: kiroImg,
-          },
-        ],
-      },
-      {
-        id: "ai-llm",
-        title: "AI and LLM",
-        resources: [
-          {
-            title: "Azure AI",
-            description: "Explore AI solutions with Azure.",
-            url: "https://ai.azure.com",
-            image: azureAiImg,
-          },
-          {
-            title: "Hugging Face",
-            description: "Collaborate on models, datasets, and applications.",
-            url: "https://huggingface.co",
-            image: huggingfaceImg,
-          },
-          {
-            title: "Google Vertex AI",
-            description: "Build and deploy AI models on Google Cloud.",
-            url: "https://console.cloud.google.com/vertex-ai/studio",
-            image: vertexAiImg,
-          },
-        ],
-      },
-      {
-        id: "code-with-ai",
-        title: "Code With AI",
-        resources: [
-          {
-            title: "Cursor",
-            description: "AI code editor with a free year subscription for students.",
-            url: "https://cursor.com/students",
-            image: cursorImg,
-          },
-          {
-            title: "Claude Code",
-            description: "AI-powered coding assistant by Anthropic.",
-            url: "https://claude.ai",
-            image: claudeCodeImg,
-          },
-        ],
-      },
-      {
-        id: "automation",
-        title: "Automation",
-        resources: [
-          {
-            title: "Relay.app",
-            description: "Create AI agents that work for you with Relay.app.",
-            url: "https://www.relay.app",
-            image: relayImg,
-          },
-        ],
-      },
-    ],
-  },
-  {
-    id: "resume-interview",
-    title: "Resume & Interview Guide",
-    description: "Build a standout resume and ace your interviews",
-    icon: <FileText className="w-6 h-6" />,
-    color: "from-blue-500 to-cyan-500",
-    resources: [
-      {
-        title: "Jobright.ai",
-        description: "AI-powered job search copilot for more interviews with less effort.",
-        url: "https://jobright.ai/jobs/resume",
-        image: jobrightImg,
-      },
-      {
-        title: "PMF Labs",
-        description: "Use AI tools to practice and improve your interview skills.",
-        url: "https://www.pmflabs.ai",
-        image: pmflabsImg,
-        isPaid: true,
-        tips: [
-          "Practice, practice, practice",
-          "Find common interview questions and write out concise stories",
-          "Practice at least once a week with a friend or tool",
-        ],
-      },
-      {
-        title: "Leland+",
-        description: "Access to recruiting resources created by industry professionals",
-        url: "https://start.joinleland.com/campus-race?utm_source=amb-byu-dylan-mattern&utm_campaign=leland_plus_student",
-        image: lelandImg,
-        isPaid: true,
-      },
-    ],
-  },
-  {
-    id: "linkedin",
-    title: "LinkedIn Optimization",
-    description: "Perfect your LinkedIn profile to attract recruiters",
-    icon: <Linkedin className="w-6 h-6" />,
-    color: "from-blue-600 to-blue-400",
-    resources: [
-      {
-        title: "LinkedIn's Official Guide",
-        description: "Explore LinkedIn's tips and best practices for optimizing your profile.",
-        url: "https://www.linkedin.com/help/linkedin/answer/4443",
-        image: linkedinGuideImg,
-        tips: [
-          "Show your personality - recruiters assess cultural fit",
-          "Be involved - make posts, share updates, comment to increase visibility",
-          "Follow people and companies you're interested in",
-        ],
-      },
-      {
-        title: "HubSpot's LinkedIn Tips",
-        description: "Learn how to optimize your LinkedIn profile with HubSpot's comprehensive guide.",
-        url: "https://blog.hubspot.com/marketing/linkedin-profile-tips",
-        image: hubspotLinkedinImg,
-      },
-    ],
-  },
-  {
-    id: "company-research",
-    title: "Company Research",
-    description: "Research companies and understand their culture",
-    icon: <Building2 className="w-6 h-6" />,
-    color: "from-purple-500 to-pink-500",
-    resources: [
-      {
-        title: "Glassdoor",
-        description: "Read company reviews and learn about their culture.",
-        url: "https://www.glassdoor.com",
-        image: glassdoorImg,
-        tips: [
-          "Create a list of your top 10 target companies",
-          "Explore company websites and news articles",
-          "Consider locations, reviews, and salary insights",
-          "Ensure it's a company or product you're excited about",
-        ],
-      },
-      {
-        title: "Levels.fyi",
-        description: "Get insights on salary levels. These tend to be pretty accurate!",
-        url: "https://www.levels.fyi",
-        image: levelsFyiImg,
-      },
-    ],
-  },
-  {
-    id: "networking",
-    title: "Networking & Coffee Chats",
-    description: "Connect with industry professionals and build relationships",
-    icon: <Coffee className="w-6 h-6" />,
-    color: "from-amber-500 to-orange-500",
-    resources: [
-      {
-        title: "Coffee Chat Guide",
-        description: "Learn how to conduct effective coffee chats and informational interviews.",
-        url: "#",
-        image: coffeeChatImg,
-        tips: [
-          "Connect with BYU alumni and conduct informational interviews",
-          "Learn about their company, projects, and culture",
-          "Make it friendly and get to know them personally",
-          "Ask if they would be willing to provide a referral",
-          "Get insider tips on how to stand out as an applicant",
-        ],
-      },
-    ],
-  },
-  {
-    id: "job-search",
-    title: "Job Search Tools",
-    description: "Find and apply for PM positions and internships",
-    icon: <Briefcase className="w-6 h-6" />,
-    color: "from-green-500 to-emerald-500",
-    resources: [
-      {
-        title: "NewGrad Jobs",
-        description: "Explore entry-level job opportunities for new graduates.",
-        url: "https://www.newgrad-jobs.com",
-        image: newgradJobsImg,
-        tips: [
-          "Use job search engines and company career pages",
-          "Set alerts for positions matching your criteria",
-          "Customize your resume and cover letter for each application",
-          "Try to get a referral before applying",
-        ],
-      },
-      {
-        title: "Intern List",
-        description: "Find internships and entry-level positions across various industries.",
-        url: "https://www.intern-list.com",
-        image: internListImg,
-      },
-      {
-        title: "LinkedIn Jobs",
-        description: "Find job openings and connect with recruiters on LinkedIn.",
-        url: "https://www.linkedin.com/jobs/",
-        image: linkedinJobsImg,
-      },
-      {
-        title: "APM Season",
-        description: "Stay up-to-date on the latest APM programs and internships for aspiring product managers.",
-        url: "https://www.apmseason.com",
-        image: apmSeasonImg,
-      },
-      {
-        title: "Jobright",
-        description: "Utilize AI to find job matches and streamline your job search process.",
-        url: "https://jobright.ai",
-        image: jobrightImg,
-      },
-    ],
-  },
-];
+const ICON_MAP: Record<string, React.ReactNode> = {
+  Cpu: <Cpu className="w-6 h-6" />,
+  FileText: <FileText className="w-6 h-6" />,
+  Linkedin: <Linkedin className="w-6 h-6" />,
+  Building2: <Building2 className="w-6 h-6" />,
+  Coffee: <Coffee className="w-6 h-6" />,
+  Briefcase: <Briefcase className="w-6 h-6" />,
+  GraduationCap: <GraduationCap className="w-6 h-6" />,
+  BookOpen: <BookOpen className="w-6 h-6" />,
+  Users: <Users className="w-6 h-6" />,
+  Lightbulb: <Lightbulb className="w-6 h-6" />,
+};
 
 const ResourcesPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -324,20 +81,20 @@ const ResourcesPage = () => {
   const [isPmaMember, setIsPmaMember] = useState(false);
   const [selectedPaidResource, setSelectedPaidResource] = useState<{ title: string; url: string } | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
+  
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loadingData, setLoadingData] = useState(true);
 
-  // Scroll to top when switching category or search view
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [selectedCategory, searchQuery]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    fetchTopResources();
+    void loadResourcesData();
 
-    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
-      // Defer Supabase calls to avoid auth-js#762 deadlock
       setTimeout(() => {
         if (session?.user) {
           fetchMembershipStatus(session.user.id);
@@ -354,18 +111,18 @@ const ResourcesPage = () => {
       }
     });
 
-    // Check if we need to open a modal for a paid resource after auth
+    return () => subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
     const resourceParam = searchParams.get("resource");
-    if (resourceParam) {
+    if (resourceParam && categories.length > 0) {
       let matchedResource: Resource | undefined;
       
-      // Search through all categories
       for (const cat of categories) {
-        // Check direct resources
         matchedResource = cat.resources?.find(r => r.title === resourceParam);
         if (matchedResource) break;
         
-        // Check subcategory resources
         if (cat.subcategories) {
           for (const sub of cat.subcategories) {
             matchedResource = sub.resources.find(r => r.title === resourceParam);
@@ -378,12 +135,116 @@ const ResourcesPage = () => {
       if (matchedResource?.isPaid) {
         setSelectedPaidResource({ title: matchedResource.title, url: matchedResource.url });
       }
-      // Clear the param
       setSearchParams({});
     }
+  }, [searchParams, categories, setSearchParams]);
 
-    return () => subscription.unsubscribe();
-  }, []);
+  const loadResourcesData = async () => {
+    setLoadingData(true);
+    
+    const [categoriesResult, resourcesResult] = await Promise.all([
+      supabase
+        .from("resource_categories")
+        .select("*")
+        .order("display_order", { ascending: true }),
+      supabase
+        .from("resources")
+        .select("*")
+        .order("display_order", { ascending: true }),
+    ]);
+
+    if (categoriesResult.error) {
+      console.error("Error loading categories", categoriesResult.error);
+      setLoadingData(false);
+      return;
+    }
+
+    if (resourcesResult.error) {
+      console.error("Error loading resources", resourcesResult.error);
+      setLoadingData(false);
+      return;
+    }
+
+    const dbCategories: DbResourceCategory[] = categoriesResult.data ?? [];
+    const dbResources: DbResource[] = resourcesResult.data ?? [];
+
+    const transformedCategories: Category[] = dbCategories.map((dbCat) => {
+      const categoryResources = dbResources.filter((r) => r.category_id === dbCat.id);
+      
+      const subcategoryNames = [...new Set(
+        categoryResources
+          .filter((r) => r.subcategory)
+          .map((r) => r.subcategory!)
+      )];
+
+      const hasSubcategories = subcategoryNames.length > 0;
+
+      const mapResource = (r: DbResource): Resource => ({
+        title: r.title,
+        description: r.description,
+        url: r.url,
+        image: r.image_url,
+        tips: r.tips && r.tips.length > 0 ? r.tips : undefined,
+        isPaid: r.is_paid || undefined,
+      });
+
+      if (hasSubcategories) {
+        const subcategories: Subcategory[] = subcategoryNames.map((subName) => ({
+          id: subName.toLowerCase().replace(/\s+/g, "-"),
+          title: subName,
+          resources: categoryResources
+            .filter((r) => r.subcategory === subName)
+            .map(mapResource),
+        }));
+
+        const directResources = categoryResources
+          .filter((r) => !r.subcategory)
+          .map(mapResource);
+
+        return {
+          id: dbCat.slug,
+          title: dbCat.title,
+          description: dbCat.description,
+          icon: ICON_MAP[dbCat.icon] ?? <FileText className="w-6 h-6" />,
+          color: dbCat.color,
+          subcategories,
+          resources: directResources.length > 0 ? directResources : undefined,
+        };
+      } else {
+        return {
+          id: dbCat.slug,
+          title: dbCat.title,
+          description: dbCat.description,
+          icon: ICON_MAP[dbCat.icon] ?? <FileText className="w-6 h-6" />,
+          color: dbCat.color,
+          resources: categoryResources.map(mapResource),
+        };
+      }
+    });
+
+    setCategories(transformedCategories);
+    
+    const defaultResourceTitles = ["PMF Labs", "Lovable.dev", "Leland+", "Cursor", "APM Season", "Jobright"];
+    const finalResources: Array<{ resource: Resource; category: Category; clicks: number }> = [];
+
+    transformedCategories.forEach((category) => {
+      category.resources?.forEach((resource) => {
+        if (defaultResourceTitles.includes(resource.title)) {
+          finalResources.push({ resource, category, clicks: 0 });
+        }
+      });
+      category.subcategories?.forEach((subcategory) => {
+        subcategory.resources.forEach((resource) => {
+          if (defaultResourceTitles.includes(resource.title)) {
+            finalResources.push({ resource, category, clicks: 0 });
+          }
+        });
+      });
+    });
+
+    setTopResources(finalResources);
+    setLoadingData(false);
+  };
 
   const fetchMembershipStatus = async (userId: string) => {
     const { data: profile } = await supabase
@@ -395,31 +256,7 @@ const ResourcesPage = () => {
     setIsPmaMember(profile?.is_pma_member ?? false);
   };
 
-  const fetchTopResources = () => {
-    // Always show these 6 curated resources (no DB dependency)
-    const defaultResources = ["PMF Labs", "Lovable.dev", "Leland+", "Cursor", "APM Season", "Jobright"];
-    const finalResources: Array<{ resource: Resource; category: Category; clicks: number }> = [];
-
-    categories.forEach((category) => {
-      category.resources?.forEach((resource) => {
-        if (defaultResources.includes(resource.title)) {
-          finalResources.push({ resource, category, clicks: 0 });
-        }
-      });
-      category.subcategories?.forEach((subcategory) => {
-        subcategory.resources.forEach((resource) => {
-          if (defaultResources.includes(resource.title)) {
-            finalResources.push({ resource, category, clicks: 0 });
-          }
-        });
-      });
-    });
-
-    setTopResources(finalResources);
-  };
-
   const trackResourceClick = async (resource: Resource, categoryId: string, e?: React.MouseEvent) => {
-    // Handle paid resources
     if (resource.isPaid) {
       e?.preventDefault();
       setSelectedPaidResource({ title: resource.title, url: resource.url });
@@ -436,7 +273,6 @@ const ResourcesPage = () => {
     ? categories.flatMap((category) => {
         const results: Array<{ resource: Resource; category: Category }> = [];
         
-        // Search in direct resources
         category.resources?.forEach((resource) => {
           if (
             resource.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -446,7 +282,6 @@ const ResourcesPage = () => {
           }
         });
         
-        // Search in subcategory resources
         category.subcategories?.forEach((subcategory) => {
           subcategory.resources.forEach((resource) => {
             if (
@@ -485,6 +320,18 @@ const ResourcesPage = () => {
   });
 
   const selectedCategoryData = selectedCategory ? categories.find((c) => c.id === selectedCategory) : null;
+
+  if (loadingData) {
+    return (
+      <div className="min-h-screen pt-24 pb-20 bg-background text-foreground">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="flex items-center justify-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen pt-24 pb-20 bg-background text-foreground">
@@ -552,7 +399,7 @@ const ResourcesPage = () => {
 
                           <div className="mb-1.5">
                             <div className="w-full aspect-square rounded-md overflow-hidden bg-muted mb-1.5 relative">
-                              <img src={resource.image} alt={resource.title} className={`w-full h-full ${resource.image === lovableImg ? 'object-contain scale-150' : 'object-cover'}`} />
+                              <img src={resource.image} alt={resource.title} className="w-full h-full object-cover" />
                               {resource.isPaid && (
                                 <Badge className="absolute top-1 right-1 bg-gradient-to-r from-primary to-blue-500 text-white text-[7px] px-1 py-0">
                                   <Star className="w-2 h-2 mr-0.5 fill-current" />
@@ -627,7 +474,7 @@ const ResourcesPage = () => {
                                   <CardContent className="p-2">
                                     <div className="mb-1.5">
                                       <div className="w-full aspect-square rounded-md overflow-hidden bg-muted mb-1.5 relative">
-                                        <img src={resource.image} alt={resource.title} className={`w-full h-full ${resource.image === lovableImg ? 'object-contain scale-150' : 'object-cover'}`} />
+                                        <img src={resource.image} alt={resource.title} className="w-full h-full object-cover" />
                                         {resource.isPaid && (
                                           <Badge className="absolute top-1 right-1 bg-gradient-to-r from-primary to-blue-500 text-white text-[7px] px-1 py-0">
                                             <Star className="w-2 h-2 mr-0.5 fill-current" />
@@ -671,7 +518,7 @@ const ResourcesPage = () => {
                           <CardContent className="p-2">
                             <div className="mb-1.5">
                               <div className="w-full aspect-square rounded-md overflow-hidden bg-muted mb-1.5 relative">
-                                <img src={resource.image} alt={resource.title} className={`w-full h-full ${resource.image === lovableImg ? 'object-contain scale-150' : 'object-cover'}`} />
+                                <img src={resource.image} alt={resource.title} className="w-full h-full object-cover" />
                                 {resource.isPaid && (
                                   <Badge className="absolute top-1 right-1 bg-gradient-to-r from-primary to-blue-500 text-white text-[7px] px-1 py-0">
                                     <Star className="w-2 h-2 mr-0.5 fill-current" />
@@ -742,7 +589,7 @@ const ResourcesPage = () => {
 
                       <div className="mb-1.5">
                         <div className="w-full aspect-square rounded-md overflow-hidden bg-muted mb-1.5 relative">
-                          <img src={resource.image} alt={resource.title} className={`w-full h-full ${resource.image === lovableImg ? 'object-contain scale-150' : 'object-cover'}`} />
+                          <img src={resource.image} alt={resource.title} className="w-full h-full object-cover" />
                           {resource.isPaid && (
                             <Badge className="absolute top-1 right-1 bg-gradient-to-r from-primary to-blue-500 text-white text-[7px] px-1 py-0">
                               <Star className="w-2 h-2 mr-0.5 fill-current" />
