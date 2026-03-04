@@ -65,6 +65,7 @@ interface Resource {
   image_url: string;
   tips: string[];
   is_paid: boolean;
+  is_premium: boolean;
   display_order: number;
 }
 
@@ -110,6 +111,7 @@ const emptyResource = {
   image_url: "",
   tips: [] as string[],
   is_paid: false,
+  is_premium: false,
   display_order: 0,
 };
 
@@ -323,6 +325,7 @@ const AdminResourcesPage = () => {
       image_url: resource.image_url,
       tips: resource.tips ?? [],
       is_paid: resource.is_paid,
+      is_premium: resource.is_premium,
       display_order: resource.display_order,
     });
     setTipsText((resource.tips ?? []).join("\n"));
@@ -357,6 +360,7 @@ const AdminResourcesPage = () => {
           image_url: resourceFormData.image_url,
           tips,
           is_paid: resourceFormData.is_paid,
+          is_premium: resourceFormData.is_premium,
           display_order: resourceFormData.display_order,
         })
         .eq("id", editingResource.id);
@@ -384,6 +388,7 @@ const AdminResourcesPage = () => {
         image_url: resourceFormData.image_url,
         tips,
         is_paid: resourceFormData.is_paid,
+        is_premium: resourceFormData.is_premium,
         display_order: resourceFormData.display_order,
       });
 
@@ -515,7 +520,7 @@ const AdminResourcesPage = () => {
                         <TableHead>Title</TableHead>
                         <TableHead>Category</TableHead>
                         <TableHead className="w-24">Order</TableHead>
-                        <TableHead className="w-20">Paid</TableHead>
+                        <TableHead className="w-24">Type</TableHead>
                         <TableHead className="w-28 text-right">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -552,7 +557,10 @@ const AdminResourcesPage = () => {
                             {r.display_order}
                           </TableCell>
                           <TableCell>
-                            {r.is_paid && <Badge variant="secondary">Partner</Badge>}
+                            <div className="flex flex-col gap-1">
+                              {r.is_premium && <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/20">Premium</Badge>}
+                              {r.is_paid && <Badge variant="secondary">Partner</Badge>}
+                            </div>
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex justify-end gap-1">
@@ -910,17 +918,31 @@ const AdminResourcesPage = () => {
                 placeholder="Enter tips, one per line..."
               />
             </div>
-            <div className="flex items-center gap-2">
-              <Checkbox
-                id="res-is-paid"
-                checked={resourceFormData.is_paid}
-                onCheckedChange={(checked) =>
-                  setResourceFormData({ ...resourceFormData, is_paid: Boolean(checked) })
-                }
-              />
-              <label htmlFor="res-is-paid" className="text-sm">
-                Partner/Paid resource (shows badge)
-              </label>
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id="res-is-premium"
+                  checked={resourceFormData.is_premium}
+                  onCheckedChange={(checked) =>
+                    setResourceFormData({ ...resourceFormData, is_premium: Boolean(checked) })
+                  }
+                />
+                <label htmlFor="res-is-premium" className="text-sm">
+                  Premium resource (PMA members only)
+                </label>
+              </div>
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id="res-is-paid"
+                  checked={resourceFormData.is_paid}
+                  onCheckedChange={(checked) =>
+                    setResourceFormData({ ...resourceFormData, is_paid: Boolean(checked) })
+                  }
+                />
+                <label htmlFor="res-is-paid" className="text-sm">
+                  Partner/Paid resource (shows partner badge)
+                </label>
+              </div>
             </div>
             <div>
               <label htmlFor="res-order" className="block text-sm font-medium mb-1">

@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { getAdminErrorMessage } from "@/lib/admin-utils";
 
-type DefaultRole = "user" | "admin";
+type DefaultRole = "member" | "admin";
 
 interface ApprovedEmailRow {
   id: string;
@@ -30,11 +30,11 @@ const AdminApprovedEmailsPage = () => {
   const [loadingData, setLoadingData] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [newEmail, setNewEmail] = useState("");
-  const [newRole, setNewRole] = useState<DefaultRole>("user");
+  const [newRole, setNewRole] = useState<DefaultRole>("member");
   const [saving, setSaving] = useState(false);
   const [savingRoleId, setSavingRoleId] = useState<string | null>(null);
   const [csvFile, setCsvFile] = useState<File | null>(null);
-  const [csvRole, setCsvRole] = useState<DefaultRole>("user");
+  const [csvRole, setCsvRole] = useState<DefaultRole>("member");
   const [uploadingCsv, setUploadingCsv] = useState(false);
 
   useEffect(() => {
@@ -72,7 +72,7 @@ const AdminApprovedEmailsPage = () => {
         data?.map((row: any) => ({
           id: row.id,
           email: row.email,
-          default_role: (row.default_role ?? "user") as DefaultRole,
+          default_role: (row.default_role ?? "member") as DefaultRole,
           added_at: row.added_at,
           used_at: row.used_at ?? null,
           is_disabled: row.is_disabled ?? false,
@@ -111,7 +111,7 @@ const AdminApprovedEmailsPage = () => {
         description: "The email has been added to the pre-approved list.",
       });
       setNewEmail("");
-      setNewRole("user");
+      setNewRole("member");
       await loadRows();
     }
 
@@ -197,7 +197,7 @@ const AdminApprovedEmailsPage = () => {
           description: `Added ${inserts.length} new pre-approved email${inserts.length === 1 ? "" : "s"}.`,
         });
         setCsvFile(null);
-        setCsvRole("user");
+        setCsvRole("member");
         await loadRows();
       }
     } finally {
@@ -314,7 +314,7 @@ const AdminApprovedEmailsPage = () => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="user">user</SelectItem>
+                  <SelectItem value="member">member</SelectItem>
                   <SelectItem value="admin">admin</SelectItem>
                 </SelectContent>
               </Select>
@@ -349,7 +349,7 @@ const AdminApprovedEmailsPage = () => {
                   <SelectValue placeholder="Default role" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="user">user</SelectItem>
+                  <SelectItem value="member">member</SelectItem>
                   <SelectItem value="admin">admin</SelectItem>
                 </SelectContent>
               </Select>
@@ -402,7 +402,7 @@ const AdminApprovedEmailsPage = () => {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="user">user</SelectItem>
+                          <SelectItem value="member">member</SelectItem>
                           <SelectItem value="admin">admin</SelectItem>
                         </SelectContent>
                       </Select>

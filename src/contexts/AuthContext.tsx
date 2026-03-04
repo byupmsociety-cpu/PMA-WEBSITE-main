@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, ReactNode } from "react
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
-type Role = "super-admin" | "admin" | "user" | "guest";
+type Role = "super-admin" | "admin" | "member" | "guest";
 
 interface Profile {
   id: string;
@@ -138,7 +138,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loading,
     isSuperAdmin: effectiveRole === "super-admin",
     isAdmin: effectiveRole === "admin" || effectiveRole === "super-admin",
-    isUser: effectiveRole === "user" || effectiveRole === "admin" || effectiveRole === "super-admin",
+    isUser: effectiveRole === "member" || effectiveRole === "admin" || effectiveRole === "super-admin",
     isGuest: effectiveRole === "guest",
     isBlocked,
     refreshProfile,

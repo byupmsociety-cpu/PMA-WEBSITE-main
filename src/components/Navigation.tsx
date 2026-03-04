@@ -200,9 +200,13 @@ const Navigation = () => {
                               {displayEmail}
                             </p>
                           ) : null}
-                          {!isBlocked && profile?.is_pma_member ? (
+                          {!isBlocked && !isGuest && profile?.is_pma_member ? (
                             <p className="text-[11px] text-muted-foreground">
                               Paying/verified PMA member
+                            </p>
+                          ) : !isBlocked && isGuest ? (
+                            <p className="text-[11px] text-muted-foreground">
+                              Free account
                             </p>
                           ) : null}
                         </div>
@@ -403,8 +407,7 @@ const Navigation = () => {
         <div className="container mx-auto px-4 md:px-6 py-3 flex items-center gap-2">
           <Lock className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
           <p className="text-sm text-amber-900 dark:text-amber-100">
-            You need to be a paying/verified PMA member to get full access to your dashboard.
-            Upgrade your membership to track progress, earn badges, and unlock all features.
+            You're using a free account. Become a PMA member to unlock job alerts, personalized roadmaps, member directory, and all premium features.
           </p>
         </div>
       </div>

@@ -6,6 +6,11 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { Link } from "react-router-dom";
+import { Save, Crown, Loader2 } from "lucide-react";
 
 // Types for the quiz
 type YearInSchool = 'Freshman' | 'Sophomore' | 'Junior' | 'Senior' | 'Graduate';
@@ -226,7 +231,10 @@ const generateRoadmap = (answers: QuizAnswers): Roadmap => {
 };
 
 const DiscoverPage = () => {
-  // const [, setShowQuiz] = useState(false);
+  const { user, profile } = useAuth();
+  const { toast } = useToast();
+  const isPmaMember = profile?.is_pma_member ?? false;
+  
   const [currentStep, setCurrentStep] = useState(1);
   const [answers, setAnswers] = useState<QuizAnswers>({
     yearInSchool: 'Freshman',
@@ -251,6 +259,65 @@ const DiscoverPage = () => {
   const [currentChallenge, setCurrentChallenge] = useState(0);
   const [userInput, setUserInput] = useState('');
   const [showExample, setShowExample] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  const mapExperienceLevel = (level: number): string => {
+    if (level <= 2) return 'none';
+    if (level <= 4) return 'beginner';
+    if (level <= 7) return 'intermediate';
+    return 'advanced';
+  };
+
+  const saveRoadmapToDatabase = async (generatedRoadmap: Roadmap) => {
+    if (!user || !isPmaMember) return;
+    
+    setSaving(true);
+    
+    const payload = {
+      user_id: user.id,
+      school_year: answers.yearInSchool,
+      major: answers.major,
+      coding_experience: mapExperienceLevel(answers.experience.coding),
+      design_experience: mapExperienceLevel(answers.experience.design),
+      business_experience: mapExperienceLevel(answers.experience.businessStrategy),
+      pm_experience: mapExperienceLevel(answers.experience.productManagement),
+      has_internship: answers.internship !== 'None',
+      interest_areas: answers.interests,
+      skill_focus: answers.skillFocus,
+      generated_roadmap: {
+        academics: generatedRoadmap.major,
+        classes: generatedRoadmap.classes,
+        clubs: generatedRoadmap.clubs,
+        projects: generatedRoadmap.projects,
+        internships: generatedRoadmap.internships,
+        skills: generatedRoadmap.skills,
+        tools: generatedRoadmap.tools,
+        events: generatedRoadmap.events,
+        alumni: generatedRoadmap.alumniConnections,
+      },
+    };
+
+    const { error } = await supabase
+      .from("roadmap_profiles")
+      .upsert(payload, { onConflict: "user_id" });
+
+    if (error) {
+      console.error("Error saving roadmap:", error);
+      toast({
+        title: "Error saving roadmap",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      setSaved(true);
+      toast({
+        title: "Roadmap saved!",
+        description: "View your personalized roadmap anytime from your dashboard.",
+      });
+    }
+    setSaving(false);
+  };
 
   const handleNext = () => {
     if (currentStep < 6) {
@@ -258,6 +325,9 @@ const DiscoverPage = () => {
     } else {
       const generatedRoadmap = generateRoadmap(answers);
       setRoadmap(generatedRoadmap);
+      if (user && isPmaMember) {
+        saveRoadmapToDatabase(generatedRoadmap);
+      }
     }
   };
 
@@ -451,7 +521,6 @@ const DiscoverPage = () => {
     if (!roadmap) return null;
 
     const exportToCSV = () => {
-      // Create CSV content
       const sections = [
         { title: 'Academic Path', items: roadmap.major },
         { title: 'Recommended Classes', items: roadmap.classes },
@@ -471,7 +540,6 @@ const DiscoverPage = () => {
         });
       });
 
-      // Create and download file
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
       const url = URL.createObjectURL(blob);
@@ -485,15 +553,62 @@ const DiscoverPage = () => {
 
     return (
       <div className="space-y-6 max-h-[70vh] overflow-y-auto px-2 py-4">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <h3 className="text-2xl font-bold">Your Personalized PM Roadmap</h3>
-          <Button
-            onClick={exportToCSV}
-            className="bg-gradient-to-r from-[#215096] to-[#4299E1] !text-white drop-shadow-md"
-          >
-            Export Roadmap
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              onClick={exportToCSV}
+              variant="outline"
+              size="sm"
+            >
+              Export CSV
+            </Button>
+            {isPmaMember && saved && (
+              <Button asChild size="sm" className="bg-gradient-to-r from-[#215096] to-[#4299E1] !text-white">
+                <Link to="/roadmap">
+                  View Dashboard
+                </Link>
+              </Button>
+            )}
+          </div>
         </div>
+        
+        {/* Save status for PMA members */}
+        {user && isPmaMember && (
+          <div className={`p-3 rounded-lg text-sm ${saved ? 'bg-green-500/10 text-green-600' : 'bg-primary/10 text-primary'}`}>
+            {saving ? (
+              <span className="flex items-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Saving your roadmap...
+              </span>
+            ) : saved ? (
+              <span className="flex items-center gap-2">
+                <Save className="w-4 h-4" />
+                Roadmap saved! Track your progress in the Roadmap Dashboard.
+              </span>
+            ) : (
+              <span className="flex items-center gap-2">
+                <Save className="w-4 h-4" />
+                Your roadmap will be saved automatically.
+              </span>
+            )}
+          </div>
+        )}
+        
+        {user && !isPmaMember && (
+          <div className="p-3 rounded-lg bg-amber-500/10 text-amber-600 text-sm">
+            <span className="flex items-center gap-2">
+              <Crown className="w-4 h-4" />
+              Join PMA to save your roadmap and track your progress over time!
+            </span>
+          </div>
+        )}
+        
+        {!user && (
+          <div className="p-3 rounded-lg bg-muted text-muted-foreground text-sm">
+            <Link to="/auth" className="text-primary hover:underline">Sign in</Link> to save your roadmap and track progress.
+          </div>
+        )}
         
         <div className="space-y-6">
           <div>
