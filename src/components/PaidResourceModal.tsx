@@ -94,7 +94,7 @@ const PaidResourceModal = ({ isOpen, onClose, resourceTitle, resourceUrl, isAuth
                     <p className="text-xs text-muted-foreground">
                       Join PMA at{" "}
                       <a 
-                        href="https://clubs.byu.edu/p/clubview/18295873486206095" 
+                        href="https://clubs.byu.edu/link/club/18295873486206095" 
                         target="_blank" 
                         rel="noopener noreferrer"
                         className="text-primary underline hover:no-underline"
@@ -121,7 +121,7 @@ const PaidResourceModal = ({ isOpen, onClose, resourceTitle, resourceUrl, isAuth
                       Join PMA to access exclusive discount codes
                     </p>
                     <Button 
-                      onClick={() => window.open("https://clubs.byu.edu/p/clubview/18295873486206095", '_blank')}
+                      onClick={() => window.open("https://clubs.byu.edu/link/club/18295873486206095", '_blank')}
                       className="w-full"
                       size="default"
                     >

@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import KpiCard from "@/components/admin/KpiCard";
-import { Users, UserPlus, Calendar, UsersRound, RefreshCw, Shield, BookOpen } from "lucide-react";
+import { Users, UserPlus, Calendar, UsersRound, RefreshCw, Shield, BookOpen, Briefcase } from "lucide-react";
 
 const AdminDashboardPage = () => {
   const { user, isAdmin, isSuperAdmin, loading } = useAuth();
@@ -270,6 +270,25 @@ const AdminDashboardPage = () => {
               <div className="flex flex-col sm:flex-row gap-2">
                 <Button asChild className="w-full sm:w-auto">
                   <Link to="/admin/resources">Manage resources</Link>
+                </Button>
+              </div>
+            </div>
+
+            <div className="rounded-xl border bg-card p-5 space-y-3 hover:border-primary/40 transition-colors">
+              <div className="flex items-start justify-between gap-3">
+                <div className="space-y-1">
+                  <h3 className="font-semibold">Job Postings</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Post jobs and notify matching PMA members.
+                  </p>
+                </div>
+                <div className="text-muted-foreground">
+                  <Briefcase className="h-5 w-5" />
+                </div>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Button asChild className="w-full sm:w-auto">
+                  <Link to="/admin/jobs">Manage jobs</Link>
                 </Button>
               </div>
             </div>

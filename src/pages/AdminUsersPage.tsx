@@ -19,7 +19,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { getAdminErrorMessage } from "@/lib/admin-utils";
 
-type Role = "super-admin" | "admin" | "user" | "guest";
+type Role = "super-admin" | "admin" | "member" | "guest";
 
 interface AdminUserRow {
   id: string;
@@ -92,9 +92,10 @@ const AdminUsersPage = () => {
 
   const updateRole = async (id: string, newRole: Role) => {
     setSavingId(id);
+    const is_pma_member = newRole !== "guest";
     const { error } = await supabase
       .from("profiles")
-      .update({ role: newRole })
+      .update({ role: newRole, is_pma_member })
       .eq("id", id);
 
     if (error) {
@@ -106,7 +107,7 @@ const AdminUsersPage = () => {
     } else {
       toast({
         title: "Role updated",
-        description: "User role has been updated.",
+        description: `User role has been updated to ${newRole}. PMA membership ${is_pma_member ? "enabled" : "disabled"}.`,
       });
       await loadUsers();
     }
@@ -175,9 +176,9 @@ const AdminUsersPage = () => {
     setSavingId(null);
   };
 
-  const handlePromoteGuestToUser = async (row: AdminUserRow) => {
+  const handlePromoteGuestToMember = async (row: AdminUserRow) => {
     if (row.role !== "guest") return;
-    await updateRole(row.id, "user");
+    await updateRole(row.id, "member");
   };
 
   if (loading) {
@@ -195,7 +196,7 @@ const AdminUsersPage = () => {
           <div>
             <h1 className="text-2xl font-bold">Users & Roles</h1>
             <p className="text-muted-foreground text-sm">
-              Super-admins can assign any role. Admins can assign admin, user, or guest (super-admin is super-admin only).
+              Super-admins can assign any role. Admins can assign admin, member, or guest (super-admin is super-admin only).
             </p>
           </div>
           <Button variant="outline" size="sm" onClick={() => navigate("/admin")}>
@@ -256,7 +257,7 @@ const AdminUsersPage = () => {
                               <SelectItem value="super-admin">super-admin</SelectItem>
                             )}
                             <SelectItem value="admin">admin</SelectItem>
-                            <SelectItem value="user">user</SelectItem>
+                            <SelectItem value="member">member</SelectItem>
                             <SelectItem value="guest">guest</SelectItem>
                           </SelectContent>
                         </Select>
@@ -298,10 +299,10 @@ const AdminUsersPage = () => {
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => handlePromoteGuestToUser(row)}
+                          onClick={() => handlePromoteGuestToMember(row)}
                           disabled={savingId === row.id || row.role !== "guest"}
                         >
-                          Promote to user
+                          Promote to member
                         </Button>
                         <Button
                           size="sm"

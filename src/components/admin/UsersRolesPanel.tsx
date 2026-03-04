@@ -25,7 +25,7 @@ import { useToast } from "@/hooks/use-toast";
 import { getAdminErrorMessage } from "@/lib/admin-utils";
 import { MoreHorizontal } from "lucide-react";
 
-type Role = "super-admin" | "admin" | "user" | "guest";
+type Role = "super-admin" | "admin" | "member" | "guest";
 
 interface AdminUserRow {
   id: string;
@@ -90,9 +90,10 @@ export default function UsersRolesPanel() {
 
   const updateRole = async (id: string, newRole: Role) => {
     setSavingId(id);
+    const is_pma_member = newRole !== "guest";
     const { error } = await supabase
       .from("profiles")
-      .update({ role: newRole })
+      .update({ role: newRole, is_pma_member })
       .eq("id", id);
 
     if (error) {
@@ -104,7 +105,7 @@ export default function UsersRolesPanel() {
     } else {
       toast({
         title: "Role updated",
-        description: "User role has been updated.",
+        description: `User role has been updated to ${newRole}. PMA membership ${is_pma_member ? "enabled" : "disabled"}.`,
       });
       await loadUsers();
     }
@@ -179,7 +180,7 @@ export default function UsersRolesPanel() {
         <div className="space-y-1">
           <CardTitle>Users & Roles</CardTitle>
           <p className="text-sm text-muted-foreground">
-            Super-admins can assign any role. Admins can assign admin, user, or guest.
+            Super-admins can assign any role. Admins can assign admin, member, or guest.
           </p>
         </div>
         {loadError ? (
@@ -232,7 +233,7 @@ export default function UsersRolesPanel() {
                             <SelectItem value="super-admin">super-admin</SelectItem>
                           )}
                           <SelectItem value="admin">admin</SelectItem>
-                          <SelectItem value="user">user</SelectItem>
+                          <SelectItem value="member">member</SelectItem>
                           <SelectItem value="guest">guest</SelectItem>
                         </SelectContent>
                       </Select>

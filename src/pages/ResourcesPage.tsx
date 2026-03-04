@@ -2,13 +2,14 @@ import { useState, useEffect } from "react";
 import AnimatedSection from "@/components/AnimatedSection";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { FileText, Linkedin, Building2, Coffee, Briefcase, Cpu, ArrowLeft, Search, TrendingUp, Star, GraduationCap, BookOpen, Users, Lightbulb } from "lucide-react";
+import { FileText, Linkedin, Building2, Coffee, Briefcase, Cpu, ArrowLeft, Search, TrendingUp, Star, GraduationCap, BookOpen, Users, Lightbulb, Lock, Crown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Badge } from "@/components/ui/badge";
 import { useSearchParams } from "react-router-dom";
 import { User } from "@supabase/supabase-js";
 import PaidResourceModal from "@/components/PaidResourceModal";
+import PremiumResourceModal from "@/components/PremiumResourceModal";
 
 interface DbResourceCategory {
   id: string;
@@ -30,6 +31,7 @@ interface DbResource {
   image_url: string;
   tips: string[];
   is_paid: boolean;
+  is_premium: boolean;
   display_order: number;
 }
 
@@ -40,6 +42,7 @@ interface Resource {
   image: string;
   tips?: string[];
   isPaid?: boolean;
+  isPremium?: boolean;
 }
 
 interface Subcategory {
@@ -80,6 +83,7 @@ const ResourcesPage = () => {
   const [user, setUser] = useState<User | null>(null);
   const [isPmaMember, setIsPmaMember] = useState(false);
   const [selectedPaidResource, setSelectedPaidResource] = useState<{ title: string; url: string } | null>(null);
+  const [selectedPremiumResource, setSelectedPremiumResource] = useState<{ title: string; url: string } | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
   
   const [categories, setCategories] = useState<Category[]>([]);
@@ -186,6 +190,7 @@ const ResourcesPage = () => {
         image: r.image_url,
         tips: r.tips && r.tips.length > 0 ? r.tips : undefined,
         isPaid: r.is_paid || undefined,
+        isPremium: r.is_premium || undefined,
       });
 
       if (hasSubcategories) {
@@ -260,6 +265,12 @@ const ResourcesPage = () => {
     if (resource.isPaid) {
       e?.preventDefault();
       setSelectedPaidResource({ title: resource.title, url: resource.url });
+      return;
+    }
+
+    if (resource.isPremium && !isPmaMember) {
+      e?.preventDefault();
+      setSelectedPremiumResource({ title: resource.title, url: resource.url });
       return;
     }
 
@@ -376,11 +387,14 @@ const ResourcesPage = () => {
                   {topResources.map(({ resource, category }, idx) => (
                     <CarouselItem key={idx} className="basis-1/3 md:basis-1/4 lg:basis-1/5 xl:basis-1/6">
                       <Card 
-                        className="h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+                        className={`h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer ${resource.isPremium && !isPmaMember ? 'ring-1 ring-amber-500/30' : ''}`}
                         onClick={(e) => {
                           if (resource.isPaid) {
                             e.preventDefault();
                             setSelectedPaidResource({ title: resource.title, url: resource.url });
+                          } else if (resource.isPremium && !isPmaMember) {
+                            e.preventDefault();
+                            setSelectedPremiumResource({ title: resource.title, url: resource.url });
                           } else {
                             trackResourceClick(resource, category.id);
                             window.open(resource.url, '_blank', 'noopener,noreferrer');
@@ -399,11 +413,22 @@ const ResourcesPage = () => {
 
                           <div className="mb-1.5">
                             <div className="w-full aspect-square rounded-md overflow-hidden bg-muted mb-1.5 relative">
-                              <img src={resource.image} alt={resource.title} className="w-full h-full object-cover" />
+                              <img src={resource.image} alt={resource.title} className={`w-full h-full object-cover ${resource.isPremium && !isPmaMember ? 'opacity-60' : ''}`} />
+                              {resource.isPremium && !isPmaMember && (
+                                <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                                  <Lock className="w-4 h-4 text-white" />
+                                </div>
+                              )}
                               {resource.isPaid && (
                                 <Badge className="absolute top-1 right-1 bg-gradient-to-r from-primary to-blue-500 text-white text-[7px] px-1 py-0">
                                   <Star className="w-2 h-2 mr-0.5 fill-current" />
                                   Partner
+                                </Badge>
+                              )}
+                              {resource.isPremium && (
+                                <Badge className="absolute top-1 left-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[7px] px-1 py-0">
+                                  <Crown className="w-2 h-2 mr-0.5 fill-current" />
+                                  Premium
                                 </Badge>
                               )}
                             </div>
@@ -460,11 +485,14 @@ const ResourcesPage = () => {
                             {subcategory.resources.map((resource, idx) => (
                               <CarouselItem key={idx} className="basis-1/3 md:basis-1/4 lg:basis-1/5 xl:basis-1/6">
                                 <Card 
-                                  className="h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+                                  className={`h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer ${resource.isPremium && !isPmaMember ? 'ring-1 ring-amber-500/30' : ''}`}
                                   onClick={(e) => {
                                     if (resource.isPaid) {
                                       e.preventDefault();
                                       setSelectedPaidResource({ title: resource.title, url: resource.url });
+                                    } else if (resource.isPremium && !isPmaMember) {
+                                      e.preventDefault();
+                                      setSelectedPremiumResource({ title: resource.title, url: resource.url });
                                     } else {
                                       trackResourceClick(resource, selectedCategoryData.id);
                                       window.open(resource.url, '_blank', 'noopener,noreferrer');
@@ -474,11 +502,22 @@ const ResourcesPage = () => {
                                   <CardContent className="p-2">
                                     <div className="mb-1.5">
                                       <div className="w-full aspect-square rounded-md overflow-hidden bg-muted mb-1.5 relative">
-                                        <img src={resource.image} alt={resource.title} className="w-full h-full object-cover" />
+                                        <img src={resource.image} alt={resource.title} className={`w-full h-full object-cover ${resource.isPremium && !isPmaMember ? 'opacity-60' : ''}`} />
+                                        {resource.isPremium && !isPmaMember && (
+                                          <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                                            <Lock className="w-4 h-4 text-white" />
+                                          </div>
+                                        )}
                                         {resource.isPaid && (
                                           <Badge className="absolute top-1 right-1 bg-gradient-to-r from-primary to-blue-500 text-white text-[7px] px-1 py-0">
                                             <Star className="w-2 h-2 mr-0.5 fill-current" />
                                             Partner
+                                          </Badge>
+                                        )}
+                                        {resource.isPremium && (
+                                          <Badge className="absolute top-1 left-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[7px] px-1 py-0">
+                                            <Crown className="w-2 h-2 mr-0.5 fill-current" />
+                                            Premium
                                           </Badge>
                                         )}
                                       </div>
@@ -504,11 +543,14 @@ const ResourcesPage = () => {
                     {selectedCategoryData.resources?.map((resource, idx) => (
                       <AnimatedSection key={idx} animation="slide-up" delay={idx * 100}>
                         <Card 
-                          className="h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+                          className={`h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer ${resource.isPremium && !isPmaMember ? 'ring-1 ring-amber-500/30' : ''}`}
                           onClick={(e) => {
                             if (resource.isPaid) {
                               e.preventDefault();
                               setSelectedPaidResource({ title: resource.title, url: resource.url });
+                            } else if (resource.isPremium && !isPmaMember) {
+                              e.preventDefault();
+                              setSelectedPremiumResource({ title: resource.title, url: resource.url });
                             } else {
                               selectedCategoryData && trackResourceClick(resource, selectedCategoryData.id);
                               window.open(resource.url, '_blank', 'noopener,noreferrer');
@@ -518,11 +560,22 @@ const ResourcesPage = () => {
                           <CardContent className="p-2">
                             <div className="mb-1.5">
                               <div className="w-full aspect-square rounded-md overflow-hidden bg-muted mb-1.5 relative">
-                                <img src={resource.image} alt={resource.title} className="w-full h-full object-cover" />
+                                <img src={resource.image} alt={resource.title} className={`w-full h-full object-cover ${resource.isPremium && !isPmaMember ? 'opacity-60' : ''}`} />
+                                {resource.isPremium && !isPmaMember && (
+                                  <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                                    <Lock className="w-4 h-4 text-white" />
+                                  </div>
+                                )}
                                 {resource.isPaid && (
                                   <Badge className="absolute top-1 right-1 bg-gradient-to-r from-primary to-blue-500 text-white text-[7px] px-1 py-0">
                                     <Star className="w-2 h-2 mr-0.5 fill-current" />
                                     Partner
+                                  </Badge>
+                                )}
+                                {resource.isPremium && (
+                                  <Badge className="absolute top-1 left-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[7px] px-1 py-0">
+                                    <Crown className="w-2 h-2 mr-0.5 fill-current" />
+                                    Premium
                                   </Badge>
                                 )}
                               </div>
@@ -566,11 +619,14 @@ const ResourcesPage = () => {
               {searchResults.map(({ resource, category }, idx) => (
                 <AnimatedSection key={idx} animation="slide-up" delay={idx * 50}>
                   <Card 
-                    className="h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+                    className={`h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer ${resource.isPremium && !isPmaMember ? 'ring-1 ring-amber-500/30' : ''}`}
                     onClick={(e) => {
                       if (resource.isPaid) {
                         e.preventDefault();
                         setSelectedPaidResource({ title: resource.title, url: resource.url });
+                      } else if (resource.isPremium && !isPmaMember) {
+                        e.preventDefault();
+                        setSelectedPremiumResource({ title: resource.title, url: resource.url });
                       } else {
                         trackResourceClick(resource, category.id);
                         window.open(resource.url, '_blank', 'noopener,noreferrer');
@@ -589,11 +645,22 @@ const ResourcesPage = () => {
 
                       <div className="mb-1.5">
                         <div className="w-full aspect-square rounded-md overflow-hidden bg-muted mb-1.5 relative">
-                          <img src={resource.image} alt={resource.title} className="w-full h-full object-cover" />
+                          <img src={resource.image} alt={resource.title} className={`w-full h-full object-cover ${resource.isPremium && !isPmaMember ? 'opacity-60' : ''}`} />
+                          {resource.isPremium && !isPmaMember && (
+                            <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                              <Lock className="w-4 h-4 text-white" />
+                            </div>
+                          )}
                           {resource.isPaid && (
                             <Badge className="absolute top-1 right-1 bg-gradient-to-r from-primary to-blue-500 text-white text-[7px] px-1 py-0">
                               <Star className="w-2 h-2 mr-0.5 fill-current" />
                               Partner
+                            </Badge>
+                          )}
+                          {resource.isPremium && (
+                            <Badge className="absolute top-1 left-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[7px] px-1 py-0">
+                              <Crown className="w-2 h-2 mr-0.5 fill-current" />
+                              Premium
                             </Badge>
                           )}
                         </div>
@@ -676,6 +743,16 @@ const ResourcesPage = () => {
         onClose={() => setSelectedPaidResource(null)}
         resourceTitle={selectedPaidResource?.title || ""}
         resourceUrl={selectedPaidResource?.url || ""}
+        isAuthenticated={!!user}
+        isPmaMember={isPmaMember}
+      />
+
+      {/* Premium Resource Modal */}
+      <PremiumResourceModal
+        isOpen={!!selectedPremiumResource}
+        onClose={() => setSelectedPremiumResource(null)}
+        resourceTitle={selectedPremiumResource?.title || ""}
+        resourceUrl={selectedPremiumResource?.url || ""}
         isAuthenticated={!!user}
         isPmaMember={isPmaMember}
       />
