@@ -1,8 +1,7 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { 
   Target, 
@@ -22,10 +21,11 @@ import {
   BadgesCard,
   MemberBenefitsCard,
   UpcomingEventsCard,
+  MemberToolsGrid,
 } from "@/components/dashboard";
 
 const DashboardPage = () => {
-  const { isGuest, isBlocked, loading: authLoading, profile: authProfile, user } = useAuth();
+  const { isGuest, isBlocked, loading: authLoading, user } = useAuth();
   const isGuestRestricted = isGuest && !authLoading;
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -268,6 +268,10 @@ const DashboardPage = () => {
 
           <div className="grid lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
+              {isPmaMember && (
+                <MemberToolsGrid />
+              )}
+              
               {isPmaMember && (
                 <div className="grid sm:grid-cols-2 gap-4">
                   <JobsAlertCard

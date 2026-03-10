@@ -120,6 +120,12 @@ export default function ApprovedEmailsPanel() {
     setUploadingCsv(true);
     try {
       const text = await csvFile.text();
+      
+      // Robustly parse the CSV handling quoted strings
+      const parseCsvRow = (line: string) => {
+        return line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.replace(/^"|"$/g, '').trim());
+      };
+
       const lines = text
         .split(/\r?\n/)
         .map((line) => line.trim())
@@ -134,8 +140,9 @@ export default function ApprovedEmailsPanel() {
         return;
       }
 
-      const header = lines[0].split(",").map((h) => h.trim().toLowerCase());
+      const header = parseCsvRow(lines[0]).map((h) => h.toLowerCase());
       const emailIndex = header.findIndex((h) => h === "email" || h.includes("email"));
+      const statusIndex = header.findIndex((h) => h === "status" || h.includes("status"));
 
       if (emailIndex === -1) {
         toast({
@@ -146,48 +153,121 @@ export default function ApprovedEmailsPanel() {
         return;
       }
 
-      const existingEmails = new Set(rows.map((row) => row.email.toLowerCase()));
-      const newEmailSet = new Set<string>();
+      const existingEmailsMap = new Map<string, ApprovedEmailRow>();
+      rows.forEach((row) => existingEmailsMap.set(row.email.toLowerCase(), row));
+
+      const emailsToAdd = new Set<string>();
+      const emailsToEnable = new Set<string>();
+      const emailsToDisable = new Set<string>();
 
       for (const line of lines.slice(1)) {
-        const cols = line.split(",");
+        const cols = parseCsvRow(line);
         const rawEmail = (cols[emailIndex] ?? "").trim().toLowerCase();
-        if (!rawEmail) continue;
-        if (!rawEmail.endsWith("@byu.edu")) continue;
-        if (existingEmails.has(rawEmail)) continue;
-        newEmailSet.add(rawEmail);
+        
+        if (!rawEmail || !rawEmail.endsWith("@byu.edu")) continue;
+
+        const statusRaw = statusIndex !== -1 ? (cols[statusIndex] || "").trim().toLowerCase() : "active";
+        const isGrantedAccess = statusRaw === "active" || statusRaw === "approved";
+        
+        const existingRow = existingEmailsMap.get(rawEmail);
+
+        if (isGrantedAccess) {
+          if (!existingRow) {
+            emailsToAdd.add(rawEmail);
+          } else if (existingRow.is_disabled) {
+            emailsToEnable.add(rawEmail);
+          }
+        } else {
+          // Status is inactive, requested, etc.
+          if (existingRow && !existingRow.is_disabled) {
+            emailsToDisable.add(rawEmail);
+          }
+        }
       }
 
-      if (newEmailSet.size === 0) {
+      if (emailsToAdd.size === 0 && emailsToEnable.size === 0 && emailsToDisable.size === 0) {
         toast({
-          title: "No new emails",
-          description: "All valid @byu.edu emails in the CSV are already pre-approved.",
+          title: "No changes needed",
+          description: "All valid @byu.edu users in the CSV are already up to date.",
         });
         return;
       }
 
-      const inserts = Array.from(newEmailSet).map((email) => ({
-        email,
-        default_role: csvRole,
-      }));
+      let appliedChanges = false;
+      let hasError = false;
 
-      const { error } = await supabase.from("approved_pma_members").insert(inserts);
+      // 1. Add new users
+      if (emailsToAdd.size > 0) {
+        const inserts = Array.from(emailsToAdd).map((email) => ({
+          email,
+          default_role: csvRole,
+        }));
+        const { error } = await supabase.from("approved_pma_members").insert(inserts);
+        if (error) {
+          hasError = true;
+          toast({
+            title: "Error adding users",
+            description: getAdminErrorMessage(error),
+            variant: "destructive",
+          });
+        } else {
+          appliedChanges = true;
+        }
+      }
 
-      if (error) {
+      // 2. Enable existing users
+      if (emailsToEnable.size > 0) {
+        const { error } = await supabase
+          .from("approved_pma_members")
+          .update({ is_disabled: false })
+          .in("email", Array.from(emailsToEnable));
+        
+        if (error) {
+          hasError = true;
+          toast({
+            title: "Error enabling users",
+            description: getAdminErrorMessage(error),
+            variant: "destructive",
+          });
+        } else {
+          appliedChanges = true;
+        }
+      }
+
+      // 3. Disable inactive/requested users
+      if (emailsToDisable.size > 0) {
+        const { error } = await supabase
+          .from("approved_pma_members")
+          .update({ is_disabled: true })
+          .in("email", Array.from(emailsToDisable));
+        
+        if (error) {
+          hasError = true;
+          toast({
+            title: "Error disabling users",
+            description: getAdminErrorMessage(error),
+            variant: "destructive",
+          });
+        } else {
+          appliedChanges = true;
+        }
+      }
+
+      if (appliedChanges && !hasError) {
         toast({
-          title: "Error uploading CSV",
-          description: getAdminErrorMessage(error),
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "CSV processed",
-          description: `Added ${inserts.length} new pre-approved email${inserts.length === 1 ? "" : "s"}.`,
+          title: "CSV processing complete",
+          description: `Added ${emailsToAdd.size}, enabled ${emailsToEnable.size}, disabled ${emailsToDisable.size} users.`,
         });
         setCsvFile(null);
         setCsvRole("member");
         await loadRows();
+      } else if (appliedChanges && hasError) {
+        // Partial success
+        setCsvFile(null);
+        setCsvRole("member");
+        await loadRows();
       }
+
     } finally {
       setUploadingCsv(false);
     }
@@ -298,9 +378,9 @@ export default function ApprovedEmailsPanel() {
             <CardTitle>Bulk Upload (CSV)</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <p className="text-sm text-muted-foreground">
-              Upload a CSV with a header row containing an <code>email</code> column (e.g. <code>Name,Email</code>).
-              Only new <span className="font-mono">@byu.edu</span> addresses are added.
+            <p className="text-sm text-muted-foreground mb-2">
+              Upload a CSV with a header row containing an <code>email</code> column.
+              If a <code>status</code> column is present, users marked as <strong>Active/Approved</strong> will be added or enabled, while <strong>Inactive/Requested</strong> users will have their access disabled. Only <span className="font-mono">@byu.edu</span> addresses are processed.
             </p>
             <form onSubmit={handleCsvUpload} className="flex flex-col sm:flex-row gap-3 items-start">
               <Input

@@ -36,6 +36,10 @@ import AdminJobsPage from "./pages/AdminJobsPage";
 import JobsPage from "./pages/JobsPage";
 import RoadmapPage from "./pages/RoadmapPage";
 import MembersPage from "./pages/MembersPage";
+import ApplicationTrackerPage from "./pages/ApplicationTrackerPage";
+import MockInterviewsPage from "./pages/MockInterviewsPage";
+import ResumesPage from "./pages/ResumesPage";
+import AdminResumesPage from "./pages/AdminResumesPage";
 
 const queryClient = new QueryClient();
 
@@ -68,6 +72,9 @@ const App = () => (
               <Route path="/jobs" element={<JobsPage />} />
               <Route path="/roadmap" element={<RoadmapPage />} />
               <Route path="/members" element={<MembersPage />} />
+              <Route path="/tracker" element={<ApplicationTrackerPage />} />
+              <Route path="/interviews" element={<MockInterviewsPage />} />
+              <Route path="/resumes" element={<ResumesPage />} />
               <Route path="/blocked" element={<BlockedPage />} />
               <Route path="/admin" element={<AdminDashboardPage />} />
               <Route path="/admin/access" element={<AdminAccessPage />} />
@@ -75,6 +82,7 @@ const App = () => (
               <Route path="/admin/events" element={<AdminEventsPage />} />
               <Route path="/admin/resources" element={<AdminResourcesPage />} />
               <Route path="/admin/jobs" element={<AdminJobsPage />} />
+              <Route path="/admin/resumes" element={<AdminResumesPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <Footer />

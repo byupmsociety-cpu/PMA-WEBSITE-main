@@ -8,3 +8,4 @@ export { MemberBenefitsCard } from "./MemberBenefitsCard";
 export { UpcomingEventsCard } from "./UpcomingEventsCard";
 export { DashboardHeader } from "./DashboardHeader";
 export { PMJourneySection } from "./PMJourneySection";
+export { MemberToolsGrid } from "./MemberToolsGrid";

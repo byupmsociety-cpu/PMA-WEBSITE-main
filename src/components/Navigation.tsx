@@ -4,7 +4,7 @@ import ThemeToggle from './ThemeToggle';
 import { Button } from './ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import AuthModal from './AuthModal';
-import { ChevronDown, LayoutDashboard, LogOut, Shield, User, UserCircle, Lock } from 'lucide-react';
+import { ChevronDown, LayoutDashboard, LogOut, Shield, User, UserCircle, Lock, Briefcase } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   DropdownMenu,
@@ -73,7 +73,7 @@ const Navigation = () => {
     setMobileMenuOpen(false);
   };
 
-  const links = [
+  const links: { name: string; path: string; featured?: boolean }[] = [
     { name: 'Home', path: '/' },
     { name: 'Events', path: '/events' },
     { name: 'Resources', path: '/resources' },
@@ -228,6 +228,12 @@ const Navigation = () => {
                           Profile
                         </DropdownMenuItem>
                       )}
+                      {!isBlocked && (
+                        <DropdownMenuItem onClick={() => navigate('/tracker')} className="cursor-pointer gap-2">
+                          <Briefcase className="h-4 w-4 text-muted-foreground" />
+                          Tracker
+                        </DropdownMenuItem>
+                      )}
                       {isBlocked && (
                         <DropdownMenuItem onClick={() => navigate('/blocked')} className="cursor-pointer gap-2">
                           <Lock className="h-4 w-4 text-muted-foreground" />
@@ -342,15 +348,26 @@ const Navigation = () => {
                         Profile
                       </button>
                       {!isSuperAdmin && (
-                        <button
-                          onClick={() => {
-                            navigate('/dashboard');
-                            setMobileMenuOpen(false);
-                          }}
-                          className="block w-full text-left px-4 py-3 text-base font-medium rounded-md transition-colors text-muted-foreground hover:text-primary hover:bg-muted"
-                        >
-                          Dashboard
-                        </button>
+                        <>
+                          <button
+                            onClick={() => {
+                              navigate('/dashboard');
+                              setMobileMenuOpen(false);
+                            }}
+                            className="block w-full text-left px-4 py-3 text-base font-medium rounded-md transition-colors text-muted-foreground hover:text-primary hover:bg-muted"
+                          >
+                            Dashboard
+                          </button>
+                          <button
+                            onClick={() => {
+                              navigate('/tracker');
+                              setMobileMenuOpen(false);
+                            }}
+                            className="block w-full text-left px-4 py-3 text-base font-medium rounded-md transition-colors text-muted-foreground hover:text-primary hover:bg-muted"
+                          >
+                            Tracker
+                          </button>
+                        </>
                       )}
                       {(isAdmin || isSuperAdmin) && (
                         <button

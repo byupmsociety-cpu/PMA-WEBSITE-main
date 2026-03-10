@@ -143,6 +143,57 @@ export type Database = {
         }
         Relationships: []
       }
+      asset_reviews: {
+        Row: {
+          id: string
+          user_id: string
+          file_url: string
+          file_name: string
+          status: string
+          feedback: string | null
+          reviewer_id: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          file_url: string
+          file_name: string
+          status?: string
+          feedback?: string | null
+          reviewer_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          file_url?: string
+          file_name?: string
+          status?: string
+          feedback?: string | null
+          reviewer_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "asset_reviews_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "asset_reviews_reviewer_id_fkey"
+            columns: ["reviewer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       badges: {
         Row: {
           badge_type: Database["public"]["Enums"]["badge_type"]
@@ -209,55 +260,79 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          bio: string | null
           created_at: string
+          current_company: string | null
           deleted_at: string | null
           email: string | null
           full_name: string | null
           id: string
+          is_alumni: boolean | null
           is_blocked: boolean
           is_pma_member: boolean | null
+          is_visible_in_directory: boolean | null
+          linkedin_url: string | null
           membership_verified_at: string | null
           onboarding_completed: boolean | null
+          open_to_coffee_chats: boolean | null
           persona: Database["public"]["Enums"]["user_persona"] | null
           progress_percentage: number | null
+          recruiting_stage: string | null
           role: string
           school_year: string | null
+          target_roles: string[] | null
           updated_at: string
           user_id: string
         }
         Insert: {
           avatar_url?: string | null
+          bio?: string | null
           created_at?: string
+          current_company?: string | null
           deleted_at?: string | null
           email?: string | null
           full_name?: string | null
           id?: string
+          is_alumni?: boolean | null
           is_blocked?: boolean
           is_pma_member?: boolean | null
+          is_visible_in_directory?: boolean | null
+          linkedin_url?: string | null
           membership_verified_at?: string | null
           onboarding_completed?: boolean | null
+          open_to_coffee_chats?: boolean | null
           persona?: Database["public"]["Enums"]["user_persona"] | null
           progress_percentage?: number | null
+          recruiting_stage?: string | null
           role?: string
           school_year?: string | null
+          target_roles?: string[] | null
           updated_at?: string
           user_id: string
         }
         Update: {
           avatar_url?: string | null
+          bio?: string | null
           created_at?: string
+          current_company?: string | null
           deleted_at?: string | null
           email?: string | null
           full_name?: string | null
           id?: string
+          is_alumni?: boolean | null
           is_blocked?: boolean
           is_pma_member?: boolean | null
+          is_visible_in_directory?: boolean | null
+          linkedin_url?: string | null
           membership_verified_at?: string | null
           onboarding_completed?: boolean | null
+          open_to_coffee_chats?: boolean | null
           persona?: Database["public"]["Enums"]["user_persona"] | null
           progress_percentage?: number | null
+          recruiting_stage?: string | null
           role?: string
           school_year?: string | null
+          target_roles?: string[] | null
           updated_at?: string
           user_id?: string
         }
@@ -476,6 +551,234 @@ export type Database = {
           score?: number
         }
         Relationships: []
+      }
+      job_postings: {
+        Row: {
+          id: string
+          title: string
+          company: string
+          description: string | null
+          url: string
+          job_type: string | null
+          industry: string | null
+          location: string | null
+          company_size: string | null
+          salary_range: string | null
+          deadline: string | null
+          is_featured: boolean
+          created_at: string
+          is_active: boolean
+        }
+        Insert: {
+          id?: string
+          title: string
+          company: string
+          description?: string | null
+          url: string
+          job_type?: string | null
+          industry?: string | null
+          location?: string | null
+          company_size?: string | null
+          salary_range?: string | null
+          deadline?: string | null
+          is_featured?: boolean
+          created_at?: string
+          is_active?: boolean
+        }
+        Update: {
+          id?: string
+          title?: string
+          company?: string
+          description?: string | null
+          url?: string
+          job_type?: string | null
+          industry?: string | null
+          location?: string | null
+          company_size?: string | null
+          salary_range?: string | null
+          deadline?: string | null
+          is_featured?: boolean
+          created_at?: string
+          is_active?: boolean
+        }
+        Relationships: []
+      }
+      job_applications: {
+        Row: {
+          id: string
+          user_id: string
+          job_posting_id: string | null
+          company_name: string | null
+          job_title: string | null
+          status: string
+          notes: string | null
+          applied_date: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          job_posting_id?: string | null
+          company_name?: string | null
+          job_title?: string | null
+          status: string
+          notes?: string | null
+          applied_date?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          job_posting_id?: string | null
+          company_name?: string | null
+          job_title?: string | null
+          status?: string
+          notes?: string | null
+          applied_date?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_applications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_applications_job_posting_id_fkey"
+            columns: ["job_posting_id"]
+            isOneToOne: false
+            referencedRelation: "job_postings"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      job_notifications: {
+        Row: {
+          user_id: string
+          job_id: string
+          viewed_at: string | null
+          applied: boolean
+          saved: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          user_id: string
+          job_id: string
+          viewed_at?: string | null
+          applied?: boolean
+          saved?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          user_id?: string
+          job_id?: string
+          viewed_at?: string | null
+          applied?: boolean
+          saved?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      mock_interview_slots: {
+        Row: {
+          id: string
+          user_id: string
+          start_time: string
+          end_time: string
+          is_booked: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          start_time: string
+          end_time: string
+          is_booked?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          start_time?: string
+          end_time?: string
+          is_booked?: boolean
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mock_interview_slots_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      mock_interviews: {
+        Row: {
+          id: string
+          slot_id: string
+          interviewer_id: string
+          interviewee_id: string
+          status: string
+          meeting_link: string | null
+          feedback_notes: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          slot_id: string
+          interviewer_id: string
+          interviewee_id: string
+          status?: string
+          meeting_link?: string | null
+          feedback_notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          slot_id?: string
+          interviewer_id?: string
+          interviewee_id?: string
+          status?: string
+          meeting_link?: string | null
+          feedback_notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mock_interviews_slot_id_fkey"
+            columns: ["slot_id"]
+            isOneToOne: false
+            referencedRelation: "mock_interview_slots"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mock_interviews_interviewer_id_fkey"
+            columns: ["interviewer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mock_interviews_interviewee_id_fkey"
+            columns: ["interviewee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
       }
     }
     Views: {

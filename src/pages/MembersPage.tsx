@@ -25,6 +25,8 @@ import {
   Briefcase,
   Users,
   Settings,
+  Coffee,
+  Building2,
 } from "lucide-react";
 
 interface MemberProfile {
@@ -37,6 +39,9 @@ interface MemberProfile {
   target_roles: string[] | null;
   linkedin_url: string | null;
   bio: string | null;
+  is_alumni: boolean | null;
+  open_to_coffee_chats: boolean | null;
+  current_company: string | null;
 }
 
 const RECRUITING_STAGES = [
@@ -64,6 +69,8 @@ const MembersPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStage, setFilterStage] = useState<string>("all");
   const [filterYear, setFilterYear] = useState<string>("all");
+  const [showAlumniOnly, setShowAlumniOnly] = useState(false);
+  const [showChatsOnly, setShowChatsOnly] = useState(false);
 
   const isPmaMember = profile?.is_pma_member ?? false;
 
@@ -84,7 +91,7 @@ const MembersPage = () => {
 
     const { data, error } = await supabase
       .from("profiles")
-      .select("id, user_id, full_name, avatar_url, school_year, recruiting_stage, target_roles, linkedin_url, bio")
+      .select("id, user_id, full_name, avatar_url, school_year, recruiting_stage, target_roles, linkedin_url, bio, is_alumni, open_to_coffee_chats, current_company")
       .eq("is_pma_member", true)
       .eq("is_visible_in_directory", true)
       .is("deleted_at", null)
@@ -112,6 +119,8 @@ const MembersPage = () => {
     }
     if (filterStage !== "all" && member.recruiting_stage !== filterStage) return false;
     if (filterYear !== "all" && member.school_year !== filterYear) return false;
+    if (showAlumniOnly && !member.is_alumni) return false;
+    if (showChatsOnly && !member.open_to_coffee_chats) return false;
     return true;
   });
 
@@ -256,6 +265,25 @@ const MembersPage = () => {
                   </SelectContent>
                 </Select>
               </div>
+
+              <div className="flex flex-wrap gap-2 mt-4">
+                <Badge
+                  variant={showAlumniOnly ? "default" : "outline"}
+                  className="cursor-pointer font-medium px-3 py-1 text-sm border-primary/20 hover:border-primary/50"
+                  onClick={() => setShowAlumniOnly(!showAlumniOnly)}
+                >
+                  <GraduationCap className="w-3.5 h-3.5 mr-1" />
+                  Alumni Only
+                </Badge>
+                <Badge
+                  variant={showChatsOnly ? "default" : "outline"}
+                  className="cursor-pointer font-medium px-3 py-1 text-sm border-primary/20 hover:border-primary/50"
+                  onClick={() => setShowChatsOnly(!showChatsOnly)}
+                >
+                  <Coffee className="w-3.5 h-3.5 mr-1 text-[#C08A66]" />
+                  Open to Coffee Chats
+                </Badge>
+              </div>
             </CardContent>
           </Card>
         </AnimatedSection>
@@ -309,13 +337,25 @@ const MembersPage = () => {
                               </span>
                             )}
                           </div>
-                          {member.recruiting_stage && (
+                          {member.recruiting_stage && !member.is_alumni && (
                             <Badge variant="outline" className={stageConfig.color}>
                               {stageConfig.label}
                             </Badge>
                           )}
+                          {member.is_alumni && (
+                            <Badge variant="default" className="bg-primary hover:bg-primary/90">
+                              Alumni
+                            </Badge>
+                          )}
                         </div>
                       </div>
+
+                      {member.current_company && (
+                        <div className="flex items-center gap-2 text-sm font-medium mt-3 text-foreground">
+                          <Building2 className="w-4 h-4 text-primary" />
+                          {member.current_company}
+                        </div>
+                      )}
 
                       {member.bio && (
                         <p className="text-sm text-muted-foreground mt-3 line-clamp-2">
@@ -336,6 +376,13 @@ const MembersPage = () => {
                               +{member.target_roles.length - 3}
                             </Badge>
                           )}
+                        </div>
+                      )}
+
+                      {member.open_to_coffee_chats && (
+                        <div className="flex items-center gap-2 mt-4 text-xs font-semibold text-[#C08A66] bg-[#C08A66]/10 py-1.5 px-3 rounded-full w-fit">
+                          <Coffee className="w-3.5 h-3.5" />
+                          Open to Coffee Chats
                         </div>
                       )}
                     </CardContent>

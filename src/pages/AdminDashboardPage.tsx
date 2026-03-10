@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import KpiCard from "@/components/admin/KpiCard";
-import { Users, UserPlus, Calendar, UsersRound, RefreshCw, Shield, BookOpen, Briefcase } from "lucide-react";
+import { Users, UserPlus, Calendar, UsersRound, RefreshCw, Shield, BookOpen, Briefcase, FileText } from "lucide-react";
 
 const AdminDashboardPage = () => {
   const { user, isAdmin, isSuperAdmin, loading } = useAuth();
@@ -189,107 +189,159 @@ const AdminDashboardPage = () => {
 
         <Separator />
 
-        <section className="space-y-4">
+        <section className="space-y-8 pb-12">
           <div className="space-y-0.5">
-            <h2 className="text-lg font-semibold">Tools</h2>
+            <h2 className="text-lg font-semibold">Admin Tools</h2>
             <p className="text-sm text-muted-foreground">
-              Common admin workflows, organized by area.
+              Manage platform content, user access, and career services.
             </p>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="rounded-xl border bg-card p-5 space-y-3 hover:border-primary/40 transition-colors">
-              <div className="flex items-start justify-between gap-3">
-                <div className="space-y-1">
-                  <h3 className="font-semibold">Access &amp; Membership</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Roles, blocking, and pre-approved emails.
-                  </p>
+          <div className="space-y-6">
+            <div className="space-y-4">
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">User Management</h3>
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <div className="rounded-xl border bg-card p-5 space-y-4 hover:border-primary/40 transition-colors">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="space-y-1">
+                      <h4 className="font-semibold">Access &amp; Membership</h4>
+                      <p className="text-sm text-muted-foreground flex-grow">
+                        Roles, blocking, and pre-approved emails.
+                      </p>
+                    </div>
+                    <div className="text-primary/70 bg-primary/10 p-2 rounded-lg">
+                      <Shield className="h-5 w-5" />
+                    </div>
+                  </div>
+                  <Button asChild className="w-full">
+                    <Link to="/admin/access">Manage access</Link>
+                  </Button>
                 </div>
-                <div className="text-muted-foreground">
-                  <Shield className="h-5 w-5" />
+
+                <div className="rounded-xl border bg-card p-5 space-y-4 hover:border-primary/40 transition-colors">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="space-y-1">
+                      <h4 className="font-semibold">Team</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Update the PMA presidency section on the website.
+                      </p>
+                    </div>
+                    <div className="text-primary/70 bg-primary/10 p-2 rounded-lg">
+                      <UsersRound className="h-5 w-5" />
+                    </div>
+                  </div>
+                  <Button asChild className="w-full">
+                    <Link to="/admin/team">Manage team</Link>
+                  </Button>
                 </div>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-2">
-                <Button asChild className="w-full sm:w-auto">
-                  <Link to="/admin/access">Manage access &amp; membership</Link>
-                </Button>
               </div>
             </div>
 
-            <div className="rounded-xl border bg-card p-5 space-y-3 hover:border-primary/40 transition-colors">
-              <div className="flex items-start justify-between gap-3">
-                <div className="space-y-1">
-                  <h3 className="font-semibold">Team</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Update the PMA presidency section on the website.
-                  </p>
+            <Separator />
+
+            <div className="space-y-4">
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Content Hub</h3>
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <div className="rounded-xl border bg-card p-5 space-y-4 hover:border-primary/40 transition-colors">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="space-y-1">
+                      <h4 className="font-semibold">Events</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Publish and manage events shown on the public site.
+                      </p>
+                    </div>
+                    <div className="text-primary/70 bg-primary/10 p-2 rounded-lg">
+                      <Calendar className="h-5 w-5" />
+                    </div>
+                  </div>
+                  <Button asChild className="w-full">
+                    <Link to="/admin/events">Manage events</Link>
+                  </Button>
                 </div>
-                <div className="text-muted-foreground">
-                  <UsersRound className="h-5 w-5" />
+
+                <div className="rounded-xl border bg-card p-5 space-y-4 hover:border-primary/40 transition-colors">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="space-y-1">
+                      <h4 className="font-semibold">Resources</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Manage tools and resources on the Resources page.
+                      </p>
+                    </div>
+                    <div className="text-primary/70 bg-primary/10 p-2 rounded-lg">
+                      <BookOpen className="h-5 w-5" />
+                    </div>
+                  </div>
+                  <Button asChild className="w-full">
+                    <Link to="/admin/resources">Manage resources</Link>
+                  </Button>
                 </div>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-2">
-                <Button asChild className="w-full sm:w-auto">
-                  <Link to="/admin/team">Manage team</Link>
-                </Button>
               </div>
             </div>
 
-            <div className="rounded-xl border bg-card p-5 space-y-3 hover:border-primary/40 transition-colors">
-              <div className="flex items-start justify-between gap-3">
-                <div className="space-y-1">
-                  <h3 className="font-semibold">Events</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Publish and manage events shown on the public site.
-                  </p>
-                </div>
-                <div className="text-muted-foreground">
-                  <Calendar className="h-5 w-5" />
-                </div>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-2">
-                <Button asChild className="w-full sm:w-auto">
-                  <Link to="/admin/events">Manage events</Link>
-                </Button>
-              </div>
-            </div>
+            <Separator />
 
-            <div className="rounded-xl border bg-card p-5 space-y-3 hover:border-primary/40 transition-colors">
-              <div className="flex items-start justify-between gap-3">
-                <div className="space-y-1">
-                  <h3 className="font-semibold">Resources</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Manage tools and resources on the Resources page.
-                  </p>
+            <div className="space-y-4">
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Career Services</h3>
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <div className="rounded-xl border bg-card p-5 space-y-4 hover:border-primary/40 transition-colors">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="space-y-1">
+                      <h4 className="font-semibold">Job Postings</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Post jobs and notify matching PMA members.
+                      </p>
+                    </div>
+                    <div className="text-primary/70 bg-primary/10 p-2 rounded-lg">
+                      <Briefcase className="h-5 w-5" />
+                    </div>
+                  </div>
+                  <Button asChild className="w-full">
+                    <Link to="/admin/jobs">Manage jobs</Link>
+                  </Button>
                 </div>
-                <div className="text-muted-foreground">
-                  <BookOpen className="h-5 w-5" />
-                </div>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-2">
-                <Button asChild className="w-full sm:w-auto">
-                  <Link to="/admin/resources">Manage resources</Link>
-                </Button>
-              </div>
-            </div>
 
-            <div className="rounded-xl border bg-card p-5 space-y-3 hover:border-primary/40 transition-colors">
-              <div className="flex items-start justify-between gap-3">
-                <div className="space-y-1">
-                  <h3 className="font-semibold">Job Postings</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Post jobs and notify matching PMA members.
-                  </p>
+                {/* Placeholders for upcoming Phase 2+ features */}
+                <div className="rounded-xl border bg-card/40 p-5 space-y-4 border-dashed relative overflow-hidden group">
+                  <div className="absolute inset-0 bg-muted/20 hidden group-hover:block transition-all"></div>
+                  <div className="flex items-start justify-between gap-3 relative z-10">
+                    <div className="space-y-1 opacity-60">
+                      <h4 className="font-semibold flex items-center gap-2">Mock Interviews <span className="text-[10px] bg-primary/20 text-primary px-2 py-0.5 rounded-full uppercase tracking-wider">Soon</span></h4>
+                      <p className="text-sm text-muted-foreground">
+                        Manage peer matching system.
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <div className="text-muted-foreground">
-                  <Briefcase className="h-5 w-5" />
+
+                <div className="rounded-xl border bg-card p-5 space-y-4 hover:border-primary/40 transition-colors">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="space-y-1">
+                      <h4 className="font-semibold">Resume Review</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Manage the resume feedback queue.
+                      </p>
+                    </div>
+                    <div className="text-primary/70 bg-primary/10 p-2 rounded-lg">
+                      <FileText className="h-5 w-5" />
+                    </div>
+                  </div>
+                  <Button asChild className="w-full">
+                    <Link to="/admin/resumes">Review Resumes</Link>
+                  </Button>
                 </div>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-2">
-                <Button asChild className="w-full sm:w-auto">
-                  <Link to="/admin/jobs">Manage jobs</Link>
-                </Button>
+
+                <div className="rounded-xl border bg-card/40 p-5 space-y-4 border-dashed relative overflow-hidden group">
+                  <div className="absolute inset-0 bg-muted/20 hidden group-hover:block transition-all"></div>
+                  <div className="flex items-start justify-between gap-3 relative z-10">
+                    <div className="space-y-1 opacity-60">
+                      <h4 className="font-semibold flex items-center gap-2">Alumni Network <span className="text-[10px] bg-primary/20 text-primary px-2 py-0.5 rounded-full uppercase tracking-wider">Soon</span></h4>
+                      <p className="text-sm text-muted-foreground">
+                        Manage alumni network access and profiles.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
               </div>
             </div>
           </div>

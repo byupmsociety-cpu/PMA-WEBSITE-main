@@ -25,6 +25,9 @@ interface DirectoryProfile {
   linkedin_url: string | null;
   bio: string | null;
   is_visible_in_directory: boolean;
+  is_alumni: boolean;
+  open_to_coffee_chats: boolean;
+  current_company: string | null;
 }
 
 const RECRUITING_STAGES = [
@@ -57,6 +60,9 @@ const ProfilePage = () => {
     linkedin_url: null,
     bio: null,
     is_visible_in_directory: true,
+    is_alumni: false,
+    open_to_coffee_chats: false,
+    current_company: null,
   });
   const [loadingDirectory, setLoadingDirectory] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -79,7 +85,7 @@ const ProfilePage = () => {
     
     const { data, error } = await supabase
       .from("profiles")
-      .select("recruiting_stage, target_roles, linkedin_url, bio, is_visible_in_directory")
+      .select("recruiting_stage, target_roles, linkedin_url, bio, is_visible_in_directory, is_alumni, open_to_coffee_chats, current_company")
       .eq("user_id", user.id)
       .single();
 
@@ -92,6 +98,9 @@ const ProfilePage = () => {
         linkedin_url: data.linkedin_url,
         bio: data.bio,
         is_visible_in_directory: data.is_visible_in_directory ?? true,
+        is_alumni: data.is_alumni ?? false,
+        open_to_coffee_chats: data.open_to_coffee_chats ?? false,
+        current_company: data.current_company,
       });
     }
     setLoadingDirectory(false);
@@ -109,6 +118,9 @@ const ProfilePage = () => {
         linkedin_url: directoryProfile.linkedin_url,
         bio: directoryProfile.bio,
         is_visible_in_directory: directoryProfile.is_visible_in_directory,
+        is_alumni: directoryProfile.is_alumni,
+        open_to_coffee_chats: directoryProfile.open_to_coffee_chats,
+        current_company: directoryProfile.current_company,
       })
       .eq("user_id", user.id);
 
@@ -209,16 +221,16 @@ const ProfilePage = () => {
           <CardContent className="space-y-4">
             <div>
               <p className="text-sm text-muted-foreground">Name</p>
-              <p className="text-lg font-semibold">{profile.full_name || "Not set"}</p>
+              <p className="text-lg font-semibold">{profile?.full_name || "Not set"}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Email</p>
-              <p className="text-lg font-mono">{profile.email || user?.email}</p>
+              <p className="text-lg font-mono">{profile?.email || user?.email}</p>
             </div>
             <div className="flex items-center gap-2">
               <p className="text-sm text-muted-foreground">Role</p>
               <Badge>{roleLabel}</Badge>
-              {profile.is_pma_member && (
+              {profile?.is_pma_member && (
                 <Badge variant="outline" className="ml-1">
                   PMA Member
                 </Badge>
@@ -264,7 +276,60 @@ const ProfilePage = () => {
                     />
                   </div>
 
-                  <div>
+                  <div className="flex items-center justify-between pt-4 border-t border-border">
+                    <div>
+                      <Label htmlFor="is_alumni" className="text-base font-medium">
+                        I am a BYU Alumni
+                      </Label>
+                      <p className="text-sm text-muted-foreground">
+                        Identify yourself as a graduated active member
+                      </p>
+                    </div>
+                    <Switch
+                      id="is_alumni"
+                      checked={directoryProfile.is_alumni}
+                      onCheckedChange={(checked) =>
+                        setDirectoryProfile({ ...directoryProfile, is_alumni: checked })
+                      }
+                    />
+                  </div>
+
+                  {directoryProfile.is_alumni && (
+                    <div className="flex items-center justify-between pb-4 border-b border-border">
+                      <div>
+                        <Label htmlFor="coffee_chats" className="text-base font-medium">
+                          Open to Coffee Chats
+                        </Label>
+                        <p className="text-sm text-muted-foreground">
+                          Allow students to reach out for a quick chat
+                        </p>
+                      </div>
+                      <Switch
+                        id="coffee_chats"
+                        checked={directoryProfile.open_to_coffee_chats}
+                        onCheckedChange={(checked) =>
+                          setDirectoryProfile({ ...directoryProfile, open_to_coffee_chats: checked })
+                        }
+                      />
+                    </div>
+                  )}
+
+                  <div className="pb-4 border-b border-border">
+                    <Label htmlFor="current_company" className="text-sm font-medium">
+                      Current Company
+                    </Label>
+                    <Input
+                      id="current_company"
+                      placeholder="e.g. Google, Microsoft, Startup"
+                      value={directoryProfile.current_company ?? ""}
+                      onChange={(e) =>
+                        setDirectoryProfile({ ...directoryProfile, current_company: e.target.value || null })
+                      }
+                      className="mt-1"
+                    />
+                  </div>
+
+                  <div className="pt-2">
                     <Label htmlFor="recruiting_stage" className="text-sm font-medium">
                       Recruiting Stage
                     </Label>

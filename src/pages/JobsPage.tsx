@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import AnimatedSection from "@/components/AnimatedSection";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -14,8 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { 
-  Briefcase, 
+import {
   Building2, 
   MapPin, 
   Calendar, 
@@ -29,7 +28,8 @@ import {
   Crown,
   Bookmark,
   BookmarkCheck,
-  CheckCircle2
+  CheckCircle2,
+  Users
 } from "lucide-react";
 import { format, isPast, isWithinInterval, addDays } from "date-fns";
 
@@ -86,6 +86,7 @@ const JobsPage = () => {
   const [filterType, setFilterType] = useState<string>("all");
   const [filterLocation, setFilterLocation] = useState<string>("all");
   const [showSavedOnly, setShowSavedOnly] = useState(false);
+  const [alumniCompanies, setAlumniCompanies] = useState<Record<string, number>>({});
 
   const isPmaMember = profile?.is_pma_member ?? false;
 
@@ -96,6 +97,7 @@ const JobsPage = () => {
       } else if (isPmaMember) {
         void loadJobs();
         void loadNotifications();
+        void loadAlumniCompanies();
       } else {
         setLoading(false);
       }
@@ -136,6 +138,25 @@ const JobsPage = () => {
     }
   };
 
+  const loadAlumniCompanies = async () => {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("current_company")
+      .eq("is_alumni", true)
+      .not("current_company", "is", null);
+
+    if (!error && data) {
+      const counts: Record<string, number> = {};
+      data.forEach((p) => {
+        if (p.current_company) {
+          const comp = p.current_company.toLowerCase().trim();
+          counts[comp] = (counts[comp] || 0) + 1;
+        }
+      });
+      setAlumniCompanies(counts);
+    }
+  };
+
   const markAsViewed = async (jobId: string) => {
     if (!user) return;
     
@@ -151,34 +172,57 @@ const JobsPage = () => {
     await loadNotifications();
   };
 
-  const toggleSaved = async (jobId: string, e: React.MouseEvent) => {
+  const toggleSaved = async (job: JobPosting, e: React.MouseEvent) => {
     e.stopPropagation();
     if (!user) return;
 
-    const existing = notifications.get(jobId);
+    const existing = notifications.get(job.id);
     const newSaved = !existing?.saved;
 
     await supabase.from("job_notifications").upsert({
       user_id: user.id,
-      job_id: jobId,
+      job_id: job.id,
       saved: newSaved,
     }, { onConflict: "user_id,job_id" });
+
+    // Also sync to application tracker if saving
+    if (newSaved) {
+       await supabase.from("job_applications").insert({
+         user_id: user.id,
+         job_posting_id: job.id,
+         company_name: job.company,
+         job_title: job.title,
+         status: 'wishlist'
+       });
+    }
 
     await loadNotifications();
   };
 
-  const toggleApplied = async (jobId: string, e: React.MouseEvent) => {
+  const toggleApplied = async (job: JobPosting, e: React.MouseEvent) => {
     e.stopPropagation();
     if (!user) return;
 
-    const existing = notifications.get(jobId);
+    const existing = notifications.get(job.id);
     const newApplied = !existing?.applied;
 
     await supabase.from("job_notifications").upsert({
       user_id: user.id,
-      job_id: jobId,
+      job_id: job.id,
       applied: newApplied,
     }, { onConflict: "user_id,job_id" });
+
+    // Also sync to application tracker automatically
+    if (newApplied) {
+       await supabase.from("job_applications").insert({
+         user_id: user.id,
+         job_posting_id: job.id,
+         company_name: job.company,
+         job_title: job.title,
+         status: 'applied',
+         applied_date: new Date().toISOString()
+       });
+    }
 
     await loadNotifications();
   };
@@ -399,6 +443,12 @@ const JobsPage = () => {
                                 {JOB_TYPES.find((t) => t.value === job.job_type)?.label ?? job.job_type}
                               </Badge>
                             )}
+                            {alumniCompanies[job.company.toLowerCase().trim()] > 0 && (
+                              <Badge variant="outline" className="text-indigo-600 border-indigo-200 bg-indigo-50/50">
+                                <Users className="w-3 h-3 mr-1" />
+                                {alumniCompanies[job.company.toLowerCase().trim()]} Alumni here
+                              </Badge>
+                            )}
                           </div>
 
                           {job.description && (
@@ -431,7 +481,7 @@ const JobsPage = () => {
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={(e) => toggleSaved(job.id, e)}
+                            onClick={(e) => toggleSaved(job, e)}
                             className={isSaved ? 'text-primary' : ''}
                           >
                             {isSaved ? (
@@ -443,7 +493,7 @@ const JobsPage = () => {
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={(e) => toggleApplied(job.id, e)}
+                            onClick={(e) => toggleApplied(job, e)}
                             className={isApplied ? 'text-green-500' : ''}
                           >
                             <CheckCircle2 className="w-5 h-5" />
