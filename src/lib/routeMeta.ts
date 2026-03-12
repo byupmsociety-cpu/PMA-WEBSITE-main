@@ -81,9 +81,43 @@ export const ROUTE_META: Record<string, { title: string; description: string }> 
     title: "Admin Resources | BYU PMA",
     description: "Manage tools and resources shown on the Resources page.",
   },
+  "/preferences": {
+    title: "Job Preferences | BYU PMA",
+    description: "Manage your career and job preferences.",
+  },
+  "/jobs": {
+    title: "Jobs | BYU PMA",
+    description: "Explore product management job opportunities.",
+  },
+  "/roadmap": {
+    title: "Career Roadmap | BYU PMA",
+    description: "Your personalized product management career roadmap.",
+  },
+  "/members": {
+    title: "Members Directory | BYU PMA",
+    description: "Connect with BYU PMA members and alumni.",
+  },
+  "/tracker": {
+    title: "Application Tracker | BYU PMA",
+    description: "Track your product management job applications.",
+  },
+  "/interviews": {
+    title: "Mock Interviews | BYU PMA",
+    description: "Practice your PM interview skills with peers.",
+  },
+  "/resumes": {
+    title: "Resume Review | BYU PMA",
+    description: "Upload your resume for asynchronous feedback.",
+  },
+  "/admin/jobs": {
+    title: "Admin Jobs | BYU PMA",
+    description: "Manage job postings and notify matching candidates.",
+  },
+  "/admin/resumes": {
+    title: "Admin Resumes | BYU PMA",
+    description: "Review member resumes and provide actionable feedback.",
+  },
 };
-
-const DEFAULT_META = ROUTE_META["/"];
 
 /** Meta for 404 (unknown paths). Used for document.title and og/twitter when route is not found. */
 export const NOT_FOUND_META = {

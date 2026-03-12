@@ -230,8 +230,8 @@ const AdminDashboardPage = () => {
                       <UsersRound className="h-5 w-5" />
                     </div>
                   </div>
-                  <Button asChild className="w-full">
-                    <Link to="/admin/team">Manage team</Link>
+                  <Button className="w-full" disabled>
+                    <Link to="/admin/team">Manage team (Coming Soon)</Link>
                   </Button>
                 </div>
               </div>
@@ -271,8 +271,8 @@ const AdminDashboardPage = () => {
                       <BookOpen className="h-5 w-5" />
                     </div>
                   </div>
-                  <Button asChild className="w-full">
-                    <Link to="/admin/resources">Manage resources</Link>
+                  <Button className="w-full" disabled>
+                    <Link to="/admin/resources">Manage resources (Coming Soon)</Link>
                   </Button>
                 </div>
               </div>

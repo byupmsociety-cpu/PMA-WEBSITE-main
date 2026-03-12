@@ -40,6 +40,7 @@ const ResumesPage = () => {
   const [reviews, setReviews] = useState<AssetReview[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -80,14 +81,14 @@ const ResumesPage = () => {
     setLoading(false);
   };
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file || !user) return;
+  const processFile = async (file: File) => {
+    if (!user) return;
 
-    if (file.type !== 'application/pdf') {
+    const validTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    if (!validTypes.includes(file.type) && !file.name.toLowerCase().endsWith('.docx') && !file.name.toLowerCase().endsWith('.pdf')) {
       toast({
         title: "Invalid file type",
-        description: "Please upload a PDF file.",
+        description: "Please upload a PDF or DOCX file.",
         variant: "destructive",
       });
       return;
@@ -96,7 +97,7 @@ const ResumesPage = () => {
     if (file.size > 5 * 1024 * 1024) { // 5MB limit
       toast({
         title: "File too large",
-        description: "Resume PDF must be less than 5MB.",
+        description: "Resume must be less than 5MB.",
         variant: "destructive",
       });
       return;
@@ -153,6 +154,35 @@ const ResumesPage = () => {
     }
   };
 
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      await processFile(file);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    if (!uploading) setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+    
+    if (uploading) return;
+
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      await processFile(file);
+    }
+  };
+
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this resume? The feedback will also be lost.")) return;
     
@@ -188,6 +218,59 @@ const ResumesPage = () => {
         return <Badge variant="secondary" className="bg-amber-100 text-amber-800 hover:bg-amber-200 border-transparent dark:bg-amber-900/30 dark:text-amber-300"><Clock className="w-3 h-3 mr-1" /> Pending Review</Badge>;
     }
   };
+
+  const renderReviewCard = (review: AssetReview, isLatest: boolean) => (
+    <Card key={review.id} className={`overflow-hidden ${isLatest ? 'border-primary/30 shadow-md ring-1 ring-primary/10' : 'opacity-80 hover:opacity-100 transition-opacity'}`}>
+      <div className="p-5 flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+        
+        <div className="flex items-start gap-3 flex-1 min-w-0">
+          <div className={`p-2 rounded-md shrink-0 ${isLatest ? 'bg-primary/10' : 'bg-muted'}`}>
+            <FileText className={`w-6 h-6 ${isLatest ? 'text-primary' : 'text-muted-foreground'}`} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <h3 className="font-medium truncate" title={review.file_name}>
+              {review.file_name}
+            </h3>
+            <p className="text-xs text-muted-foreground">
+              Submitted {format(new Date(review.created_at), "MMM d, yyyy 'at' h:mm a")}
+            </p>
+            <div className="mt-2">
+              <StatusBadge status={review.status} />
+            </div>
+          </div>
+        </div>
+
+        <div className="flex sm:flex-col gap-2 shrink-0">
+          <Button variant="outline" size="sm" onClick={() => window.open(review.file_url, '_blank')}>
+            <Eye className="w-4 h-4 mr-2" /> View PDF
+          </Button>
+          {review.status === 'pending' && (
+            <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950" onClick={() => handleDelete(review.id)}>
+              <Trash2 className="w-4 h-4 mr-2" /> Delete
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {/* Feedback Section */}
+      {review.status !== 'pending' && (
+        <div className={`p-5 border-t border-border ${isLatest ? 'bg-muted/50' : 'bg-muted/30'}`}>
+          <div className="flex items-start gap-2">
+            <MessageSquare className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <h4 className="text-sm font-semibold mb-1">Reviewer Feedback</h4>
+              <p className="text-sm text-foreground whitespace-pre-wrap">
+                {review.feedback || <i className="text-muted-foreground">No detailed feedback provided.</i>}
+              </p>
+              <p className="text-xs text-muted-foreground mt-3 pt-3 border-t border-border/50 inline-block">
+                Reviewed on {format(new Date(review.updated_at), "MMM d, yyyy")}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+    </Card>
+  );
 
   if (authLoading || loading) {
     return (
@@ -233,9 +316,12 @@ const ResumesPage = () => {
               <CardContent>
                 <div 
                   className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
-                    uploading ? 'border-primary bg-primary/5' : 'border-muted hover:border-primary/50 hover:bg-muted/50'
+                    isDragging ? 'border-primary bg-primary/10 scale-[1.02]' : uploading ? 'border-primary bg-primary/5' : 'border-muted hover:border-primary/50 hover:bg-muted/50'
                   }`}
                   onClick={() => !uploading && fileInputRef.current?.click()}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
                   style={{ cursor: uploading ? 'default' : 'pointer' }}
                 >
                   {uploading ? (
@@ -244,17 +330,17 @@ const ResumesPage = () => {
                        <p className="text-sm font-medium">Uploading...</p>
                     </div>
                   ) : (
-                    <div className="flex flex-col items-center gap-2">
-                      <div className="p-3 bg-primary/10 rounded-full text-primary mb-2">
+                    <div className="flex flex-col items-center gap-2 pointer-events-none">
+                      <div className={`p-3 rounded-full mb-2 transition-colors ${isDragging ? 'bg-primary/20 text-primary' : 'bg-primary/10 text-primary'}`}>
                         <UploadCloud className="w-6 h-6" />
                       </div>
-                      <p className="text-sm font-medium">Click to browse file</p>
-                      <p className="text-xs text-muted-foreground">PDF only, up to 5MB</p>
+                      <p className="text-sm font-medium">Click to browse or drag & drop</p>
+                      <p className="text-xs text-muted-foreground">PDF or DOCX, up to 5MB</p>
                     </div>
                   )}
                   <input 
                     type="file" 
-                    accept="application/pdf"
+                    accept="application/pdf,.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                     className="hidden" 
                     ref={fileInputRef}
                     onChange={handleFileUpload}
@@ -278,59 +364,38 @@ const ResumesPage = () => {
                 </CardContent>
               </Card>
             ) : (
-              <div className="space-y-4">
-                {reviews.map((review) => (
-                  <Card key={review.id} className="overflow-hidden">
-                    <div className="p-5 flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-                      
-                      <div className="flex items-start gap-3 flex-1 min-w-0">
-                        <div className="p-2 bg-muted rounded-md shrink-0">
-                          <FileText className="w-6 h-6 text-primary" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <h3 className="font-medium truncate" title={review.file_name}>
-                            {review.file_name}
-                          </h3>
-                          <p className="text-xs text-muted-foreground">
-                            Submitted {format(new Date(review.created_at), "MMM d, yyyy 'at' h:mm a")}
-                          </p>
-                          <div className="mt-2">
-                            <StatusBadge status={review.status} />
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex sm:flex-col gap-2 shrink-0">
-                        <Button variant="outline" size="sm" onClick={() => window.open(review.file_url, '_blank')}>
-                          <Eye className="w-4 h-4 mr-2" /> View PDF
-                        </Button>
-                        {review.status === 'pending' && (
-                          <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950" onClick={() => handleDelete(review.id)}>
-                            <Trash2 className="w-4 h-4 mr-2" /> Delete
-                          </Button>
-                        )}
+              <div className="space-y-8">
+                {/* Latest Submission */}
+                <div>
+                  <h3 className="text-lg font-medium mb-3 flex items-center">
+                    <span className="bg-primary/10 text-primary px-2 py-1 rounded-md text-xs font-bold tracking-wider mr-2">LATEST</span>
+                    Current Status
+                  </h3>
+                  
+                  {reviews[0].status === 'rejected' && (
+                    <div className="mb-4 p-4 border border-destructive/50 bg-destructive/10 rounded-lg flex items-start gap-3">
+                      <AlertCircle className="w-5 h-5 text-destructive shrink-0 mt-0.5" />
+                      <div>
+                        <h4 className="font-medium text-destructive">Action Required: Revision Needed</h4>
+                        <p className="text-sm text-destructive/90 mt-1">
+                          Your resume requires some updates. Please review the feedback below, make the necessary changes, and upload a new version.
+                        </p>
                       </div>
                     </div>
+                  )}
 
-                    {/* Feedback Section */}
-                    {review.status !== 'pending' && (
-                      <div className="bg-muted/30 p-5 border-t border-border">
-                        <div className="flex items-start gap-2">
-                          <MessageSquare className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                          <div className="flex-1">
-                            <h4 className="text-sm font-semibold mb-1">Reviewer Feedback</h4>
-                            <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                              {review.feedback || <i>No detailed feedback provided.</i>}
-                            </p>
-                            <p className="text-xs text-muted-foreground mt-3 pt-3 border-t border-border/50 inline-block">
-                              Reviewed on {format(new Date(review.updated_at), "MMM d, yyyy")}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </Card>
-                ))}
+                  {renderReviewCard(reviews[0], true)}
+                </div>
+
+                {/* Previous Versions */}
+                {reviews.length > 1 && (
+                  <div>
+                    <h3 className="text-lg font-medium mb-3 text-muted-foreground border-b border-border/50 pb-2">Previous Versions</h3>
+                    <div className="space-y-4">
+                      {reviews.slice(1).map((review) => renderReviewCard(review, false))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </AnimatedSection>
