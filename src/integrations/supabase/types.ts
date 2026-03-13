@@ -780,6 +780,101 @@ export type Database = {
           }
         ]
       }
+      resource_categories: {
+        Row: {
+          color: string
+          created_at: string
+          description: string
+          display_order: number
+          icon: string
+          id: string
+          slug: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          description?: string
+          display_order?: number
+          icon?: string
+          id?: string
+          slug: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          description?: string
+          display_order?: number
+          icon?: string
+          id?: string
+          slug?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      resources: {
+        Row: {
+          category_id: string
+          created_at: string
+          description: string
+          display_order: number
+          id: string
+          image_url: string
+          is_featured: boolean
+          is_paid: boolean
+          is_premium: boolean
+          subcategory: string | null
+          tips: string[] | null
+          title: string
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          category_id: string
+          created_at?: string
+          description?: string
+          display_order?: number
+          id?: string
+          image_url?: string
+          is_featured?: boolean
+          is_paid?: boolean
+          is_premium?: boolean
+          subcategory?: string | null
+          tips?: string[] | null
+          title: string
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          category_id?: string
+          created_at?: string
+          description?: string
+          display_order?: number
+          id?: string
+          image_url?: string
+          is_featured?: boolean
+          is_paid?: boolean
+          is_premium?: boolean
+          subcategory?: string | null
+          tips?: string[] | null
+          title?: string
+          updated_at?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resources_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "resource_categories"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never

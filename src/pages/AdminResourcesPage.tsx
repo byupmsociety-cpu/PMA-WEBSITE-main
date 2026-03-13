@@ -43,7 +43,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Pencil, Trash2, Plus, ExternalLink, FolderOpen, FileText } from "lucide-react";
+import { Pencil, Trash2, Plus, ExternalLink, FolderOpen, FileText, Star } from "lucide-react";
 
 interface ResourceCategory {
   id: string;
@@ -63,9 +63,10 @@ interface Resource {
   description: string;
   url: string;
   image_url: string;
-  tips: string[];
+  tips: string[] | null;
   is_paid: boolean;
   is_premium: boolean;
+  is_featured: boolean;
   display_order: number;
 }
 
@@ -112,6 +113,7 @@ const emptyResource = {
   tips: [] as string[],
   is_paid: false,
   is_premium: false,
+  is_featured: false,
   display_order: 0,
 };
 
@@ -121,7 +123,7 @@ const AdminResourcesPage = () => {
   const { toast } = useToast();
 
   const [activeTab, setActiveTab] = useState("resources");
-  
+
   // Categories state
   const [categories, setCategories] = useState<ResourceCategory[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
@@ -129,7 +131,7 @@ const AdminResourcesPage = () => {
   const [editingCategory, setEditingCategory] = useState<ResourceCategory | null>(null);
   const [categoryFormData, setCategoryFormData] = useState<typeof emptyCategory>({ ...emptyCategory });
   const [deleteCategoryId, setDeleteCategoryId] = useState<string | null>(null);
-  
+
   // Resources state
   const [resources, setResources] = useState<Resource[]>([]);
   const [loadingResources, setLoadingResources] = useState(true);
@@ -139,7 +141,7 @@ const AdminResourcesPage = () => {
   const [deleteResourceId, setDeleteResourceId] = useState<string | null>(null);
   const [filterCategoryId, setFilterCategoryId] = useState<string>("all");
   const [tipsText, setTipsText] = useState("");
-  
+
   // Loading states
   const [savingId, setSavingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -232,9 +234,9 @@ const AdminResourcesPage = () => {
 
   const handleSaveCategory = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const slug = categoryFormData.slug || generateSlug(categoryFormData.title);
-    
+
     if (editingCategory) {
       setSavingId(editingCategory.id);
       const { error } = await supabase
@@ -326,6 +328,7 @@ const AdminResourcesPage = () => {
       tips: resource.tips ?? [],
       is_paid: resource.is_paid,
       is_premium: resource.is_premium,
+      is_featured: resource.is_featured,
       display_order: resource.display_order,
     });
     setTipsText((resource.tips ?? []).join("\n"));
@@ -341,7 +344,7 @@ const AdminResourcesPage = () => {
 
   const handleSaveResource = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const tips = tipsText
       .split("\n")
       .map((t) => t.trim())
@@ -361,6 +364,7 @@ const AdminResourcesPage = () => {
           tips,
           is_paid: resourceFormData.is_paid,
           is_premium: resourceFormData.is_premium,
+          is_featured: resourceFormData.is_featured,
           display_order: resourceFormData.display_order,
         })
         .eq("id", editingResource.id);
@@ -389,6 +393,7 @@ const AdminResourcesPage = () => {
         tips,
         is_paid: resourceFormData.is_paid,
         is_premium: resourceFormData.is_premium,
+        is_featured: resourceFormData.is_featured,
         display_order: resourceFormData.display_order,
       });
 
@@ -435,6 +440,26 @@ const AdminResourcesPage = () => {
 
   const selectedCategory = categories.find((c) => c.id === resourceFormData.category_id);
   const showSubcategory = selectedCategory?.slug === "ai-tools";
+
+  const handleToggleFeatured = async (id: string, currentStatus: boolean) => {
+    setSavingId(id);
+    const { error } = await supabase
+      .from("resources")
+      .update({ is_featured: !currentStatus })
+      .eq("id", id);
+
+    if (error) {
+      toast({
+        title: "Error updating resource",
+        description: getAdminErrorMessage(error),
+        variant: "destructive",
+      });
+    } else {
+      toast({ title: "Featured status updated" });
+      await loadResources();
+    }
+    setSavingId(null);
+  };
 
   const isSaving = savingId !== null;
 
@@ -521,6 +546,7 @@ const AdminResourcesPage = () => {
                         <TableHead>Category</TableHead>
                         <TableHead className="w-24">Order</TableHead>
                         <TableHead className="w-24">Type</TableHead>
+                        <TableHead className="w-24 text-center">Featured</TableHead>
                         <TableHead className="w-28 text-right">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -534,6 +560,10 @@ const AdminResourcesPage = () => {
                                   src={r.image_url}
                                   alt={r.title}
                                   className="h-full w-full object-cover"
+                                  onError={(e) => {
+                                    e.currentTarget.style.display = 'none';
+                                    e.currentTarget.parentElement!.innerHTML = `<div class="h-full w-full flex items-center justify-center text-muted-foreground text-xs font-bold bg-muted-foreground/10">${r.title.charAt(0)}</div>`;
+                                  }}
                                 />
                               ) : (
                                 <div className="h-full w-full flex items-center justify-center text-muted-foreground text-xs">
@@ -561,6 +591,18 @@ const AdminResourcesPage = () => {
                               {r.is_premium && <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/20">Premium</Badge>}
                               {r.is_paid && <Badge variant="secondary">Partner</Badge>}
                             </div>
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className={`h-8 w-8 ${r.is_featured ? "text-amber-500 hover:text-amber-600" : "text-muted-foreground"}`}
+                              onClick={() => handleToggleFeatured(r.id, r.is_featured)}
+                              title={r.is_featured ? "Unfeature resource" : "Feature resource"}
+                              disabled={savingId === r.id}
+                            >
+                              <Star className={`h-4 w-4 ${r.is_featured ? "fill-current" : ""}`} />
+                            </Button>
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex justify-end gap-1">
@@ -919,6 +961,18 @@ const AdminResourcesPage = () => {
               />
             </div>
             <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id="res-is-featured"
+                  checked={resourceFormData.is_featured}
+                  onCheckedChange={(checked) =>
+                    setResourceFormData({ ...resourceFormData, is_featured: Boolean(checked) })
+                  }
+                />
+                <label htmlFor="res-is-featured" className="text-sm">
+                  Featured resource (shows in top carousel)
+                </label>
+              </div>
               <div className="flex items-center gap-2">
                 <Checkbox
                   id="res-is-premium"
