@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,6 +29,8 @@ const DashboardPage = () => {
   const isGuestRestricted = isGuest && !authLoading;
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const [reviewedResumeCount, setReviewedResumeCount] = useState(0);
 
   const {
     profile,
@@ -143,6 +145,27 @@ const DashboardPage = () => {
       });
     }
   };
+
+  useEffect(() => {
+    const loadReviewedResumes = async () => {
+      if (!user || !isPmaMember) return;
+
+      const { count, error } = await supabase
+        .from("asset_reviews")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user.id)
+        .neq("status", "pending");
+
+      if (error) {
+        console.error("Error loading reviewed resumes:", error);
+        return;
+      }
+
+      setReviewedResumeCount(count ?? 0);
+    };
+
+    void loadReviewedResumes();
+  }, [user, isPmaMember]);
 
   if (loading) {
     return (
@@ -269,7 +292,7 @@ const DashboardPage = () => {
           <div className="grid lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
               {isPmaMember && (
-                <MemberToolsGrid />
+                <MemberToolsGrid resumeFeedbackCount={reviewedResumeCount} />
               )}
               
               {isPmaMember && (

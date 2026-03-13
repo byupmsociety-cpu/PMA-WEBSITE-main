@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import KpiCard from "@/components/admin/KpiCard";
 import { Users, UserPlus, Calendar, UsersRound, RefreshCw, Shield, BookOpen, Briefcase, FileText } from "lucide-react";
 
@@ -20,6 +21,7 @@ const AdminDashboardPage = () => {
     teamMembersTotal: 0,
     eventsTotal: 0,
     eventsUpcoming: 0,
+    pendingResumes: 0,
   });
 
   const since7dIso = useMemo(() => {
@@ -61,6 +63,7 @@ const AdminDashboardPage = () => {
         teamMembersRes,
         eventsTotalRes,
         eventsUpcomingRes,
+        pendingResumesRes,
       ] = await Promise.all([
         supabase.from("profiles").select("id", { count: "exact", head: true }).is("deleted_at", null),
         supabase
@@ -79,6 +82,10 @@ const AdminDashboardPage = () => {
           .from("events" as any)
           .select("id", { count: "exact", head: true })
           .gt("start_time", nowIso),
+        supabase
+          .from("asset_reviews")
+          .select("id", { count: "exact", head: true })
+          .eq("status", "pending"),
       ]);
 
       const anyError =
@@ -87,7 +94,8 @@ const AdminDashboardPage = () => {
         usersNew30dRes.error ||
         teamMembersRes.error ||
         eventsTotalRes.error ||
-        eventsUpcomingRes.error;
+        eventsUpcomingRes.error ||
+        pendingResumesRes.error;
 
       if (anyError) {
         throw anyError;
@@ -100,6 +108,7 @@ const AdminDashboardPage = () => {
         teamMembersTotal: teamMembersRes.count ?? 0,
         eventsTotal: eventsTotalRes.count ?? 0,
         eventsUpcoming: eventsUpcomingRes.count ?? 0,
+        pendingResumes: pendingResumesRes.count ?? 0,
       });
     } catch (e: any) {
       setMetricsError(e?.message || "Failed to load metrics.");
@@ -171,18 +180,20 @@ const AdminDashboardPage = () => {
               loading={loadingMetrics}
             />
             <KpiCard
-              title="Team members"
-              value={metrics.teamMembersTotal.toLocaleString()}
-              helperText="Shown on /team"
-              icon={<UsersRound />}
-              loading={loadingMetrics}
-            />
-            <KpiCard
               title="Upcoming events"
               value={metrics.eventsUpcoming.toLocaleString()}
               helperText={`${metrics.eventsTotal.toLocaleString()} total events`}
               icon={<Calendar />}
               loading={loadingMetrics}
+            />
+            <KpiCard
+              title="Pending resumes"
+              value={metrics.pendingResumes.toLocaleString()}
+              helperText="Awaiting admin review"
+              icon={<FileText />}
+              loading={loadingMetrics}
+              ctaLabel="Review resumes"
+              ctaTo="/admin/resumes"
             />
           </div>
         </section>
@@ -313,13 +324,29 @@ const AdminDashboardPage = () => {
                   </div>
                 </div>
 
-                <div className="rounded-xl border bg-card p-5 space-y-4 hover:border-primary/40 transition-colors">
+                <div className="rounded-xl border bg-card p-5 space-y-4 hover:border-primary/40 transition-colors relative">
+                  {metrics.pendingResumes > 0 && (
+                    <div className="absolute -top-2 -right-2">
+                      <Badge
+                        variant="destructive"
+                        className="rounded-full px-2 py-0.5 text-[11px] leading-none"
+                      >
+                        {metrics.pendingResumes > 99 ? "99+" : metrics.pendingResumes}
+                      </Badge>
+                    </div>
+                  )}
                   <div className="flex items-start justify-between gap-3">
                     <div className="space-y-1">
                       <h4 className="font-semibold">Resume Review</h4>
                       <p className="text-sm text-muted-foreground">
                         Manage the resume feedback queue.
                       </p>
+                      {metrics.pendingResumes > 0 && (
+                        <p className="text-xs text-destructive mt-1">
+                          {metrics.pendingResumes} resume
+                          {metrics.pendingResumes === 1 ? "" : "s"} awaiting review
+                        </p>
+                      )}
                     </div>
                     <div className="text-primary/70 bg-primary/10 p-2 rounded-lg">
                       <FileText className="h-5 w-5" />
