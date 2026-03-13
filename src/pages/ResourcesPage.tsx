@@ -29,9 +29,10 @@ interface DbResource {
   description: string;
   url: string;
   image_url: string;
-  tips: string[];
+  tips: string[] | null;
   is_paid: boolean;
   is_premium: boolean;
+  is_featured: boolean;
   display_order: number;
 }
 
@@ -43,6 +44,7 @@ interface Resource {
   tips?: string[];
   isPaid?: boolean;
   isPremium?: boolean;
+  isFeatured?: boolean;
 }
 
 interface Subcategory {
@@ -74,6 +76,46 @@ const ICON_MAP: Record<string, React.ReactNode> = {
   Lightbulb: <Lightbulb className="w-6 h-6" />,
 };
 
+const ResourceImage = ({ resource, isPmaMember }: { resource: Resource; isPmaMember: boolean }) => {
+  const [sourceIndex, setSourceIndex] = useState(0);
+
+  const getDomain = (urlString: string) => {
+    try { return new URL(urlString).hostname.replace('www.', ''); } catch (e) { return null; }
+  };
+  const domain = getDomain(resource.url);
+
+  const sources = [];
+  if (resource.image && resource.image.startsWith('http')) {
+    sources.push(resource.image);
+  }
+  if (resource.image && resource.image.startsWith('/assets/')) {
+    sources.push(resource.image);
+  }
+  if (domain) {
+    sources.push(`https://logo.clearbit.com/${domain}?size=240`);
+  }
+
+  const currentSrc = sources[sourceIndex];
+  const premiumOpacity = resource.isPremium && !isPmaMember ? 'opacity-60' : '';
+
+  if (!currentSrc || sourceIndex >= sources.length) {
+    return (
+      <div className={`w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-primary/5 text-primary/40 font-bold ${premiumOpacity}`}>
+        <span className="text-4xl">{resource.title.charAt(0)}</span>
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={currentSrc}
+      alt={resource.title}
+      className={`w-full h-full transition-opacity ${currentSrc.includes('clearbit') ? 'object-contain p-6 bg-white dark:bg-zinc-900' : 'object-cover'} ${premiumOpacity}`}
+      onError={() => setSourceIndex(i => i + 1)}
+    />
+  );
+};
+
 const ResourcesPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -85,7 +127,7 @@ const ResourcesPage = () => {
   const [selectedPaidResource, setSelectedPaidResource] = useState<{ title: string; url: string } | null>(null);
   const [selectedPremiumResource, setSelectedPremiumResource] = useState<{ title: string; url: string } | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
-  
+
   const [categories, setCategories] = useState<Category[]>([]);
   const [loadingData, setLoadingData] = useState(true);
 
@@ -122,11 +164,11 @@ const ResourcesPage = () => {
     const resourceParam = searchParams.get("resource");
     if (resourceParam && categories.length > 0) {
       let matchedResource: Resource | undefined;
-      
+
       for (const cat of categories) {
         matchedResource = cat.resources?.find(r => r.title === resourceParam);
         if (matchedResource) break;
-        
+
         if (cat.subcategories) {
           for (const sub of cat.subcategories) {
             matchedResource = sub.resources.find(r => r.title === resourceParam);
@@ -135,7 +177,7 @@ const ResourcesPage = () => {
         }
         if (matchedResource) break;
       }
-      
+
       if (matchedResource?.isPaid) {
         setSelectedPaidResource({ title: matchedResource.title, url: matchedResource.url });
       }
@@ -145,7 +187,7 @@ const ResourcesPage = () => {
 
   const loadResourcesData = async () => {
     setLoadingData(true);
-    
+
     const [categoriesResult, resourcesResult] = await Promise.all([
       supabase
         .from("resource_categories")
@@ -169,12 +211,12 @@ const ResourcesPage = () => {
       return;
     }
 
-    const dbCategories: DbResourceCategory[] = categoriesResult.data ?? [];
-    const dbResources: DbResource[] = resourcesResult.data ?? [];
+    const dbCategories: DbResourceCategory[] = (categoriesResult.data as any) ?? [];
+    const dbResources: DbResource[] = (resourcesResult.data as any) ?? [];
 
     const transformedCategories: Category[] = dbCategories.map((dbCat) => {
       const categoryResources = dbResources.filter((r) => r.category_id === dbCat.id);
-      
+
       const subcategoryNames = [...new Set(
         categoryResources
           .filter((r) => r.subcategory)
@@ -191,6 +233,7 @@ const ResourcesPage = () => {
         tips: r.tips && r.tips.length > 0 ? r.tips : undefined,
         isPaid: r.is_paid || undefined,
         isPremium: r.is_premium || undefined,
+        isFeatured: r.is_featured || undefined,
       });
 
       if (hasSubcategories) {
@@ -228,19 +271,18 @@ const ResourcesPage = () => {
     });
 
     setCategories(transformedCategories);
-    
-    const defaultResourceTitles = ["PMF Labs", "Lovable.dev", "Leland+", "Cursor", "APM Season", "Jobright"];
+
     const finalResources: Array<{ resource: Resource; category: Category; clicks: number }> = [];
 
     transformedCategories.forEach((category) => {
       category.resources?.forEach((resource) => {
-        if (defaultResourceTitles.includes(resource.title)) {
+        if (resource.isFeatured) {
           finalResources.push({ resource, category, clicks: 0 });
         }
       });
       category.subcategories?.forEach((subcategory) => {
         subcategory.resources.forEach((resource) => {
-          if (defaultResourceTitles.includes(resource.title)) {
+          if (resource.isFeatured) {
             finalResources.push({ resource, category, clicks: 0 });
           }
         });
@@ -257,7 +299,7 @@ const ResourcesPage = () => {
       .select("is_pma_member")
       .eq("user_id", userId)
       .single();
-    
+
     setIsPmaMember(profile?.is_pma_member ?? false);
   };
 
@@ -282,9 +324,19 @@ const ResourcesPage = () => {
 
   const searchResults = searchQuery
     ? categories.flatMap((category) => {
-        const results: Array<{ resource: Resource; category: Category }> = [];
-        
-        category.resources?.forEach((resource) => {
+      const results: Array<{ resource: Resource; category: Category }> = [];
+
+      category.resources?.forEach((resource) => {
+        if (
+          resource.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          resource.description.toLowerCase().includes(searchQuery.toLowerCase())
+        ) {
+          results.push({ resource, category });
+        }
+      });
+
+      category.subcategories?.forEach((subcategory) => {
+        subcategory.resources.forEach((resource) => {
           if (
             resource.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
             resource.description.toLowerCase().includes(searchQuery.toLowerCase())
@@ -292,41 +344,31 @@ const ResourcesPage = () => {
             results.push({ resource, category });
           }
         });
-        
-        category.subcategories?.forEach((subcategory) => {
-          subcategory.resources.forEach((resource) => {
-            if (
-              resource.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-              resource.description.toLowerCase().includes(searchQuery.toLowerCase())
-            ) {
-              results.push({ resource, category });
-            }
-          });
-        });
-        
-        return results;
-      })
+      });
+
+      return results;
+    })
     : [];
 
   const filteredCategories = categories.filter((category) => {
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
-    
+
     const titleMatch = category.title.toLowerCase().includes(query);
     const descMatch = category.description.toLowerCase().includes(query);
-    
+
     const resourceMatch = category.resources?.some(
       (resource) =>
         resource.title.toLowerCase().includes(query) || resource.description.toLowerCase().includes(query),
     ) || false;
-    
+
     const subcategoryMatch = category.subcategories?.some((subcategory) =>
       subcategory.resources.some(
         (resource) =>
           resource.title.toLowerCase().includes(query) || resource.description.toLowerCase().includes(query),
       ),
     ) || false;
-    
+
     return titleMatch || descMatch || resourceMatch || subcategoryMatch;
   });
 
@@ -386,7 +428,7 @@ const ResourcesPage = () => {
                 <CarouselContent>
                   {topResources.map(({ resource, category }, idx) => (
                     <CarouselItem key={idx} className="basis-1/3 md:basis-1/4 lg:basis-1/5 xl:basis-1/6">
-                      <Card 
+                      <Card
                         className={`h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer ${resource.isPremium && !isPmaMember ? 'ring-1 ring-amber-500/30' : ''}`}
                         onClick={(e) => {
                           if (resource.isPaid) {
@@ -413,7 +455,7 @@ const ResourcesPage = () => {
 
                           <div className="mb-1.5">
                             <div className="w-full aspect-square rounded-md overflow-hidden bg-muted mb-1.5 relative">
-                              <img src={resource.image} alt={resource.title} className={`w-full h-full object-cover ${resource.isPremium && !isPmaMember ? 'opacity-60' : ''}`} />
+                              <ResourceImage resource={resource} isPmaMember={isPmaMember} />
                               {resource.isPremium && !isPmaMember && (
                                 <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
                                   <Lock className="w-4 h-4 text-white" />
@@ -484,7 +526,7 @@ const ResourcesPage = () => {
                           <CarouselContent>
                             {subcategory.resources.map((resource, idx) => (
                               <CarouselItem key={idx} className="basis-1/3 md:basis-1/4 lg:basis-1/5 xl:basis-1/6">
-                                <Card 
+                                <Card
                                   className={`h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer ${resource.isPremium && !isPmaMember ? 'ring-1 ring-amber-500/30' : ''}`}
                                   onClick={(e) => {
                                     if (resource.isPaid) {
@@ -502,7 +544,7 @@ const ResourcesPage = () => {
                                   <CardContent className="p-2">
                                     <div className="mb-1.5">
                                       <div className="w-full aspect-square rounded-md overflow-hidden bg-muted mb-1.5 relative">
-                                        <img src={resource.image} alt={resource.title} className={`w-full h-full object-cover ${resource.isPremium && !isPmaMember ? 'opacity-60' : ''}`} />
+                                        <ResourceImage resource={resource} isPmaMember={isPmaMember} />
                                         {resource.isPremium && !isPmaMember && (
                                           <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
                                             <Lock className="w-4 h-4 text-white" />
@@ -542,7 +584,7 @@ const ResourcesPage = () => {
                   <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2.5">
                     {selectedCategoryData.resources?.map((resource, idx) => (
                       <AnimatedSection key={idx} animation="slide-up" delay={idx * 100}>
-                        <Card 
+                        <Card
                           className={`h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer ${resource.isPremium && !isPmaMember ? 'ring-1 ring-amber-500/30' : ''}`}
                           onClick={(e) => {
                             if (resource.isPaid) {
@@ -560,7 +602,7 @@ const ResourcesPage = () => {
                           <CardContent className="p-2">
                             <div className="mb-1.5">
                               <div className="w-full aspect-square rounded-md overflow-hidden bg-muted mb-1.5 relative">
-                                <img src={resource.image} alt={resource.title} className={`w-full h-full object-cover ${resource.isPremium && !isPmaMember ? 'opacity-60' : ''}`} />
+                                <ResourceImage resource={resource} isPmaMember={isPmaMember} />
                                 {resource.isPremium && !isPmaMember && (
                                   <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
                                     <Lock className="w-4 h-4 text-white" />
@@ -618,7 +660,7 @@ const ResourcesPage = () => {
             <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2.5">
               {searchResults.map(({ resource, category }, idx) => (
                 <AnimatedSection key={idx} animation="slide-up" delay={idx * 50}>
-                  <Card 
+                  <Card
                     className={`h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer ${resource.isPremium && !isPmaMember ? 'ring-1 ring-amber-500/30' : ''}`}
                     onClick={(e) => {
                       if (resource.isPaid) {
@@ -645,7 +687,7 @@ const ResourcesPage = () => {
 
                       <div className="mb-1.5">
                         <div className="w-full aspect-square rounded-md overflow-hidden bg-muted mb-1.5 relative">
-                          <img src={resource.image} alt={resource.title} className={`w-full h-full object-cover ${resource.isPremium && !isPmaMember ? 'opacity-60' : ''}`} />
+                          <ResourceImage resource={resource} isPmaMember={isPmaMember} />
                           {resource.isPremium && !isPmaMember && (
                             <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
                               <Lock className="w-4 h-4 text-white" />
@@ -714,9 +756,9 @@ const ResourcesPage = () => {
                     <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{category.description}</p>
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-muted-foreground">
-                        {category.resources?.length || 
-                         category.subcategories?.reduce((acc, sub) => acc + sub.resources.length, 0) || 
-                         0} resources
+                        {category.resources?.length ||
+                          category.subcategories?.reduce((acc, sub) => acc + sub.resources.length, 0) ||
+                          0} resources
                       </span>
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
