@@ -1,8 +1,13 @@
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Briefcase, FolderKanban, Users, FileText, Video, Network } from "lucide-react";
 
-export function MemberToolsGrid() {
+interface MemberToolsGridProps {
+  resumeFeedbackCount?: number;
+}
+
+export function MemberToolsGrid({ resumeFeedbackCount = 0 }: MemberToolsGridProps) {
   return (
     <div className="space-y-3">
       <h3 className="text-lg font-semibold flex items-center gap-2">
@@ -64,7 +69,17 @@ export function MemberToolsGrid() {
         </Link>
 
         <Link to="/resumes" className="group">
-          <Card className="h-full border-primary/20 hover:border-primary/50 transition-colors bg-card hover:bg-card/60">
+          <Card className="h-full border-primary/20 hover:border-primary/50 transition-colors bg-card hover:bg-card/60 relative">
+            {resumeFeedbackCount > 0 && (
+              <div className="absolute -top-2 -right-2">
+                <Badge
+                  variant="destructive"
+                  className="rounded-full px-2 py-0.5 text-[11px] leading-none"
+                >
+                  {resumeFeedbackCount > 99 ? "99+" : resumeFeedbackCount}
+                </Badge>
+              </div>
+            )}
             <CardContent className="p-5 flex flex-col items-center text-center space-y-3">
               <div className="p-3 bg-pink-500/10 rounded-full text-pink-600 dark:text-pink-400 group-hover:scale-110 transition-transform">
                 <FileText className="h-6 w-6" />
