@@ -283,6 +283,7 @@ export type Database = {
           target_roles: string[] | null
           updated_at: string
           user_id: string
+          last_seen_resume_feedback_at: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -309,6 +310,7 @@ export type Database = {
           target_roles?: string[] | null
           updated_at?: string
           user_id: string
+          last_seen_resume_feedback_at?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -335,6 +337,7 @@ export type Database = {
           target_roles?: string[] | null
           updated_at?: string
           user_id?: string
+          last_seen_resume_feedback_at?: string | null
         }
         Relationships: []
       }

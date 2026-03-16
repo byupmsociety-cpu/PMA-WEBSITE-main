@@ -17,7 +17,7 @@ const AdminDashboardPage = () => {
     usersTotal: 0,
     usersNew7d: 0,
     usersNew30d: 0,
-    teamMembersTotal: 0,
+    resumeReviewsPending: 0,
     eventsTotal: 0,
     eventsUpcoming: 0,
   });
@@ -58,7 +58,7 @@ const AdminDashboardPage = () => {
         usersTotalRes,
         usersNew7dRes,
         usersNew30dRes,
-        teamMembersRes,
+        resumeReviewsPendingRes,
         eventsTotalRes,
         eventsUpcomingRes,
       ] = await Promise.all([
@@ -73,7 +73,10 @@ const AdminDashboardPage = () => {
           .select("id", { count: "exact", head: true })
           .is("deleted_at", null)
           .gte("created_at", since30dIso),
-        supabase.from("team_members" as any).select("id", { count: "exact", head: true }),
+        supabase
+          .from("asset_reviews" as any)
+          .select("id", { count: "exact", head: true })
+          .eq("status", "pending"),
         supabase.from("events" as any).select("id", { count: "exact", head: true }),
         supabase
           .from("events" as any)
@@ -85,7 +88,7 @@ const AdminDashboardPage = () => {
         usersTotalRes.error ||
         usersNew7dRes.error ||
         usersNew30dRes.error ||
-        teamMembersRes.error ||
+        resumeReviewsPendingRes.error ||
         eventsTotalRes.error ||
         eventsUpcomingRes.error;
 
@@ -97,7 +100,7 @@ const AdminDashboardPage = () => {
         usersTotal: usersTotalRes.count ?? 0,
         usersNew7d: usersNew7dRes.count ?? 0,
         usersNew30d: usersNew30dRes.count ?? 0,
-        teamMembersTotal: teamMembersRes.count ?? 0,
+        resumeReviewsPending: resumeReviewsPendingRes.count ?? 0,
         eventsTotal: eventsTotalRes.count ?? 0,
         eventsUpcoming: eventsUpcomingRes.count ?? 0,
       });
@@ -170,13 +173,18 @@ const AdminDashboardPage = () => {
               icon={<UserPlus />}
               loading={loadingMetrics}
             />
-            <KpiCard
-              title="Team members"
-              value={metrics.teamMembersTotal.toLocaleString()}
-              helperText="Shown on /team"
-              icon={<UsersRound />}
-              loading={loadingMetrics}
-            />
+            <div className="space-y-2">
+              <KpiCard
+                title="Resumes to review"
+                value={metrics.resumeReviewsPending.toLocaleString()}
+                helperText="Pending resume submissions"
+                icon={<FileText />}
+                loading={loadingMetrics}
+              />
+              <Button asChild size="sm" variant="outline" className="w-full">
+                <Link to="/admin/resumes">Review resumes</Link>
+              </Button>
+            </div>
             <KpiCard
               title="Upcoming events"
               value={metrics.eventsUpcoming.toLocaleString()}
@@ -313,7 +321,12 @@ const AdminDashboardPage = () => {
                   </div>
                 </div>
 
-                <div className="rounded-xl border bg-card p-5 space-y-4 hover:border-primary/40 transition-colors">
+                <div className="rounded-xl border bg-card p-5 space-y-4 hover:border-primary/40 transition-colors relative">
+                  {metrics.resumeReviewsPending > 0 && (
+                    <div className="absolute -top-2 -right-2 flex h-6 min-w-[1.5rem] items-center justify-center rounded-full bg-red-500 text-[10px] font-semibold text-white px-1.5">
+                      {metrics.resumeReviewsPending > 99 ? "99+" : metrics.resumeReviewsPending}
+                    </div>
+                  )}
                   <div className="flex items-start justify-between gap-3">
                     <div className="space-y-1">
                       <h4 className="font-semibold">Resume Review</h4>

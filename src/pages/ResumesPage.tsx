@@ -75,9 +75,31 @@ const ResumesPage = () => {
         description: "Failed to load resume reviews.",
         variant: "destructive",
       });
-    } else {
-      setReviews(data as AssetReview[]);
+      setLoading(false);
+      return;
     }
+
+    const typed = (data || []) as AssetReview[];
+    setReviews(typed);
+
+    // Mark latest feedback as viewed for dashboard notifications (persistent in DB)
+    try {
+      const latestCompleted = typed
+        .filter((r) => r.status !== "pending")
+        .sort(
+          (a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+        )[0];
+
+      if (latestCompleted) {
+        await supabase
+          .from("profiles")
+          .update({ last_seen_resume_feedback_at: latestCompleted.updated_at })
+          .eq("user_id", user.id);
+      }
+    } catch (e) {
+      console.error("Error updating resume feedback last seen timestamp in DB:", e);
+    }
+
     setLoading(false);
   };
 
