@@ -157,7 +157,9 @@ const AdminResumesPage = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold">Resume Reviews</h1>
-            <p className="text-muted-foreground">Manage and review member resume submissions</p>
+            <p className="text-muted-foreground">
+              Provide human, PM-focused feedback on resumes that often have already been improved using VMock.
+            </p>
           </div>
           <Badge variant="outline" className="w-fit text-sm">
             {pendingReviews.length} Pending

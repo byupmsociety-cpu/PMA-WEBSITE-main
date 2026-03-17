@@ -129,7 +129,7 @@ export function MemberToolsGrid() {
               </div>
               <div className="space-y-1">
                 <h4 className="font-semibold">Resumes</h4>
-                <p className="text-xs text-muted-foreground hidden sm:block">Get feedback</p>
+                <p className="text-xs text-muted-foreground hidden sm:block">VMock + PMA feedback</p>
               </div>
             </CardContent>
           </Card>
