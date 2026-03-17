@@ -41,6 +41,7 @@ const ResumesPage = () => {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [vmockUsed, setVmockUsed] = useState<"yes" | "no" | null>(null);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -316,11 +317,56 @@ const ResumesPage = () => {
     <div className="min-h-screen pt-24 pb-20 bg-background">
       <div className="container max-w-4xl mx-auto px-4">
         
+        {/* Step 1: VMock */}
         <AnimatedSection animation="slide-up">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">Resume Review Hub</h1>
-            <p className="text-muted-foreground">
-              Upload your resume as a PDF and get asynchronous feedback from PMA leadership and alumni.
+          <div className="mb-8 space-y-4">
+            <div className="space-y-1">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
+                Step 1 · VMock
+              </p>
+              <h1 className="text-3xl font-bold mb-1">Start with VMock</h1>
+              <p className="text-muted-foreground">
+                As a BYU student, you get free access to VMock, an AI-powered resume review tool. Use it to quickly tighten formatting and basics before asking PMA for a deeper PM-focused review.
+              </p>
+            </div>
+            <Card className="border-primary/20">
+              <CardContent className="p-4 md:p-5 flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
+                <div className="space-y-2 flex-1">
+                  <Button
+                    asChild
+                    className="w-full md:w-auto"
+                  >
+                    <a
+                      href="https://www.vmock.com/byu/login"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Open VMock for instant feedback
+                    </a>
+                  </Button>
+                  <p className="text-xs text-muted-foreground md:text-sm">
+                    Log in with your BYU NetID, upload your resume, and iterate on VMock’s suggestions until you feel good about the score and basics.
+                  </p>
+                </div>
+                <ul className="text-xs text-muted-foreground space-y-1.5 md:text-sm md:w-1/2">
+                  <li><span className="font-semibold">•</span> Get instant scoring and section-by-section suggestions.</li>
+                  <li><span className="font-semibold">•</span> Fix formatting, structure, and obvious red flags quickly.</li>
+                  <li><span className="font-semibold">•</span> Then move to Step 2 for personalized PMA feedback.</li>
+                </ul>
+              </CardContent>
+            </Card>
+          </div>
+        </AnimatedSection>
+
+        {/* Step 2: PMA review */}
+        <AnimatedSection animation="slide-up" delay={75}>
+          <div className="mb-6 space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
+              Step 2 · PMA Review
+            </p>
+            <h2 className="text-2xl font-semibold">Upload for a PM-focused second pass</h2>
+            <p className="text-sm text-muted-foreground">
+              After (ideally) running your resume through VMock, upload it here so PMA leaders can help with PM storytelling, impact, and tailoring to roles. You can still submit even if you haven’t used VMock yet.
             </p>
           </div>
         </AnimatedSection>
@@ -330,12 +376,40 @@ const ResumesPage = () => {
           <AnimatedSection animation="slide-up" delay={100} className="md:col-span-1">
             <Card className="h-full border-primary/20 sticky top-24">
               <CardHeader>
-                <CardTitle className="text-lg">Upload Resume</CardTitle>
+                <CardTitle className="text-lg">Upload for PMA review</CardTitle>
                 <CardDescription>
-                  Submit a new version of your resume for feedback.
+                  Best after VMock. Submit your resume for a human second look from PMA leadership and alumni.
                 </CardDescription>
               </CardHeader>
               <CardContent>
+                <div className="mb-4 space-y-1.5 text-left">
+                  <p className="text-xs font-medium text-muted-foreground">
+                    Have you already used VMock on this resume?
+                  </p>
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant={vmockUsed === "yes" ? "default" : "outline"}
+                      size="xs"
+                      onClick={() => setVmockUsed("yes")}
+                    >
+                      Yes
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={vmockUsed === "no" ? "default" : "outline"}
+                      size="xs"
+                      onClick={() => setVmockUsed("no")}
+                    >
+                      Not yet
+                    </Button>
+                  </div>
+                  {vmockUsed === "no" && (
+                    <p className="text-[11px] text-amber-700 dark:text-amber-300">
+                      We recommend running your resume through VMock first for quick iterations, but you can still upload here anytime.
+                    </p>
+                  )}
+                </div>
                 <div 
                   className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
                     isDragging ? 'border-primary bg-primary/10 scale-[1.02]' : uploading ? 'border-primary bg-primary/5' : 'border-muted hover:border-primary/50 hover:bg-muted/50'
@@ -375,14 +449,16 @@ const ResumesPage = () => {
 
           {/* History Section */}
           <AnimatedSection animation="slide-up" delay={150} className="md:col-span-2">
-            <h2 className="text-xl font-semibold mb-4">Your Submissions</h2>
+            <h2 className="text-xl font-semibold mb-4">Your PMA review submissions</h2>
             
             {reviews.length === 0 ? (
               <Card className="bg-muted/30 border-dashed">
                 <CardContent className="flex flex-col items-center justify-center p-12 text-center text-muted-foreground">
                   <FileText className="w-12 h-12 mb-4 opacity-20" />
                   <p className="font-medium">No resumes uploaded yet</p>
-                  <p className="text-sm">Upload your first resume version on the left to get started.</p>
+                  <p className="text-sm">
+                    First, run your resume through VMock for quick AI feedback. Then upload your improved version on the left for a PM-focused review from PMA.
+                  </p>
                 </CardContent>
               </Card>
             ) : (
@@ -422,6 +498,38 @@ const ResumesPage = () => {
             )}
           </AnimatedSection>
         </div>
+
+        <AnimatedSection animation="slide-up" delay={200} className="mt-10">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">How to use VMock + PMA review together</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm text-muted-foreground">
+              <ol className="list-decimal list-inside space-y-2">
+                <li>
+                  <span className="font-semibold">Open VMock</span> using your BYU credentials at{" "}
+                  <a
+                    href="https://www.vmock.com/byu/login"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline underline-offset-2"
+                  >
+                    vmock.com/byu
+                  </a>{" "}
+                  and upload your resume for instant scoring and line-by-line suggestions.
+                </li>
+                <li>
+                  <span className="font-semibold">Apply the suggestions</span> until your resume feels strong (formatting, clarity,
+                  and basics dialed in).
+                </li>
+                <li>
+                  <span className="font-semibold">Upload here for a human second pass</span> so PMA leaders can help with PM-specific
+                  storytelling, impact, and tailoring to your target roles.
+                </li>
+              </ol>
+            </CardContent>
+          </Card>
+        </AnimatedSection>
       </div>
     </div>
   );
