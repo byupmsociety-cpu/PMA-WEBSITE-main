@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import KpiCard from "@/components/admin/KpiCard";
-import { Users, UserPlus, Calendar, UsersRound, RefreshCw, Shield, BookOpen, Briefcase, FileText } from "lucide-react";
+import { Users, UserPlus, Calendar, UsersRound, RefreshCw, Shield, BookOpen, Briefcase, FileText, Video } from "lucide-react";
 
 const AdminDashboardPage = () => {
   const { user, isAdmin, isSuperAdmin, loading } = useAuth();
@@ -309,16 +309,21 @@ const AdminDashboardPage = () => {
                 </div>
 
                 {/* Placeholders for upcoming Phase 2+ features */}
-                <div className="rounded-xl border bg-card/40 p-5 space-y-4 border-dashed relative overflow-hidden group">
-                  <div className="absolute inset-0 bg-muted/20 hidden group-hover:block transition-all"></div>
-                  <div className="flex items-start justify-between gap-3 relative z-10">
-                    <div className="space-y-1 opacity-60">
-                      <h4 className="font-semibold flex items-center gap-2">Mock Interviews <span className="text-[10px] bg-primary/20 text-primary px-2 py-0.5 rounded-full uppercase tracking-wider">Soon</span></h4>
+                <div className="rounded-xl border bg-card p-5 space-y-4 hover:border-primary/40 transition-colors">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="space-y-1">
+                      <h4 className="font-semibold">Mock Interviews</h4>
                       <p className="text-sm text-muted-foreground">
-                        Manage peer matching system.
+                        Monitor and manage mock interview activity.
                       </p>
                     </div>
+                    <div className="text-primary/70 bg-primary/10 p-2 rounded-lg">
+                      <Video className="h-5 w-5" />
+                    </div>
                   </div>
+                  <Button asChild className="w-full">
+                    <Link to="/admin/interviews">Manage interviews</Link>
+                  </Button>
                 </div>
 
                 <div className="rounded-xl border bg-card p-5 space-y-4 hover:border-primary/40 transition-colors relative">

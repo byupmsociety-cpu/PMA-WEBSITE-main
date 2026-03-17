@@ -697,6 +697,9 @@ export type Database = {
           start_time: string
           end_time: string
           is_booked: boolean
+          slot_type: string
+          interview_type: string
+          duration_minutes: number
           created_at: string
         }
         Insert: {
@@ -705,6 +708,9 @@ export type Database = {
           start_time: string
           end_time: string
           is_booked?: boolean
+          slot_type?: string
+          interview_type?: string
+          duration_minutes?: number
           created_at?: string
         }
         Update: {
@@ -713,6 +719,9 @@ export type Database = {
           start_time?: string
           end_time?: string
           is_booked?: boolean
+          slot_type?: string
+          interview_type?: string
+          duration_minutes?: number
           created_at?: string
         }
         Relationships: [
@@ -734,6 +743,10 @@ export type Database = {
           status: string
           meeting_link: string | null
           feedback_notes: string | null
+          completed_at: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          cancellation_reason: string | null
           created_at: string
           updated_at: string
         }
@@ -745,6 +758,10 @@ export type Database = {
           status?: string
           meeting_link?: string | null
           feedback_notes?: string | null
+          completed_at?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
+          cancellation_reason?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -756,6 +773,10 @@ export type Database = {
           status?: string
           meeting_link?: string | null
           feedback_notes?: string | null
+          completed_at?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
+          cancellation_reason?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -778,6 +799,92 @@ export type Database = {
             foreignKeyName: "mock_interviews_interviewee_id_fkey"
             columns: ["interviewee_id"]
             isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      mock_interview_feedback: {
+        Row: {
+          id: string
+          interview_id: string
+          reviewer_id: string
+          rubric: Json
+          notes: string | null
+          strengths: string | null
+          improvements: string | null
+          action_items: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          interview_id: string
+          reviewer_id: string
+          rubric?: Json
+          notes?: string | null
+          strengths?: string | null
+          improvements?: string | null
+          action_items?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          interview_id?: string
+          reviewer_id?: string
+          rubric?: Json
+          notes?: string | null
+          strengths?: string | null
+          improvements?: string | null
+          action_items?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mock_interview_feedback_interview_id_fkey"
+            columns: ["interview_id"]
+            isOneToOne: false
+            referencedRelation: "mock_interviews"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mock_interview_feedback_reviewer_id_fkey"
+            columns: ["reviewer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      mock_interview_mentors: {
+        Row: {
+          user_id: string
+          is_active: boolean
+          topics: string[] | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          user_id: string
+          is_active?: boolean
+          topics?: string[] | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          user_id?: string
+          is_active?: boolean
+          topics?: string[] | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mock_interview_mentors_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           }
@@ -884,6 +991,18 @@ export type Database = {
     }
     Functions: {
       calculate_user_progress: { Args: { user_uuid: string }; Returns: number }
+      book_mock_interview: {
+        Args: { p_slot_id: string }
+        Returns: Database["public"]["Tables"]["mock_interviews"]["Row"]
+      }
+      cancel_mock_interview: {
+        Args: { p_interview_id: string; p_reason?: string | null }
+        Returns: Database["public"]["Tables"]["mock_interviews"]["Row"]
+      }
+      complete_mock_interview: {
+        Args: { p_interview_id: string }
+        Returns: Database["public"]["Tables"]["mock_interviews"]["Row"]
+      }
       is_approved_pma_member: {
         Args: { email_address: string }
         Returns: boolean

@@ -9,6 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useMockInterviews } from "@/hooks/useMockInterviews";
 import { format } from "date-fns";
 
@@ -20,16 +22,37 @@ const MockInterviewsPage = () => {
     openSlots, 
     mySlots, 
     myInterviews, 
+    myFeedback,
     isLoading, 
     createSlot, 
     deleteSlot, 
-    bookInterview 
+    bookInterview,
+    updateInterview,
+    cancelInterview,
+    completeInterview,
+    upsertFeedback,
   } = useMockInterviews(user?.id);
 
   const [activeTab, setActiveTab] = useState<"find" | "schedule" | "library">("find");
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [newSlotDate, setNewSlotDate] = useState("");
   const [newSlotTime, setNewSlotTime] = useState("");
+  const [newSlotType, setNewSlotType] = useState<"peer" | "mentor">("peer");
+  const [newInterviewType, setNewInterviewType] = useState<"general" | "behavioral" | "product" | "case">("general");
+  const [newDuration, setNewDuration] = useState<30 | 45 | 60>(60);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [feedbackInterviewId, setFeedbackInterviewId] = useState<string | null>(null);
+  const [rubric, setRubric] = useState<Record<string, number>>({
+    structure: 3,
+    communication: 3,
+    productThinking: 3,
+    clarity: 3,
+  });
+  const [notes, setNotes] = useState("");
+  const [strengths, setStrengths] = useState("");
+  const [improvements, setImprovements] = useState("");
+  const [actionItems, setActionItems] = useState("");
+  const [meetingLinkDraft, setMeetingLinkDraft] = useState<Record<string, string>>({});
 
   const handleCreateSlot = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,11 +60,14 @@ const MockInterviewsPage = () => {
     
     // Create Date objects (keeping it simple for MVP)
     const start = new Date(`${newSlotDate}T${newSlotTime}`);
-    const end = new Date(start.getTime() + 60 * 60 * 1000); // 1 hour later
+    const end = new Date(start.getTime() + newDuration * 60 * 1000);
     
     await createSlot({
       startTime: start.toISOString(),
-      endTime: end.toISOString()
+      endTime: end.toISOString(),
+      slotType: newSlotType,
+      interviewType: newInterviewType,
+      durationMinutes: newDuration,
     });
     
     setIsAddOpen(false);
@@ -109,13 +135,54 @@ const MockInterviewsPage = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Start Time (1 hour slot)</Label>
+                  <Label>Start Time</Label>
                   <Input 
                     type="time" 
                     required 
                     value={newSlotTime} 
                     onChange={(e) => setNewSlotTime(e.target.value)} 
                   />
+                </div>
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="space-y-2">
+                    <Label>Type</Label>
+                    <Select value={newSlotType} onValueChange={(v) => setNewSlotType(v as any)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="peer">Peer</SelectItem>
+                        <SelectItem value="mentor">Mentor</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Focus</Label>
+                    <Select value={newInterviewType} onValueChange={(v) => setNewInterviewType(v as any)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="general">General</SelectItem>
+                        <SelectItem value="behavioral">Behavioral</SelectItem>
+                        <SelectItem value="product">Product</SelectItem>
+                        <SelectItem value="case">Case</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Minutes</Label>
+                    <Select value={String(newDuration)} onValueChange={(v) => setNewDuration(Number(v) as any)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="30">30</SelectItem>
+                        <SelectItem value="45">45</SelectItem>
+                        <SelectItem value="60">60</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
                 <Button type="submit" className="w-full">Post Availability</Button>
               </form>
@@ -151,6 +218,9 @@ const MockInterviewsPage = () => {
                           </CardTitle>
                           <div className="flex gap-2 text-xs text-muted-foreground">
                             {slot.profiles?.school_year && <Badge variant="secondary" className="text-[10px]">{slot.profiles.school_year}</Badge>}
+                            {slot.slot_type && <Badge variant="outline" className="text-[10px]">{slot.slot_type}</Badge>}
+                            {slot.interview_type && <Badge variant="outline" className="text-[10px]">{slot.interview_type}</Badge>}
+                            {slot.duration_minutes && <Badge variant="outline" className="text-[10px]">{slot.duration_minutes}m</Badge>}
                           </div>
                         </div>
                       </div>
@@ -168,7 +238,7 @@ const MockInterviewsPage = () => {
                       </div>
                       <Button 
                         className="w-full mt-auto" 
-                        onClick={() => bookInterview({ slotId: slot.id, interviewerId: slot.user_id })}
+                        onClick={() => bookInterview({ slotId: slot.id })}
                       >
                         Book Interview
                       </Button>
@@ -193,6 +263,8 @@ const MockInterviewsPage = () => {
                     const isInterviewer = interview.interviewer_id === user?.id;
                     const partner = isInterviewer ? interview.interviewee : interview.interviewer;
                     const roleLabel = isInterviewer ? "You are Interviewing" : "You are the Candidate";
+                    const feedbackForInterview = (myFeedback || []).find((f: any) => f.interview_id === interview.id) as any;
+                    const meetingLinkValue = meetingLinkDraft[interview.id] ?? interview.meeting_link ?? "";
                     
                     return (
                       <Card key={interview.id} className="bg-card">
@@ -218,7 +290,85 @@ const MockInterviewsPage = () => {
                                {format(new Date(interview.slot.start_time), "h:mm a")}
                              </div>
                            </div>
-                           <p className="text-xs text-muted-foreground">Reach out via email or Slack to coordinate a meeting link.</p>
+                           <div className="space-y-2">
+                             <Label className="text-xs">Meeting link (Zoom/Google Meet)</Label>
+                             <div className="flex gap-2">
+                               <Input
+                                 placeholder="Paste a meeting link..."
+                                 value={meetingLinkValue}
+                                 onChange={(e) =>
+                                   setMeetingLinkDraft((prev) => ({ ...prev, [interview.id]: e.target.value }))
+                                 }
+                               />
+                               <Button
+                                 variant="outline"
+                                 onClick={() =>
+                                   updateInterview({
+                                     interviewId: interview.id,
+                                     updates: { meeting_link: meetingLinkValue.trim() === "" ? null : meetingLinkValue.trim() },
+                                   })
+                                 }
+                               >
+                                 Save
+                               </Button>
+                             </div>
+                             <p className="text-xs text-muted-foreground">
+                               Tip: add a Google Meet link from your calendar event and paste it here.
+                             </p>
+                           </div>
+
+                           <div className="flex flex-wrap gap-2 pt-2">
+                             {interview.status === "scheduled" ? (
+                               <>
+                                 <Button variant="secondary" onClick={() => completeInterview({ interviewId: interview.id })}>
+                                   Mark completed
+                                 </Button>
+                                 <Button
+                                   variant="ghost"
+                                   className="text-destructive"
+                                   onClick={() => cancelInterview({ interviewId: interview.id })}
+                                 >
+                                   Cancel
+                                 </Button>
+                               </>
+                             ) : null}
+
+                             {isInterviewer ? (
+                               <Button
+                                 onClick={() => {
+                                  const existing = (myFeedback || []).find((f: any) => f.interview_id === interview.id) as any;
+                                  if (existing?.rubric) setRubric(existing.rubric as any);
+                                  setNotes(existing?.notes ?? "");
+                                  setStrengths(existing?.strengths ?? "");
+                                  setImprovements(existing?.improvements ?? "");
+                                  setActionItems(existing?.action_items ?? "");
+                                   setFeedbackInterviewId(interview.id);
+                                   setFeedbackOpen(true);
+                                 }}
+                                 disabled={interview.status !== "completed"}
+                               >
+                                 Leave feedback
+                               </Button>
+                             ) : null}
+
+                             {!isInterviewer && feedbackForInterview ? (
+                               <Button
+                                 variant="outline"
+                                 onClick={() => {
+                                   setFeedbackInterviewId(interview.id);
+                                   setFeedbackOpen(true);
+                                 }}
+                               >
+                                 View feedback
+                               </Button>
+                             ) : null}
+                           </div>
+
+                           {!isInterviewer && interview.status === "completed" && !feedbackForInterview ? (
+                             <p className="text-xs text-muted-foreground">
+                               Feedback hasn’t been submitted yet.
+                             </p>
+                           ) : null}
                         </CardContent>
                       </Card>
                     );
@@ -308,6 +458,171 @@ const MockInterviewsPage = () => {
             </div>
           </TabsContent>
         </Tabs>
+
+        <Dialog open={feedbackOpen} onOpenChange={setFeedbackOpen}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Mock interview feedback</DialogTitle>
+            </DialogHeader>
+
+            {(() => {
+              const interview = (myInterviews || []).find((i: any) => i.id === feedbackInterviewId) as any;
+              if (!interview) {
+                return <p className="text-sm text-muted-foreground">Select an interview to view feedback.</p>;
+              }
+
+              const isInterviewer = interview.interviewer_id === user?.id;
+              const existing = (myFeedback || []).find((f: any) => f.interview_id === interview.id) as any;
+              const canEdit = isInterviewer;
+
+              const shownRubric = (existing?.rubric as any) || rubric;
+              const shownNotes = existing?.notes ?? notes;
+              const shownStrengths = existing?.strengths ?? strengths;
+              const shownImprovements = existing?.improvements ?? improvements;
+              const shownActionItems = existing?.action_items ?? actionItems;
+
+              if (!canEdit) {
+                return (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-3">
+                      <Card>
+                        <CardContent className="p-4 space-y-1">
+                          <p className="text-xs text-muted-foreground">Structure</p>
+                          <p className="text-lg font-semibold">{shownRubric.structure ?? "-"}</p>
+                        </CardContent>
+                      </Card>
+                      <Card>
+                        <CardContent className="p-4 space-y-1">
+                          <p className="text-xs text-muted-foreground">Communication</p>
+                          <p className="text-lg font-semibold">{shownRubric.communication ?? "-"}</p>
+                        </CardContent>
+                      </Card>
+                      <Card>
+                        <CardContent className="p-4 space-y-1">
+                          <p className="text-xs text-muted-foreground">Product thinking</p>
+                          <p className="text-lg font-semibold">{shownRubric.productThinking ?? "-"}</p>
+                        </CardContent>
+                      </Card>
+                      <Card>
+                        <CardContent className="p-4 space-y-1">
+                          <p className="text-xs text-muted-foreground">Clarity</p>
+                          <p className="text-lg font-semibold">{shownRubric.clarity ?? "-"}</p>
+                        </CardContent>
+                      </Card>
+                    </div>
+
+                    <Card>
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-base">Notes</CardTitle>
+                      </CardHeader>
+                      <CardContent className="text-sm whitespace-pre-wrap">
+                        {shownNotes || <span className="text-muted-foreground">No notes provided.</span>}
+                      </CardContent>
+                    </Card>
+
+                    <div className="grid gap-3 md:grid-cols-2">
+                      <Card>
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-base">Strengths</CardTitle>
+                        </CardHeader>
+                        <CardContent className="text-sm whitespace-pre-wrap">
+                          {shownStrengths || <span className="text-muted-foreground">—</span>}
+                        </CardContent>
+                      </Card>
+                      <Card>
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-base">Improvements</CardTitle>
+                        </CardHeader>
+                        <CardContent className="text-sm whitespace-pre-wrap">
+                          {shownImprovements || <span className="text-muted-foreground">—</span>}
+                        </CardContent>
+                      </Card>
+                    </div>
+
+                    <Card>
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-base">Next steps</CardTitle>
+                      </CardHeader>
+                      <CardContent className="text-sm whitespace-pre-wrap">
+                        {shownActionItems || <span className="text-muted-foreground">—</span>}
+                      </CardContent>
+                    </Card>
+                  </div>
+                );
+              }
+
+              return (
+                <div className="space-y-5">
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      { key: "structure", label: "Structure" },
+                      { key: "communication", label: "Communication" },
+                      { key: "productThinking", label: "Product thinking" },
+                      { key: "clarity", label: "Clarity" },
+                    ].map((item) => (
+                      <div key={item.key} className="space-y-2">
+                        <Label>{item.label} (1–5)</Label>
+                        <Input
+                          type="number"
+                          min={1}
+                          max={5}
+                          value={rubric[item.key] ?? 3}
+                          onChange={(e) =>
+                            setRubric((prev) => ({ ...prev, [item.key]: Number(e.target.value) }))
+                          }
+                        />
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Notes / bullet point summary</Label>
+                    <Textarea
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                      placeholder={"- What went well\n- What to improve\n- Any frameworks to practice"}
+                      className="min-h-[120px]"
+                    />
+                  </div>
+
+                  <div className="grid gap-3 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label>Strengths</Label>
+                      <Textarea value={strengths} onChange={(e) => setStrengths(e.target.value)} className="min-h-[90px]" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Improvements</Label>
+                      <Textarea value={improvements} onChange={(e) => setImprovements(e.target.value)} className="min-h-[90px]" />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Action items / next steps</Label>
+                    <Textarea value={actionItems} onChange={(e) => setActionItems(e.target.value)} className="min-h-[90px]" />
+                  </div>
+
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      onClick={async () => {
+                        await upsertFeedback({
+                          interviewId: interview.id,
+                          rubric,
+                          notes,
+                          strengths,
+                          improvements,
+                          actionItems,
+                        });
+                        setFeedbackOpen(false);
+                      }}
+                    >
+                      Save feedback
+                    </Button>
+                  </div>
+                </div>
+              );
+            })()}
+          </DialogContent>
+        </Dialog>
 
       </div>
     </div>
