@@ -117,6 +117,10 @@ export const ROUTE_META: Record<string, { title: string; description: string }> 
     title: "Admin Resumes | BYU PMA",
     description: "Review member resumes and provide actionable feedback.",
   },
+  "/admin/interviews": {
+    title: "Admin Mock Interviews | BYU PMA",
+    description: "Monitor mock interview activity and manage interviews.",
+  },
 };
 
 /** Meta for 404 (unknown paths). Used for document.title and og/twitter when route is not found. */

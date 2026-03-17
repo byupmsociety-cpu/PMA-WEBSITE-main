@@ -40,6 +40,7 @@ import ApplicationTrackerPage from "./pages/ApplicationTrackerPage";
 import MockInterviewsPage from "./pages/MockInterviewsPage";
 import ResumesPage from "./pages/ResumesPage";
 import AdminResumesPage from "./pages/AdminResumesPage";
+import AdminInterviewsPage from "./pages/AdminInterviewsPage";
 
 const queryClient = new QueryClient();
 
@@ -83,6 +84,7 @@ const App = () => (
               <Route path="/admin/resources" element={<AdminResourcesPage />} />
               <Route path="/admin/jobs" element={<AdminJobsPage />} />
               <Route path="/admin/resumes" element={<AdminResumesPage />} />
+              <Route path="/admin/interviews" element={<AdminInterviewsPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <Footer />

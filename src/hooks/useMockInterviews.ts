@@ -2,6 +2,9 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "./use-toast";
 
+type SlotType = "peer" | "mentor";
+type InterviewType = "general" | "behavioral" | "product" | "case";
+
 export const useMockInterviews = (userId: string | undefined) => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -66,7 +69,19 @@ export const useMockInterviews = (userId: string | undefined) => {
   });
 
   const createSlotMutation = useMutation({
-    mutationFn: async ({ startTime, endTime }: { startTime: string, endTime: string }) => {
+    mutationFn: async ({
+      startTime,
+      endTime,
+      slotType = "peer",
+      interviewType = "general",
+      durationMinutes = 60,
+    }: {
+      startTime: string;
+      endTime: string;
+      slotType?: SlotType;
+      interviewType?: InterviewType;
+      durationMinutes?: 30 | 45 | 60;
+    }) => {
       if (!userId) throw new Error("Not logged in");
       const { data, error } = await supabase
         .from("mock_interview_slots")
@@ -74,6 +89,9 @@ export const useMockInterviews = (userId: string | undefined) => {
           user_id: userId,
           start_time: startTime,
           end_time: endTime,
+          slot_type: slotType,
+          interview_type: interviewType,
+          duration_minutes: durationMinutes,
         })
         .select()
         .single();
@@ -108,44 +126,54 @@ export const useMockInterviews = (userId: string | undefined) => {
   });
 
   const bookInterviewMutation = useMutation({
-    mutationFn: async ({ slotId, interviewerId }: { slotId: string, interviewerId: string }) => {
+    mutationFn: async ({ slotId }: { slotId: string }) => {
       if (!userId) throw new Error("Not logged in");
-      
-      // We must do this in two steps or use a Postgres function due to RLS, but for MVP:
-      // Since the user is not the slot owner, they can only UPDATE is_booked IF it's FALSE.
-      const { error: updateError } = await supabase
-        .from("mock_interview_slots")
-        .update({ is_booked: true })
-        .eq("id", slotId)
-        .eq("is_booked", false);
-      
-      if (updateError) throw updateError;
 
-      const { data, error } = await supabase
-        .from("mock_interviews")
-        .insert({
-          slot_id: slotId,
-          interviewer_id: interviewerId,
-          interviewee_id: userId,
-          status: "scheduled"
-        })
-        .select()
-        .single();
-
-      if (error) {
-        // Rollback (best effort, ideally a database function handles atomic booking)
-        await supabase.from("mock_interview_slots").update({ is_booked: false }).eq("id", slotId);
-        throw error;
-      }
+      const { data, error } = await supabase.rpc("book_mock_interview", { p_slot_id: slotId });
+      if (error) throw error;
       return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["mock_interview_slots"] });
       queryClient.invalidateQueries({ queryKey: ["mock_interviews"] });
-      toast({ title: "Interview booked successfully! 🎉" });
+      toast({ title: "Interview booked successfully!" });
     },
     onError: (error) => {
       toast({ title: "Error booking interview", description: error.message, variant: "destructive" });
+    }
+  });
+
+  const cancelInterviewMutation = useMutation({
+    mutationFn: async ({ interviewId, reason }: { interviewId: string; reason?: string }) => {
+      const { data, error } = await supabase.rpc("cancel_mock_interview", {
+        p_interview_id: interviewId,
+        p_reason: reason ?? null,
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["mock_interview_slots"] });
+      queryClient.invalidateQueries({ queryKey: ["mock_interviews"] });
+      toast({ title: "Interview cancelled" });
+    },
+    onError: (error) => {
+      toast({ title: "Error cancelling interview", description: error.message, variant: "destructive" });
+    }
+  });
+
+  const completeInterviewMutation = useMutation({
+    mutationFn: async ({ interviewId }: { interviewId: string }) => {
+      const { data, error } = await supabase.rpc("complete_mock_interview", { p_interview_id: interviewId });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["mock_interviews"] });
+      toast({ title: "Marked as completed" });
+    },
+    onError: (error) => {
+      toast({ title: "Error completing interview", description: error.message, variant: "destructive" });
     }
   });
 
@@ -170,14 +198,71 @@ export const useMockInterviews = (userId: string | undefined) => {
     }
   });
 
+  const { data: myFeedback, isLoading: loadingFeedback } = useQuery({
+    queryKey: ["mock_interview_feedback", "mine", userId],
+    queryFn: async () => {
+      if (!userId) return [];
+      const { data, error } = await supabase
+        .from("mock_interview_feedback")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!userId,
+  });
+
+  const upsertFeedbackMutation = useMutation({
+    mutationFn: async (payload: {
+      interviewId: string;
+      rubric: Record<string, any>;
+      notes?: string;
+      strengths?: string;
+      improvements?: string;
+      actionItems?: string;
+    }) => {
+      if (!userId) throw new Error("Not logged in");
+      const { data, error } = await supabase
+        .from("mock_interview_feedback")
+        .upsert(
+          {
+            interview_id: payload.interviewId,
+            reviewer_id: userId,
+            rubric: payload.rubric ?? {},
+            notes: payload.notes?.trim() ? payload.notes.trim() : null,
+            strengths: payload.strengths?.trim() ? payload.strengths.trim() : null,
+            improvements: payload.improvements?.trim() ? payload.improvements.trim() : null,
+            action_items: payload.actionItems?.trim() ? payload.actionItems.trim() : null,
+          },
+          { onConflict: "interview_id,reviewer_id" }
+        )
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["mock_interview_feedback"] });
+      toast({ title: "Feedback saved" });
+    },
+    onError: (error) => {
+      toast({ title: "Error saving feedback", description: error.message, variant: "destructive" });
+    }
+  });
+
   return {
     openSlots,
     mySlots,
     myInterviews,
-    isLoading: loadingSlots || loadingMySlots || loadingInterviews,
+    myFeedback,
+    isLoading: loadingSlots || loadingMySlots || loadingInterviews || loadingFeedback,
     createSlot: createSlotMutation.mutateAsync,
     deleteSlot: deleteSlotMutation.mutateAsync,
     bookInterview: bookInterviewMutation.mutateAsync,
     updateInterview: updateInterviewMutation.mutateAsync,
+    cancelInterview: cancelInterviewMutation.mutateAsync,
+    completeInterview: completeInterviewMutation.mutateAsync,
+    upsertFeedback: upsertFeedbackMutation.mutateAsync,
   };
 };
