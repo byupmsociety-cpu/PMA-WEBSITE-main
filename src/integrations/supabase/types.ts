@@ -154,6 +154,10 @@ export type Database = {
           reviewer_id: string | null
           created_at: string
           updated_at: string
+          is_tailored: boolean | null
+          job_title: string | null
+          job_url: string | null
+          job_description: string | null
         }
         Insert: {
           id?: string
@@ -165,6 +169,10 @@ export type Database = {
           reviewer_id?: string | null
           created_at?: string
           updated_at?: string
+          is_tailored?: boolean | null
+          job_title?: string | null
+          job_url?: string | null
+          job_description?: string | null
         }
         Update: {
           id?: string
@@ -176,6 +184,10 @@ export type Database = {
           reviewer_id?: string | null
           created_at?: string
           updated_at?: string
+          is_tailored?: boolean | null
+          job_title?: string | null
+          job_url?: string | null
+          job_description?: string | null
         }
         Relationships: [
           {

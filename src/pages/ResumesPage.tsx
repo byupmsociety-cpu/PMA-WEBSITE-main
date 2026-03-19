@@ -20,6 +20,10 @@ import {
   MessageSquare
 } from "lucide-react";
 import { format } from "date-fns";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 
 interface AssetReview {
   id: string;
@@ -30,6 +34,10 @@ interface AssetReview {
   feedback: string | null;
   created_at: string;
   updated_at: string;
+  is_tailored?: boolean;
+  job_title?: string | null;
+  job_url?: string | null;
+  job_description?: string | null;
 }
 
 const ResumesPage = () => {
@@ -40,8 +48,14 @@ const ResumesPage = () => {
   const [reviews, setReviews] = useState<AssetReview[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-  const [vmockUsed, setVmockUsed] = useState<"yes" | "no" | null>(null);
+  
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isContextModalOpen, setIsContextModalOpen] = useState(false);
+  
+  const [isTailored, setIsTailored] = useState<"yes" | "no" | null>(null);
+  const [jobTitle, setJobTitle] = useState("");
+  const [jobUrl, setJobUrl] = useState("");
+  const [jobDescription, setJobDescription] = useState("");
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -104,9 +118,7 @@ const ResumesPage = () => {
     setLoading(false);
   };
 
-  const processFile = async (file: File) => {
-    if (!user) return;
-
+  const handleFileSelection = (file: File) => {
     const validTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
     if (!validTypes.includes(file.type) && !file.name.toLowerCase().endsWith('.docx') && !file.name.toLowerCase().endsWith('.pdf')) {
       toast({
@@ -126,16 +138,37 @@ const ResumesPage = () => {
       return;
     }
 
+    setSelectedFile(file);
+    setIsTailored(null);
+    setJobTitle("");
+    setJobUrl("");
+    setJobDescription("");
+    setIsContextModalOpen(true);
+  };
+
+  const submitResume = async () => {
+    if (!user || !selectedFile) return;
+
+    if (isTailored === 'yes' && !jobTitle.trim()) {
+      toast({
+        title: "Missing Information",
+        description: "Please provide the role or company name.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setUploading(true);
+    setIsContextModalOpen(false);
 
     try {
-      const fileExt = file.name.split('.').pop();
+      const fileExt = selectedFile.name.split('.').pop();
       const fileName = `${user.id}-${Math.random()}.${fileExt}`;
       const filePath = `${user.id}/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
         .from('resumes')
-        .upload(filePath, file);
+        .upload(filePath, selectedFile);
 
       if (uploadError) {
         throw uploadError;
@@ -150,8 +183,12 @@ const ResumesPage = () => {
         .insert({
           user_id: user.id,
           file_url: publicUrl,
-          file_name: file.name,
-          status: 'pending'
+          file_name: selectedFile.name,
+          status: 'pending',
+          is_tailored: isTailored === 'yes',
+          job_title: isTailored === 'yes' ? jobTitle.trim() : null,
+          job_url: isTailored === 'yes' ? jobUrl.trim() : null,
+          job_description: isTailored === 'yes' ? jobDescription.trim() : null
         });
 
       if (dbError) throw dbError;
@@ -171,38 +208,17 @@ const ResumesPage = () => {
       });
     } finally {
       setUploading(false);
+      setSelectedFile(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
     }
   };
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      await processFile(file);
-    }
-  };
-
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    if (!uploading) setIsDragging(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setIsDragging(false);
-  };
-
-  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setIsDragging(false);
-    
-    if (uploading) return;
-
-    const file = e.dataTransfer.files?.[0];
-    if (file) {
-      await processFile(file);
+      handleFileSelection(file);
     }
   };
 
@@ -257,8 +273,13 @@ const ResumesPage = () => {
             <p className="text-xs text-muted-foreground">
               Submitted {format(new Date(review.created_at), "MMM d, yyyy 'at' h:mm a")}
             </p>
-            <div className="mt-2">
+            <div className="mt-2 flex flex-wrap gap-2 items-center">
               <StatusBadge status={review.status} />
+              {review.is_tailored && review.job_title && (
+                <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20">
+                  Targeted: {review.job_title}
+                </Badge>
+              )}
             </div>
           </div>
         </div>
@@ -316,124 +337,63 @@ const ResumesPage = () => {
   return (
     <div className="min-h-screen pt-24 pb-20 bg-background">
       <div className="container max-w-4xl mx-auto px-4">
-        
-        {/* Step 1: VMock */}
-        <AnimatedSection animation="slide-up">
-          <div className="mb-8 space-y-4">
-            <div className="space-y-1">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
-                Step 1 · VMock
-              </p>
-              <h1 className="text-3xl font-bold mb-1">Start with VMock</h1>
-              <p className="text-muted-foreground">
-                As a BYU student, you get free access to VMock, an AI-powered resume review tool. Use it to quickly tighten formatting and basics before asking PMA for a deeper PM-focused review.
-              </p>
-            </div>
-            <Card className="border-primary/20">
-              <CardContent className="p-4 md:p-5 flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
-                <div className="space-y-2 flex-1">
-                  <Button
-                    asChild
-                    className="w-full md:w-auto"
-                  >
-                    <a
-                      href="https://www.vmock.com/byu/login"
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Open VMock for instant feedback
-                    </a>
-                  </Button>
-                  <p className="text-xs text-muted-foreground md:text-sm">
-                    Log in with your BYU NetID, upload your resume, and iterate on VMock’s suggestions until you feel good about the score and basics.
-                  </p>
+        <div className="mb-10 text-center max-w-2xl mx-auto">
+          <h1 className="text-3xl font-bold mb-3">Resume Review</h1>
+          <p className="text-muted-foreground">
+            Get your resume reviewed using instant AI feedback or personalized guidance from PMA Leadership.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-8 mb-16">
+          {/* Card 1: VMock */}
+          <AnimatedSection animation="slide-up">
+            <Card className="h-full border-primary/20 hover:border-primary/50 transition-colors flex flex-col overflow-hidden group">
+              <div className="h-2 bg-blue-500 w-full"></div>
+              <CardHeader className="pb-4">
+                <div className="w-12 h-12 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center mb-4 group-hover:bg-blue-500/20 transition-colors">
+                  <span className="text-2xl">🤖</span>
                 </div>
-                <ul className="text-xs text-muted-foreground space-y-1.5 md:text-sm md:w-1/2">
-                  <li><span className="font-semibold">•</span> Get instant scoring and section-by-section suggestions.</li>
-                  <li><span className="font-semibold">•</span> Fix formatting, structure, and obvious red flags quickly.</li>
-                  <li><span className="font-semibold">•</span> Then move to Step 2 for personalized PMA feedback.</li>
-                </ul>
-              </CardContent>
-            </Card>
-          </div>
-        </AnimatedSection>
-
-        {/* Step 2: PMA review */}
-        <AnimatedSection animation="slide-up" delay={75}>
-          <div className="mb-6 space-y-2">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
-              Step 2 · PMA Review
-            </p>
-            <h2 className="text-2xl font-semibold">Upload for a PM-focused second pass</h2>
-            <p className="text-sm text-muted-foreground">
-              After (ideally) running your resume through VMock, upload it here so PMA leaders can help with PM storytelling, impact, and tailoring to roles. You can still submit even if you haven’t used VMock yet.
-            </p>
-          </div>
-        </AnimatedSection>
-
-        <div className="grid md:grid-cols-3 gap-6">
-          {/* Upload Section */}
-          <AnimatedSection animation="slide-up" delay={100} className="md:col-span-1">
-            <Card className="h-full border-primary/20 sticky top-24">
-              <CardHeader>
-                <CardTitle className="text-lg">Upload for PMA review</CardTitle>
-                <CardDescription>
-                  Best after VMock. Submit your resume for a human second look from PMA leadership and alumni.
+                <CardTitle className="text-xl">Instant AI Feedback</CardTitle>
+                <CardDescription className="text-sm mt-2">
+                  Use VMock to get immediate, automated scoring and line-by-line formatting suggestions.
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="mb-4 space-y-1.5 text-left">
-                  <p className="text-xs font-medium text-muted-foreground">
-                    Have you already used VMock on this resume?
-                  </p>
-                  <div className="flex gap-2">
-                    <Button
-                      type="button"
-                      variant={vmockUsed === "yes" ? "default" : "outline"}
-                      size="xs"
-                      onClick={() => setVmockUsed("yes")}
-                    >
-                      Yes
-                    </Button>
-                    <Button
-                      type="button"
-                      variant={vmockUsed === "no" ? "default" : "outline"}
-                      size="xs"
-                      onClick={() => setVmockUsed("no")}
-                    >
-                      Not yet
-                    </Button>
-                  </div>
-                  {vmockUsed === "no" && (
-                    <p className="text-[11px] text-amber-700 dark:text-amber-300">
-                      We recommend running your resume through VMock first for quick iterations, but you can still upload here anytime.
-                    </p>
-                  )}
+              <CardContent className="flex-1 flex flex-col justify-end">
+                <ul className="text-sm text-muted-foreground space-y-2 mb-8">
+                 <li className="flex items-start"><CheckCircle2 className="w-4 h-4 mr-2 text-blue-500 shrink-0 mt-0.5" /> Free access with BYU NetID</li>
+                 <li className="flex items-start"><CheckCircle2 className="w-4 h-4 mr-2 text-blue-500 shrink-0 mt-0.5" /> Catch spelling/grammar issues</li>
+                 <li className="flex items-start"><CheckCircle2 className="w-4 h-4 mr-2 text-blue-500 shrink-0 mt-0.5" /> Perfect your basic structure</li>
+                </ul>
+                <Button asChild className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+                  <a href="https://www.vmock.com/byu/login" target="_blank" rel="noreferrer">
+                    Open VMock ↗
+                  </a>
+                </Button>
+              </CardContent>
+            </Card>
+          </AnimatedSection>
+
+          {/* Card 2: PMA Review */}
+          <AnimatedSection animation="slide-up" delay={100}>
+            <Card className="h-full border-primary/20 hover:border-primary/50 transition-colors flex flex-col overflow-hidden group">
+              <div className="h-2 bg-primary w-full"></div>
+              <CardHeader className="pb-4">
+                <div className="w-12 h-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+                  <span className="text-2xl">👥</span>
                 </div>
-                <div 
-                  className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
-                    isDragging ? 'border-primary bg-primary/10 scale-[1.02]' : uploading ? 'border-primary bg-primary/5' : 'border-muted hover:border-primary/50 hover:bg-muted/50'
-                  }`}
-                  onClick={() => !uploading && fileInputRef.current?.click()}
-                  onDragOver={handleDragOver}
-                  onDragLeave={handleDragLeave}
-                  onDrop={handleDrop}
-                  style={{ cursor: uploading ? 'default' : 'pointer' }}
-                >
-                  {uploading ? (
-                    <div className="flex flex-col items-center gap-2">
-                       <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                       <p className="text-sm font-medium">Uploading...</p>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center gap-2 pointer-events-none">
-                      <div className={`p-3 rounded-full mb-2 transition-colors ${isDragging ? 'bg-primary/20 text-primary' : 'bg-primary/10 text-primary'}`}>
-                        <UploadCloud className="w-6 h-6" />
-                      </div>
-                      <p className="text-sm font-medium">Click to browse or drag & drop</p>
-                      <p className="text-xs text-muted-foreground">PDF or DOCX, up to 5MB</p>
-                    </div>
-                  )}
+                <CardTitle className="text-xl">PMA Leadership Review</CardTitle>
+                <CardDescription className="text-sm mt-2">
+                  Get personalized, targeted feedback on your PM storytelling, impact metrics, and role-fit.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="flex-1 flex flex-col justify-end">
+                <ul className="text-sm text-muted-foreground space-y-2 mb-8">
+                 <li className="flex items-start"><CheckCircle2 className="w-4 h-4 mr-2 text-primary shrink-0 mt-0.5" /> Human feedback from PMA leaders</li>
+                 <li className="flex items-start"><CheckCircle2 className="w-4 h-4 mr-2 text-primary shrink-0 mt-0.5" /> Targeted to your specific roles</li>
+                 <li className="flex items-start"><CheckCircle2 className="w-4 h-4 mr-2 text-primary shrink-0 mt-0.5" /> Best used after a VMock scan</li>
+                </ul>
+                
+                <div className="w-full">
                   <input 
                     type="file" 
                     accept="application/pdf,.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
@@ -442,94 +402,149 @@ const ResumesPage = () => {
                     onChange={handleFileUpload}
                     disabled={uploading}
                   />
+                  <Button 
+                    className="w-full" 
+                    onClick={() => !uploading && fileInputRef.current?.click()}
+                    disabled={uploading}
+                  >
+                    {uploading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <UploadCloud className="w-4 h-4 mr-2" />}
+                    Upload Resume
+                  </Button>
                 </div>
               </CardContent>
             </Card>
           </AnimatedSection>
+        </div>
 
-          {/* History Section */}
-          <AnimatedSection animation="slide-up" delay={150} className="md:col-span-2">
-            <h2 className="text-xl font-semibold mb-4">Your PMA review submissions</h2>
-            
-            {reviews.length === 0 ? (
-              <Card className="bg-muted/30 border-dashed">
-                <CardContent className="flex flex-col items-center justify-center p-12 text-center text-muted-foreground">
-                  <FileText className="w-12 h-12 mb-4 opacity-20" />
-                  <p className="font-medium">No resumes uploaded yet</p>
-                  <p className="text-sm">
-                    First, run your resume through VMock for quick AI feedback. Then upload your improved version on the left for a PM-focused review from PMA.
-                  </p>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="space-y-8">
-                {/* Latest Submission */}
-                <div>
-                  <h3 className="text-lg font-medium mb-3 flex items-center">
-                    <span className="bg-primary/10 text-primary px-2 py-1 rounded-md text-xs font-bold tracking-wider mr-2">LATEST</span>
-                    Current Status
-                  </h3>
-                  
-                  {reviews[0].status === 'rejected' && (
-                    <div className="mb-4 p-4 border border-destructive/50 bg-destructive/10 rounded-lg flex items-start gap-3">
-                      <AlertCircle className="w-5 h-5 text-destructive shrink-0 mt-0.5" />
-                      <div>
-                        <h4 className="font-medium text-destructive">Action Required: Revision Needed</h4>
-                        <p className="text-sm text-destructive/90 mt-1">
-                          Your resume requires some updates. Please review the feedback below, make the necessary changes, and upload a new version.
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {renderReviewCard(reviews[0], true)}
-                </div>
-
-                {/* Previous Versions */}
-                {reviews.length > 1 && (
-                  <div>
-                    <h3 className="text-lg font-medium mb-3 text-muted-foreground border-b border-border/50 pb-2">Previous Versions</h3>
-                    <div className="space-y-4">
-                      {reviews.slice(1).map((review) => renderReviewCard(review, false))}
+        {/* History Section */}
+        <AnimatedSection animation="slide-up" delay={200}>
+          <div className="mb-6 border-b border-border/50 pb-2">
+            <h2 className="text-2xl font-semibold">Your Review Submissions</h2>
+            <p className="text-sm text-muted-foreground mt-1">Track the status and read feedback for your uploaded resumes.</p>
+          </div>
+          
+          {reviews.length === 0 ? (
+            <Card className="bg-muted/30 border-dashed">
+              <CardContent className="flex flex-col items-center justify-center p-12 text-center text-muted-foreground">
+                <FileText className="w-12 h-12 mb-4 opacity-20" />
+                <p className="font-medium">No resumes uploaded yet</p>
+                <p className="text-sm mt-2 max-w-md">
+                  Upload your resume using the PMA Review card above. We recommend using VMock first to catch basic errors!
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="max-w-4xl space-y-8">
+              {/* Latest Submission */}
+              <div>
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3 flex items-center">
+                  <span className="bg-primary/10 text-primary px-2 py-0.5 rounded text-xs font-bold mr-2">LATEST</span>
+                  Current Status
+                </h3>
+                
+                {reviews[0].status === 'rejected' && (
+                  <div className="mb-4 p-4 border border-destructive/50 bg-destructive/10 rounded-lg flex items-start gap-3">
+                    <AlertCircle className="w-5 h-5 text-destructive shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="font-medium text-destructive">Action Required: Revision Needed</h4>
+                      <p className="text-sm text-destructive/90 mt-1">
+                        Your resume requires some updates. Please review the feedback below, make the necessary changes, and upload a new version.
+                      </p>
                     </div>
                   </div>
                 )}
-              </div>
-            )}
-          </AnimatedSection>
-        </div>
 
-        <AnimatedSection animation="slide-up" delay={200} className="mt-10">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">How to use VMock + PMA review together</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm text-muted-foreground">
-              <ol className="list-decimal list-inside space-y-2">
-                <li>
-                  <span className="font-semibold">Open VMock</span> using your BYU credentials at{" "}
-                  <a
-                    href="https://www.vmock.com/byu/login"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="underline underline-offset-2"
-                  >
-                    vmock.com/byu
-                  </a>{" "}
-                  and upload your resume for instant scoring and line-by-line suggestions.
-                </li>
-                <li>
-                  <span className="font-semibold">Apply the suggestions</span> until your resume feels strong (formatting, clarity,
-                  and basics dialed in).
-                </li>
-                <li>
-                  <span className="font-semibold">Upload here for a human second pass</span> so PMA leaders can help with PM-specific
-                  storytelling, impact, and tailoring to your target roles.
-                </li>
-              </ol>
-            </CardContent>
-          </Card>
+                {renderReviewCard(reviews[0], true)}
+              </div>
+
+              {/* Previous Versions */}
+              {reviews.length > 1 && (
+                <div>
+                  <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3 border-b border-border/50 pb-2">
+                    Previous Versions
+                  </h3>
+                  <div className="space-y-4">
+                    {reviews.slice(1).map((review) => renderReviewCard(review, false))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </AnimatedSection>
+        <Dialog open={isContextModalOpen} onOpenChange={setIsContextModalOpen}>
+          <DialogContent className="sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle>Job Context</DialogTitle>
+              <DialogDescription>
+                Is this resume tailored for a specific job application? Providing this context helps reviewers give more targeted feedback.
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-4 py-4">
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant={isTailored === "yes" ? "default" : "outline"}
+                  className="flex-1"
+                  onClick={() => setIsTailored("yes")}
+                >
+                  Yes, it's for a specific job
+                </Button>
+                <Button
+                  type="button"
+                  variant={isTailored === "no" ? "default" : "outline"}
+                  className="flex-1"
+                  onClick={() => setIsTailored("no")}
+                >
+                  No, general resume
+                </Button>
+              </div>
+
+              {isTailored === "yes" && (
+                <div className="space-y-4 pt-4 border-t animate-in fade-in slide-in-from-top-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="jobTitle">Role / Company <span className="text-red-500">*</span></Label>
+                    <Input 
+                      id="jobTitle" 
+                      placeholder="e.g. Product Manager Intern at Google" 
+                      value={jobTitle}
+                      onChange={(e) => setJobTitle(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="jobUrl">Job Link (Optional)</Label>
+                    <Input 
+                      id="jobUrl" 
+                      type="url"
+                      placeholder="https://..." 
+                      value={jobUrl}
+                      onChange={(e) => setJobUrl(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="jobDesc">Job Description (Optional)</Label>
+                    <Textarea 
+                      id="jobDesc" 
+                      placeholder="Paste the key requirements or description here if the link might be broken..." 
+                      className="min-h-[100px] resize-y"
+                      value={jobDescription}
+                      onChange={(e) => setJobDescription(e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsContextModalOpen(false)}>Cancel</Button>
+              <Button onClick={submitResume} disabled={isTailored === null || (isTailored === 'yes' && !jobTitle.trim()) || uploading}>
+                {uploading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+                Submit Resume
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
       </div>
     </div>
   );
