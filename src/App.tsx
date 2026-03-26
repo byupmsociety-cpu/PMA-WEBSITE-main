@@ -14,8 +14,6 @@ import EventsPage from "./pages/EventsPage";
 import ContactPage from "./pages/ContactPage";
 import DiscoverPage from "./pages/DiscoverPage";
 import NotFound from "./pages/NotFound";
-import Navigation from "./components/Navigation";
-import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollToTop";
 import RouteMeta from "./components/RouteMeta";
 import GamePage from './pages/GamePage';
@@ -41,7 +39,8 @@ import MockInterviewsPage from "./pages/MockInterviewsPage";
 import ResumesPage from "./pages/ResumesPage";
 import AdminResumesPage from "./pages/AdminResumesPage";
 import AdminInterviewsPage from "./pages/AdminInterviewsPage";
-
+import AppLayout from "./components/layout/AppLayout";
+import PublicLayout from "./components/layout/PublicLayout";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -54,40 +53,48 @@ const App = () => (
           <BrowserRouter>
             <ScrollToTop />
             <RouteMeta />
-            <Navigation />
             <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/team" element={<TeamPage />} />
-              <Route path="/hackathon" element={<HackathonPage />} />
-              <Route path="/hackathon/share" element={<HackathonSharePage />} />
-              <Route path="/hackathon/faq" element={<HackathonFAQPage />} />
-              <Route path="/events" element={<EventsPage />} />
-              <Route path="/resources" element={<ResourcesPage />} />
-              <Route path="/contact" element={<ContactPage />} />
-              <Route path="/discover" element={<DiscoverPage />} />
+              {/* Public Marketing Routes */}
+              <Route element={<PublicLayout />}>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/team" element={<TeamPage />} />
+                <Route path="/hackathon" element={<HackathonPage />} />
+                <Route path="/hackathon/share" element={<HackathonSharePage />} />
+                <Route path="/hackathon/faq" element={<HackathonFAQPage />} />
+                <Route path="/contact" element={<ContactPage />} />
+                <Route path="/discover" element={<DiscoverPage />} />
+                <Route path="/auth" element={<AuthPage />} />
+                <Route path="/blocked" element={<BlockedPage />} />
+                <Route path="/roadmap" element={<RoadmapPage />} />
+                <Route path="*" element={<NotFound />} />
+              </Route>
+
+              {/* Authenticated / Member Portal Routes */}
+              <Route element={<AppLayout />}>
+                <Route path="/dashboard" element={<DashboardRoute />} />
+                <Route path="/events" element={<EventsPage />} />
+                <Route path="/resources" element={<ResourcesPage />} />
+                <Route path="/jobs" element={<JobsPage />} />
+                <Route path="/members" element={<MembersPage />} />
+                <Route path="/tracker" element={<ApplicationTrackerPage />} />
+                <Route path="/interviews" element={<MockInterviewsPage />} />
+                <Route path="/resumes" element={<ResumesPage />} />
+                <Route path="/preferences" element={<JobPreferencesPage />} />
+                <Route path="/profile" element={<ProfilePage />} />
+
+                {/* Admin Routes */}
+                <Route path="/admin" element={<AdminDashboardPage />} />
+                <Route path="/admin/access" element={<AdminAccessPage />} />
+                <Route path="/admin/team" element={<AdminTeamPage />} />
+                <Route path="/admin/events" element={<AdminEventsPage />} />
+                <Route path="/admin/resources" element={<AdminResourcesPage />} />
+                <Route path="/admin/jobs" element={<AdminJobsPage />} />
+                <Route path="/admin/resumes" element={<AdminResumesPage />} />
+                <Route path="/admin/interviews" element={<AdminInterviewsPage />} />
+              </Route>
+
               <Route path="/game" element={<GamePage />} />
-              <Route path="/auth" element={<AuthPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/dashboard" element={<DashboardRoute />} />
-              <Route path="/preferences" element={<JobPreferencesPage />} />
-              <Route path="/jobs" element={<JobsPage />} />
-              <Route path="/roadmap" element={<RoadmapPage />} />
-              <Route path="/members" element={<MembersPage />} />
-              <Route path="/tracker" element={<ApplicationTrackerPage />} />
-              <Route path="/interviews" element={<MockInterviewsPage />} />
-              <Route path="/resumes" element={<ResumesPage />} />
-              <Route path="/blocked" element={<BlockedPage />} />
-              <Route path="/admin" element={<AdminDashboardPage />} />
-              <Route path="/admin/access" element={<AdminAccessPage />} />
-              <Route path="/admin/team" element={<AdminTeamPage />} />
-              <Route path="/admin/events" element={<AdminEventsPage />} />
-              <Route path="/admin/resources" element={<AdminResourcesPage />} />
-              <Route path="/admin/jobs" element={<AdminJobsPage />} />
-              <Route path="/admin/resumes" element={<AdminResumesPage />} />
-              <Route path="/admin/interviews" element={<AdminInterviewsPage />} />
-              <Route path="*" element={<NotFound />} />
             </Routes>
-            <Footer />
           </BrowserRouter>
           <Analytics />
           <SpeedInsights />

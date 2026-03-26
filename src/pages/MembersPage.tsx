@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import AnimatedSection from "@/components/AnimatedSection";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,8 @@ import {
   Settings,
   Coffee,
   Building2,
+  Copy,
+  Check,
 } from "lucide-react";
 
 interface MemberProfile {
@@ -42,6 +45,8 @@ interface MemberProfile {
   is_alumni: boolean | null;
   open_to_coffee_chats: boolean | null;
   current_company: string | null;
+  email: string | null;
+  role: string | null;
 }
 
 const RECRUITING_STAGES = [
@@ -63,6 +68,7 @@ const SCHOOL_YEARS = [
 const MembersPage = () => {
   const { user, profile, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const [members, setMembers] = useState<MemberProfile[]>([]);
   const [loading, setLoading] = useState(true);
@@ -71,6 +77,20 @@ const MembersPage = () => {
   const [filterYear, setFilterYear] = useState<string>("all");
   const [showAlumniOnly, setShowAlumniOnly] = useState(false);
   const [showChatsOnly, setShowChatsOnly] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const handleCopyEmail = (e: React.MouseEvent, email: string, memberId: string) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(email);
+    setCopiedId(memberId);
+    toast({
+      title: "Email copied",
+      description: "Email address copied to clipboard."
+    });
+    setTimeout(() => {
+      setCopiedId(null);
+    }, 2000);
+  };
 
   const isPmaMember = profile?.is_pma_member ?? false;
 
@@ -91,11 +111,13 @@ const MembersPage = () => {
 
     const { data, error } = await supabase
       .from("profiles")
-      .select("id, user_id, full_name, avatar_url, school_year, recruiting_stage, target_roles, linkedin_url, bio, is_alumni, open_to_coffee_chats, current_company")
+      .select("id, user_id, full_name, avatar_url, school_year, recruiting_stage, target_roles, linkedin_url, bio, is_alumni, open_to_coffee_chats, current_company, email, role")
       .eq("is_pma_member", true)
       .eq("is_visible_in_directory", true)
       .is("deleted_at", null)
       .eq("is_blocked", false)
+      .neq("role", "super-admin")
+      .neq("full_name", "PMA Super Admin")
       .order("full_name", { ascending: true });
 
     if (error) {
@@ -324,9 +346,24 @@ const MembersPage = () => {
                                 rel="noopener noreferrer"
                                 className="text-muted-foreground hover:text-primary"
                                 onClick={(e) => e.stopPropagation()}
+                                title="LinkedIn Profile"
                               >
                                 <Linkedin className="w-4 h-4" />
                               </a>
+                            )}
+                            {member.email && (
+                              <div
+                                className="group flex items-center gap-1.5 text-muted-foreground ml-2 px-1.5 py-0.5 rounded-md border border-transparent hover:border-border hover:bg-muted/50 cursor-pointer transition-colors"
+                                onClick={(e) => handleCopyEmail(e, member.email!, member.id)}
+                                title="Copy Email"
+                              >
+                                <span className="text-xs">{member.email}</span>
+                                {copiedId === member.id ? (
+                                  <Check className="w-3.5 h-3.5 text-green-500" />
+                                ) : (
+                                  <Copy className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                )}
+                              </div>
                             )}
                           </div>
                           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
@@ -351,31 +388,43 @@ const MembersPage = () => {
                       </div>
 
                       {member.current_company && (
-                        <div className="flex items-center gap-2 text-sm font-medium mt-3 text-foreground">
-                          <Building2 className="w-4 h-4 text-primary" />
-                          {member.current_company}
+                        <div className="mt-4">
+                          <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1 flex items-center gap-1.5">
+                            <Building2 className="w-3 h-3" />
+                            Current Company
+                          </p>
+                          <p className="text-sm font-medium text-foreground">
+                            {member.current_company}
+                          </p>
+                        </div>
+                      )}
+
+                      {member.target_roles && member.target_roles.length > 0 && (
+                        <div className="mt-4">
+                          <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                            <Briefcase className="w-3 h-3" />
+                            Target Roles
+                          </p>
+                          <div className="flex flex-wrap gap-1.5">
+                            {member.target_roles.slice(0, 3).map((role, i) => (
+                              <Badge key={i} variant="secondary" className="text-xs bg-secondary/50 hover:bg-secondary">
+                                {role}
+                              </Badge>
+                            ))}
+                            {member.target_roles.length > 3 && (
+                              <Badge variant="secondary" className="text-xs bg-secondary/50 hover:bg-secondary">
+                                +{member.target_roles.length - 3} more
+                              </Badge>
+                            )}
+                          </div>
                         </div>
                       )}
 
                       {member.bio && (
-                        <p className="text-sm text-muted-foreground mt-3 line-clamp-2">
-                          {member.bio}
-                        </p>
-                      )}
-
-                      {member.target_roles && member.target_roles.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-3">
-                          {member.target_roles.slice(0, 3).map((role, i) => (
-                            <Badge key={i} variant="secondary" className="text-xs">
-                              <Briefcase className="w-3 h-3 mr-1" />
-                              {role}
-                            </Badge>
-                          ))}
-                          {member.target_roles.length > 3 && (
-                            <Badge variant="secondary" className="text-xs">
-                              +{member.target_roles.length - 3}
-                            </Badge>
-                          )}
+                        <div className="mt-4 pt-4 border-t border-border/50">
+                          <p className="text-sm text-muted-foreground line-clamp-3">
+                            {member.bio}
+                          </p>
                         </div>
                       )}
 

@@ -3,10 +3,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { 
-  Target, 
-  BookOpen, 
-  Briefcase, 
+import {
+  Target,
+  BookOpen,
+  Briefcase,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
@@ -21,7 +21,6 @@ import {
   BadgesCard,
   MemberBenefitsCard,
   UpcomingEventsCard,
-  MemberToolsGrid,
 } from "@/components/dashboard";
 
 const DashboardPage = () => {
@@ -133,9 +132,9 @@ const DashboardPage = () => {
 
   const handleToggleStep = async (stepId: string, currentStatus: boolean) => {
     if (isGuestRestricted) return;
-    
+
     await toggleStepCompletion(stepId, currentStatus);
-    
+
     if (!currentStatus) {
       toast({
         title: "Step Completed! 🎉",
@@ -146,8 +145,8 @@ const DashboardPage = () => {
 
   if (loading) {
     return (
-      <div className={`min-h-screen bg-background ${isGuestRestricted ? "pt-32" : "pt-20"}`}>
-        <div className="container max-w-7xl mx-auto py-8 px-4">
+      <div className="py-8">
+        <div className="container max-w-7xl mx-auto px-4">
           <div className="space-y-6">
             <Skeleton className="h-24 w-full" />
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -173,7 +172,7 @@ const DashboardPage = () => {
 
   if (!profile?.persona) {
     return (
-      <div className={`min-h-screen bg-background px-4 ${isGuestRestricted ? "pt-32 pb-12" : "pt-20 pb-12"}`}>
+      <div className="py-12 px-4">
         <div className="container max-w-4xl mx-auto">
           <Card className="border-2 border-primary/20">
             <CardHeader className="text-center space-y-4">
@@ -192,9 +191,8 @@ const DashboardPage = () => {
                 <button
                   onClick={() => !isGuestRestricted && updatePersona("curious")}
                   disabled={isGuestRestricted}
-                  className={`p-6 rounded-lg border-2 border-border transition-all text-left space-y-2 group ${
-                    isGuestRestricted ? "opacity-60 cursor-not-allowed" : "hover:border-primary hover:bg-primary/5"
-                  }`}
+                  className={`p-6 rounded-lg border-2 border-border transition-all text-left space-y-2 group ${isGuestRestricted ? "opacity-60 cursor-not-allowed" : "hover:border-primary hover:bg-primary/5"
+                    }`}
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -210,9 +208,8 @@ const DashboardPage = () => {
                 <button
                   onClick={() => !isGuestRestricted && updatePersona("starting")}
                   disabled={isGuestRestricted}
-                  className={`p-6 rounded-lg border-2 border-border transition-all text-left space-y-2 group ${
-                    isGuestRestricted ? "opacity-60 cursor-not-allowed" : "hover:border-primary hover:bg-primary/5"
-                  }`}
+                  className={`p-6 rounded-lg border-2 border-border transition-all text-left space-y-2 group ${isGuestRestricted ? "opacity-60 cursor-not-allowed" : "hover:border-primary hover:bg-primary/5"
+                    }`}
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -228,9 +225,8 @@ const DashboardPage = () => {
                 <button
                   onClick={() => !isGuestRestricted && updatePersona("recruiting")}
                   disabled={isGuestRestricted}
-                  className={`p-6 rounded-lg border-2 border-border transition-all text-left space-y-2 group ${
-                    isGuestRestricted ? "opacity-60 cursor-not-allowed" : "hover:border-primary hover:bg-primary/5"
-                  }`}
+                  className={`p-6 rounded-lg border-2 border-border transition-all text-left space-y-2 group ${isGuestRestricted ? "opacity-60 cursor-not-allowed" : "hover:border-primary hover:bg-primary/5"
+                    }`}
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -253,8 +249,8 @@ const DashboardPage = () => {
   const journeyProgress = profile?.progress_percentage || 0;
 
   return (
-    <div className={`min-h-screen bg-background ${isGuestRestricted ? "pt-32" : "pt-20"}`}>
-      <div className="container max-w-7xl mx-auto py-8 px-4">
+    <div className="py-8">
+      <div className="container max-w-7xl mx-auto px-4">
         <div className="space-y-8">
           <DashboardHeader
             fullName={profile?.full_name || null}
@@ -268,10 +264,7 @@ const DashboardPage = () => {
 
           <div className="grid lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
-              {isPmaMember && (
-                <MemberToolsGrid />
-              )}
-              
+
               {isPmaMember && (
                 <div className="grid sm:grid-cols-2 gap-4">
                   <JobsAlertCard
