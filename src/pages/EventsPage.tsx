@@ -65,7 +65,7 @@ const EventsPage = () => {
       : event.description;
     
     // Extract Google Meet link from description if present
-    const meetLinkMatch = event.description.match(/(https:\/\/meet\.google\.com\/[a-z\-]+)/i);
+    const meetLinkMatch = event.description.match(/(https:\/\/meet\.google\.com\/[a-z-]+)/i);
     const meetLink = meetLinkMatch ? meetLinkMatch[1] : '';
     
     // Combine physical location and online meeting link

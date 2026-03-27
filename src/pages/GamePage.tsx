@@ -175,7 +175,6 @@ const GamePage = () => {
 
   // Game over logic
   const gameOver = useCallback(() => {
-    console.log('Game Over triggered!');
     setGameState(prev => ({
       ...prev,
       isPlaying: false,
@@ -193,7 +192,7 @@ const GamePage = () => {
     if (!gameState.isPlaying || gameState.isGameOver) return;
 
     setGameState(prev => {
-      let newState = { ...prev };
+      const newState = { ...prev };
 
       // Update bird physics
       newState.birdVelocity += GRAVITY;
