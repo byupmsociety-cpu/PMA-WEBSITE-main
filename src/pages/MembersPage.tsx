@@ -112,10 +112,10 @@ const MembersPage = () => {
       .from("profiles")
       .select("id, user_id, full_name, avatar_url, school_year, recruiting_stage, target_roles, linkedin_url, bio, is_alumni, open_to_coffee_chats, current_company, email, role")
       .eq("is_pma_member", true)
+      .in("role", ["member", "admin"])
       .eq("is_visible_in_directory", true)
       .is("deleted_at", null)
       .eq("is_blocked", false)
-      .neq("role", "super-admin")
       .neq("full_name", "PMA Super Admin")
       .order("full_name", { ascending: true });
 
