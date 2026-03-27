@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import AnimatedSection from "@/components/AnimatedSection";
+import MemberLockout from "@/components/MemberLockout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -10,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { Briefcase, Building2, MapPin, DollarSign, Bell, Save, Loader2, Crown, Lock } from "lucide-react";
+import { Briefcase, Building2, MapPin, DollarSign, Bell, Save, Loader2 } from "lucide-react";
 
 interface JobPreferences {
   id?: string;
@@ -191,34 +192,15 @@ const JobPreferencesPage = () => {
   }
 
   if (!isPmaMember) {
-    return (
-      <div className="min-h-screen pt-24 pb-20 bg-background">
-        <div className="container max-w-2xl mx-auto px-4">
-          <AnimatedSection animation="slide-up">
-            <Card className="border-amber-500/30">
-              <CardContent className="pt-8 pb-8 text-center space-y-4">
-                <div className="w-16 h-16 rounded-full bg-amber-500/10 flex items-center justify-center mx-auto">
-                  <Lock className="w-8 h-8 text-amber-500" />
-                </div>
-                <h1 className="text-2xl font-bold">PMA Members Only</h1>
-                <p className="text-muted-foreground max-w-md mx-auto">
-                  Job preferences and alerts are exclusive to PMA club members. 
-                  Join PMA to get personalized job notifications when opportunities 
-                  matching your criteria are posted.
-                </p>
-                <Button 
-                  onClick={() => window.open("https://clubs.byu.edu/link/club/18295873486206095", '_blank')}
-                  className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
-                >
-                  <Crown className="w-4 h-4 mr-2" />
-                  Join PMA
-                </Button>
-              </CardContent>
-            </Card>
-          </AnimatedSection>
-        </div>
-      </div>
-    );
+    return <MemberLockout 
+      description="Job preferences and alerts are exclusive to PMA club members. Join PMA to get personalized job notifications when opportunities matching your criteria are posted." 
+      features={[
+        "Set up personalized PM job alerts",
+        "Choose daily or weekly email digests",
+        "Never miss a role that fits your specific criteria",
+        "Stay ahead of the competition"
+      ]}
+    />;
   }
 
   return (

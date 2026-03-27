@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import MemberLockout from "@/components/MemberLockout";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Video, Calendar, Plus, Clock, User, Trash2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -76,20 +77,15 @@ const MockInterviewsPage = () => {
   };
 
   if (!isPmaMember) {
-    return (
-      <div className="min-h-screen bg-background pt-24 px-4 flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <Video className="mx-auto h-12 w-12 text-muted-foreground" />
-          <h2 className="text-xl font-semibold">PMA Members Only</h2>
-          <p className="text-muted-foreground max-w-sm mx-auto">
-            The peer-to-peer mock interview system is exclusively available to official PMA members.
-          </p>
-          <Button asChild className="mt-4">
-            <Link to="/">Return to Home</Link>
-          </Button>
-        </div>
-      </div>
-    );
+    return <MemberLockout 
+      description="The peer-to-peer mock interview system is exclusively available to official PMA members." 
+      features={[
+        "Schedule 1-on-1 mock interviews with peers",
+        "Access our official PM interview question bank",
+        "Receive and give structured feedback",
+        "Build confidence before the real interview"
+      ]}
+    />;
   }
 
   return (

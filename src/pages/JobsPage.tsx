@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import AnimatedSection from "@/components/AnimatedSection";
+import MemberLockout from "@/components/MemberLockout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -24,8 +25,6 @@ import {
   Bell, 
   Settings, 
   Loader2,
-  Lock,
-  Crown,
   Bookmark,
   BookmarkCheck,
   CheckCircle2,
@@ -260,34 +259,15 @@ const JobsPage = () => {
   }
 
   if (!isPmaMember) {
-    return (
-      <div className="min-h-screen pt-24 pb-20 bg-background">
-        <div className="container max-w-2xl mx-auto px-4">
-          <AnimatedSection animation="slide-up">
-            <Card className="border-amber-500/30">
-              <CardContent className="pt-8 pb-8 text-center space-y-4">
-                <div className="w-16 h-16 rounded-full bg-amber-500/10 flex items-center justify-center mx-auto">
-                  <Lock className="w-8 h-8 text-amber-500" />
-                </div>
-                <h1 className="text-2xl font-bold">PMA Members Only</h1>
-                <p className="text-muted-foreground max-w-md mx-auto">
-                  The job board is exclusive to PMA club members. Join PMA to access 
-                  curated job opportunities and get notified when positions matching 
-                  your preferences are posted.
-                </p>
-                <Button 
-                  onClick={() => window.open("https://clubs.byu.edu/link/club/18295873486206095", '_blank')}
-                  className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
-                >
-                  <Crown className="w-4 h-4 mr-2" />
-                  Join PMA
-                </Button>
-              </CardContent>
-            </Card>
-          </AnimatedSection>
-        </div>
-      </div>
-    );
+    return <MemberLockout 
+      description="The job board is exclusive to PMA club members. Join PMA to access curated job opportunities and get notified when positions matching your preferences are posted."
+      features={[
+        "Access exclusive PM internship & new grad roles",
+        "Filter by visa sponsorship and location",
+        "Save jobs and track application deadlines",
+        "Get notified instantly when new roles drop"
+      ]}
+    />;
   }
 
   return (

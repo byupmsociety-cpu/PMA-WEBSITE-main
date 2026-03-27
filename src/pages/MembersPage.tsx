@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import AnimatedSection from "@/components/AnimatedSection";
+import MemberLockout from "@/components/MemberLockout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -19,8 +20,6 @@ import {
 import {
   Search,
   Loader2,
-  Lock,
-  Crown,
   Linkedin,
   GraduationCap,
   Briefcase,
@@ -174,35 +173,15 @@ const MembersPage = () => {
   }
 
   if (!isPmaMember) {
-    return (
-      <div className="min-h-screen pt-24 pb-20 bg-background">
-        <div className="container max-w-2xl mx-auto px-4">
-          <AnimatedSection animation="slide-up">
-            <Card className="border-amber-500/30">
-              <CardContent className="pt-8 pb-8 text-center space-y-4">
-                <div className="w-16 h-16 rounded-full bg-amber-500/10 flex items-center justify-center mx-auto">
-                  <Lock className="w-8 h-8 text-amber-500" />
-                </div>
-                <h1 className="text-2xl font-bold">PMA Members Only</h1>
-                <p className="text-muted-foreground max-w-md mx-auto">
-                  The member directory is exclusive to PMA club members. Join PMA to
-                  connect with fellow PM aspirants and see who's recruiting.
-                </p>
-                <Button
-                  onClick={() =>
-                    window.open("https://clubs.byu.edu/link/club/18295873486206095", "_blank")
-                  }
-                  className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
-                >
-                  <Crown className="w-4 h-4 mr-2" />
-                  Join PMA
-                </Button>
-              </CardContent>
-            </Card>
-          </AnimatedSection>
-        </div>
-      </div>
-    );
+    return <MemberLockout 
+      description="The member directory is exclusive to PMA club members. Join PMA to connect with fellow PM aspirants and see who's recruiting." 
+      features={[
+        "Connect with 150+ active PMA members",
+        "Find peers recruiting for the same roles",
+        "Discover where alumni are working",
+        "Directly reach out to members for coffee chats"
+      ]}
+    />;
   }
 
   return (
