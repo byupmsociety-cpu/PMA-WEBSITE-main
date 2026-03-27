@@ -41,6 +41,7 @@ import AdminResumesPage from "./pages/AdminResumesPage";
 import AdminInterviewsPage from "./pages/AdminInterviewsPage";
 import AppLayout from "./components/layout/AppLayout";
 import PublicLayout from "./components/layout/PublicLayout";
+import HybridLayout from "./components/layout/HybridLayout";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -69,11 +70,15 @@ const App = () => (
                 <Route path="*" element={<NotFound />} />
               </Route>
 
+              {/* Hybrid Routes (Public or Member Portal depending on auth state) */}
+              <Route element={<HybridLayout />}>
+                <Route path="/events" element={<EventsPage />} />
+                <Route path="/resources" element={<ResourcesPage />} />
+              </Route>
+
               {/* Authenticated / Member Portal Routes */}
               <Route element={<AppLayout />}>
                 <Route path="/dashboard" element={<DashboardRoute />} />
-                <Route path="/events" element={<EventsPage />} />
-                <Route path="/resources" element={<ResourcesPage />} />
                 <Route path="/jobs" element={<JobsPage />} />
                 <Route path="/members" element={<MembersPage />} />
                 <Route path="/tracker" element={<ApplicationTrackerPage />} />

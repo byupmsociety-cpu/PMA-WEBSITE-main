@@ -10,6 +10,7 @@ import SuccessStoriesCarousel from "@/components/SuccessStoriesCarousel";
 import ScrollTriggeredModals from "@/components/ScrollTriggeredModals";
 import PersonaTailoredContent from "@/components/PersonaTailoredContent";
 import { useEvents, type Event } from "@/hooks/useEvents";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Recruiting Timeline data
 const recruitingMilestones = [
@@ -50,6 +51,9 @@ const FALLBACK_EVENT: Event = {
 };
 
 const HomePage = () => {
+  const { user, profile } = useAuth();
+  const isPmaMember = profile?.is_pma_member ?? false;
+
   const [showEventBanner, setShowEventBanner] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
 
@@ -124,22 +128,34 @@ const HomePage = () => {
 
               <AnimatedSection animation="fade-in" delay={600}>
                 <div className="mt-10 flex flex-col sm:flex-row gap-4">
-                  <a
-                    href="https://clubs.byu.edu/link/club/18295873486206095"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-[#215096] to-[#4299E1] rounded-xl text-white font-bold text-lg hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
-                  >
-                    <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                      />
-                    </svg>
-                    Join BYU PMA
-                  </a>
+                  {user && isPmaMember ? (
+                    <Link
+                      to="/dashboard"
+                      className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-[#215096] to-[#4299E1] rounded-xl text-white font-bold text-lg hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+                    >
+                      <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                      </svg>
+                      Go to Dashboard
+                    </Link>
+                  ) : (
+                    <a
+                      href="https://clubs.byu.edu/link/club/18295873486206095"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-[#215096] to-[#4299E1] rounded-xl text-white font-bold text-lg hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+                    >
+                      <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                        />
+                      </svg>
+                      Join BYU PMA
+                    </a>
+                  )}
                   <Link
                     to="/team"
                     className="inline-flex items-center justify-center px-6 py-3 bg-transparent border border-border rounded-lg text-foreground font-medium hover:bg-white/10 transition-all"
@@ -268,23 +284,47 @@ const HomePage = () => {
           {selectedPersona && (
             <Card className="max-w-2xl mx-auto mt-8 bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20 animate-in fade-in duration-500">
               <CardContent className="pt-6 space-y-4 text-center">
-                <h3 className="text-xl font-semibold">Ready to Start Your Journey?</h3>
-                <p className="text-muted-foreground">
-                  Sign in to track your progress, earn badges, and connect with peers
-                </p>
-                <Link to="/auth">
-                  <Button size="lg" className="gap-2">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M13 10V3L4 14h7v7l9-11h-7z"
-                      />
-                    </svg>
-                    Sign In to Unlock Dashboard
-                  </Button>
-                </Link>
+                {user ? (
+                  <>
+                    <h3 className="text-xl font-semibold">Resume Your Journey</h3>
+                    <p className="text-muted-foreground">
+                      Head to your dashboard to track your progress and access exclusive resources
+                    </p>
+                    <Link to="/dashboard">
+                      <Button size="lg" className="gap-2">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M13 10V3L4 14h7v7l9-11h-7z"
+                          />
+                        </svg>
+                        Go to Dashboard
+                      </Button>
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <h3 className="text-xl font-semibold">Ready to Start Your Journey?</h3>
+                    <p className="text-muted-foreground">
+                      Sign in to track your progress, earn badges, and connect with peers
+                    </p>
+                    <Link to="/auth">
+                      <Button size="lg" className="gap-2">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M13 10V3L4 14h7v7l9-11h-7z"
+                          />
+                        </svg>
+                        Sign In to Unlock Dashboard
+                      </Button>
+                    </Link>
+                  </>
+                )}
               </CardContent>
             </Card>
           )}

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import AnimatedSection from "@/components/AnimatedSection";
+import MemberLockout from "@/components/MemberLockout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -325,13 +326,15 @@ const ResumesPage = () => {
   }
 
   if (!isPmaMember) {
-    return (
-      <div className="min-h-screen pt-24 pb-20 bg-background flex flex-col items-center justify-center">
-        <AlertCircle className="w-12 h-12 text-muted-foreground mb-4" />
-        <h2 className="text-xl font-semibold mb-2">PMA Members Only</h2>
-        <p className="text-muted-foreground">You must be an approved PMA member to access resume reviews.</p>
-      </div>
-    );
+    return <MemberLockout 
+      description="You must be an approved PMA member to access resume reviews." 
+      features={[
+        "Get your resume reviewed by experienced PMA Presidency",
+        "Access a database of successful PM resumes",
+        "Learn how to tailor your experience for PM roles",
+        "Stand out to recruiters and hiring managers"
+      ]}
+    />;
   }
 
   return (

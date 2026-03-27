@@ -6,10 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, Plus, Trash2, Building2 } from "lucide-react";
 import AnimatedSection from "@/components/AnimatedSection";
+import MemberLockout from "@/components/MemberLockout";
 import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
@@ -231,19 +232,15 @@ const ApplicationTrackerPage = () => {
   }
 
   if (!isPmaMember) {
-    return (
-      <div className="min-h-screen pt-24 pb-20 bg-background flex items-center justify-center">
-        <Card className="max-w-md w-full text-center p-6 border-amber-500/30">
-          <CardTitle className="mb-4">PMA Members Only</CardTitle>
-          <CardDescription className="mb-6">
-            The Application Tracker is an exclusive feature for PMA Members. Please join to track your internship progress!
-          </CardDescription>
-          <Button onClick={() => window.open("https://clubs.byu.edu/link/club/18295873486206095", '_blank')}>
-            Join PMA
-          </Button>
-        </Card>
-      </div>
-    );
+    return <MemberLockout 
+      description="The Application Tracker is an exclusive feature for PMA Members. Please join to track your internship progress!" 
+      features={[
+        "Organize your entire job search in one place",
+        "Track interview stages and response dates",
+        "Log company details and hiring manager contacts",
+        "Visualize your recruiting funnel"
+      ]}
+    />;
   }
 
   return (

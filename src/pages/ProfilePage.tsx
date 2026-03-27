@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import {
   Select,
@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, Save, Users, Crown, Mail, Shield, ShieldCheck, Briefcase, GraduationCap, MapPin, UserCircle, Settings, Lock } from "lucide-react";
+import { Loader2, Save, Crown, Mail, Shield, ShieldCheck, Briefcase, UserCircle, Settings, Lock } from "lucide-react";
 
 interface DirectoryProfile {
   recruiting_stage: string | null;
@@ -210,8 +210,8 @@ const ProfilePage = () => {
               <p className="text-[13px] md:text-sm text-yellow-800 dark:text-yellow-200 leading-relaxed">
                 You currently have <span className="font-semibold">guest</span> access.{" "}
                 To become a full user, please email leadership or{" "}
-                <a href="mailto:justmax@byu.edu" className="font-bold underline hover:text-yellow-900 transition-colors">
-                  justmax@byu.edu
+                <a href="mailto:byupmsociety@gmail.com" className="font-bold underline hover:text-yellow-900 transition-colors">
+                  byupmsociety@gmail.com
                 </a>{" "}
                 using your <span className="font-mono bg-white/50 dark:bg-black/20 px-1.5 py-0.5 rounded text-xs">@byu.edu</span> address.
               </p>
