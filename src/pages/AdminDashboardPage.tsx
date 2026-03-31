@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import KpiCard from "@/components/admin/KpiCard";
-import { Users, UserPlus, Calendar, UsersRound, RefreshCw, Shield, BookOpen, Briefcase, FileText, Video } from "lucide-react";
+import { Users, Calendar, UsersRound, RefreshCw, Shield, BookOpen, Briefcase, FileText, Video, MessageSquare } from "lucide-react";
 
 const AdminDashboardPage = () => {
   const { user, isAdmin, isSuperAdmin, loading } = useAuth();
@@ -15,18 +15,14 @@ const AdminDashboardPage = () => {
   const [metricsError, setMetricsError] = useState<string | null>(null);
   const [metrics, setMetrics] = useState({
     usersTotal: 0,
-    usersNew7d: 0,
+    feedbackPending: 0,
     usersNew30d: 0,
     resumeReviewsPending: 0,
     eventsTotal: 0,
     eventsUpcoming: 0,
   });
 
-  const since7dIso = useMemo(() => {
-    const d = new Date();
-    d.setDate(d.getDate() - 7);
-    return d.toISOString();
-  }, []);
+
 
   const since30dIso = useMemo(() => {
     const d = new Date();
@@ -56,7 +52,7 @@ const AdminDashboardPage = () => {
     try {
       const [
         usersTotalRes,
-        usersNew7dRes,
+        feedbackPendingRes,
         usersNew30dRes,
         resumeReviewsPendingRes,
         eventsTotalRes,
@@ -64,10 +60,9 @@ const AdminDashboardPage = () => {
       ] = await Promise.all([
         supabase.from("profiles").select("id", { count: "exact", head: true }).is("deleted_at", null),
         supabase
-          .from("profiles")
+          .from("user_feedback")
           .select("id", { count: "exact", head: true })
-          .is("deleted_at", null)
-          .gte("created_at", since7dIso),
+          .eq("status", "new"),
         supabase
           .from("profiles")
           .select("id", { count: "exact", head: true })
@@ -86,7 +81,7 @@ const AdminDashboardPage = () => {
 
       const anyError =
         usersTotalRes.error ||
-        usersNew7dRes.error ||
+        feedbackPendingRes.error ||
         usersNew30dRes.error ||
         resumeReviewsPendingRes.error ||
         eventsTotalRes.error ||
@@ -98,7 +93,7 @@ const AdminDashboardPage = () => {
 
       setMetrics({
         usersTotal: usersTotalRes.count ?? 0,
-        usersNew7d: usersNew7dRes.count ?? 0,
+        feedbackPending: feedbackPendingRes.count ?? 0,
         usersNew30d: usersNew30dRes.count ?? 0,
         resumeReviewsPending: resumeReviewsPendingRes.count ?? 0,
         eventsTotal: eventsTotalRes.count ?? 0,
@@ -166,13 +161,18 @@ const AdminDashboardPage = () => {
               icon={<Users />}
               loading={loadingMetrics}
             />
-            <KpiCard
-              title="New users (7d)"
-              value={metrics.usersNew7d.toLocaleString()}
-              helperText="Created in the last 7 days"
-              icon={<UserPlus />}
-              loading={loadingMetrics}
-            />
+            <div className="space-y-2">
+              <KpiCard
+                title="Feedback to review"
+                value={metrics.feedbackPending.toLocaleString()}
+                helperText="New user feedback submissions"
+                icon={<MessageSquare />}
+                loading={loadingMetrics}
+              />
+              <Button asChild size="sm" variant="outline" className="w-full">
+                <Link to="/admin/feedback">Review feedback</Link>
+              </Button>
+            </div>
             <div className="space-y-2">
               <KpiCard
                 title="Resumes to review"
@@ -240,6 +240,28 @@ const AdminDashboardPage = () => {
                   </div>
                   <Button asChild className="w-full">
                     <Link to="/admin/team">Manage team</Link>
+                  </Button>
+                </div>
+
+                <div className="rounded-xl border bg-card p-5 space-y-4 hover:border-primary/40 transition-colors relative">
+                  {metrics.feedbackPending > 0 && (
+                    <div className="absolute -top-2 -right-2 flex h-6 min-w-[1.5rem] items-center justify-center rounded-full bg-red-500 text-[10px] font-semibold text-white px-1.5">
+                      {metrics.feedbackPending > 99 ? "99+" : metrics.feedbackPending}
+                    </div>
+                  )}
+                  <div className="flex items-start justify-between gap-3 relative z-10">
+                    <div className="space-y-1">
+                      <h4 className="font-semibold">User Feedback</h4>
+                      <p className="text-sm text-muted-foreground flex-grow">
+                        Review and triage feedback from users.
+                      </p>
+                    </div>
+                    <div className="text-primary/70 bg-primary/10 p-2 rounded-lg">
+                      <MessageSquare className="h-5 w-5" />
+                    </div>
+                  </div>
+                  <Button asChild className="w-full">
+                    <Link to="/admin/feedback">Manage feedback</Link>
                   </Button>
                 </div>
               </div>
