@@ -291,14 +291,14 @@ export function useDashboardData(): DashboardData & {
       .eq("is_featured", true)
       .order("created_at", { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
 
     // Check if user has job preferences
     const { data: prefs } = await supabase
       .from("job_preferences")
       .select("id")
       .eq("user_id", userId)
-      .single();
+      .maybeSingle();
 
     return {
       newJobsCount: newCount,
@@ -313,7 +313,7 @@ export function useDashboardData(): DashboardData & {
       .from("roadmap_profiles")
       .select("generated_roadmap")
       .eq("user_id", userId)
-      .single();
+      .maybeSingle();
 
     if (!roadmapProfile?.generated_roadmap) {
       return {

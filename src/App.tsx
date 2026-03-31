@@ -39,9 +39,12 @@ import MockInterviewsPage from "./pages/MockInterviewsPage";
 import ResumesPage from "./pages/ResumesPage";
 import AdminResumesPage from "./pages/AdminResumesPage";
 import AdminInterviewsPage from "./pages/AdminInterviewsPage";
+import AdminFeedbackPage from "./pages/AdminFeedbackPage";
 import AppLayout from "./components/layout/AppLayout";
 import PublicLayout from "./components/layout/PublicLayout";
 import HybridLayout from "./components/layout/HybridLayout";
+import MeetingPresentationPage from "./pages/MeetingPresentationPage";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -67,6 +70,7 @@ const App = () => (
                 <Route path="/auth" element={<AuthPage />} />
                 <Route path="/blocked" element={<BlockedPage />} />
                 <Route path="/roadmap" element={<RoadmapPage />} />
+                <Route path="/meeting" element={<MeetingPresentationPage />} />
                 <Route path="*" element={<NotFound />} />
               </Route>
 
@@ -96,6 +100,7 @@ const App = () => (
                 <Route path="/admin/jobs" element={<AdminJobsPage />} />
                 <Route path="/admin/resumes" element={<AdminResumesPage />} />
                 <Route path="/admin/interviews" element={<AdminInterviewsPage />} />
+                <Route path="/admin/feedback" element={<AdminFeedbackPage />} />
               </Route>
 
               <Route path="/game" element={<GamePage />} />

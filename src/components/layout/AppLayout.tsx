@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import ThemeToggle from '../ThemeToggle';
 import { Button } from '../ui/button';
+import { FeedbackModal } from '../FeedbackModal';
 import { Avatar, AvatarFallback } from '../ui/avatar';
 import { Badge } from '../ui/badge';
 import { Sheet, SheetContent, SheetTitle } from '../ui/sheet';
@@ -281,9 +282,9 @@ const AppLayout = () => {
           </div>
         )}
 
-        {/* Page Content */}
-        <main className="flex-1 w-full max-w-7xl mx-auto md:py-6">
+        <main className="flex-1 w-full max-w-7xl mx-auto md:py-6 relative">
           <Outlet />
+          {!isGuest && <FeedbackModal />}
         </main>
       </div>
     </div>
