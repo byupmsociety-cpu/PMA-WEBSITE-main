@@ -29,15 +29,9 @@ const UpcomingEventBanner = () => {
 
   useEffect(() => {
     const dismissed = sessionStorage.getItem('eventBannerDismissed');
-    if (dismissed === 'true') {
-      return; 
-    }
-
-    const timer = setTimeout(() => {
+    if (dismissed !== 'true') {
       setShowEventBanner(true);
-    }, 3000);
-
-    return () => clearTimeout(timer);
+    }
   }, []);
 
   if (!showEventBanner || !upcomingEvent || isLoadingEvents) {
@@ -54,8 +48,8 @@ const UpcomingEventBanner = () => {
         className="fixed bottom-6 left-6 right-6 z-50 mx-auto max-w-2xl"
       >
         <div className="bg-card/95 backdrop-blur-md rounded-xl shadow-lg border border-border overflow-hidden">
-          <div className="p-4 flex items-start justify-between gap-4">
-            <div className="flex items-start gap-3 flex-1">
+          <div className="p-4 flex flex-col sm:flex-row items-start justify-between gap-4 sm:gap-6">
+            <div className="flex items-start gap-3 w-full sm:w-auto sm:flex-1">
               <div className="flex-shrink-0 mt-0.5">
                 <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
                   <svg
@@ -123,7 +117,7 @@ const UpcomingEventBanner = () => {
                 </div>
               </div>
             </div>
-            <div className="flex items-start gap-2 flex-shrink-0">
+            <div className="flex items-center gap-2 w-full sm:w-auto justify-start sm:justify-end flex-shrink-0 mt-2 sm:mt-0 pb-1 sm:pb-0">
               <Link
                 to={upcomingEvent.title.toLowerCase().includes('hackathon') ? '/hackathon' : '/events'}
                 onClick={() => {

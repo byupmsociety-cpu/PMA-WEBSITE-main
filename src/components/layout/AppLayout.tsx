@@ -188,7 +188,7 @@ const AppLayout = () => {
                   </div>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" side="right" className="w-64 ml-2">
+              <DropdownMenuContent align="end" side={mobile ? "top" : "right"} className={cn("w-64", mobile ? "mb-2" : "ml-2")}>
                 <DropdownMenuLabel className="p-4">
                   <div className="flex items-start gap-3">
                     <Avatar className="h-10 w-10">

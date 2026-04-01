@@ -112,7 +112,7 @@ const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
       }
       onClose();
     }}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md w-[95vw] max-w-[95vw] p-4 md:p-6 max-h-[90vh] overflow-y-auto rounded-lg">
         <DialogHeader>
           <DialogTitle>{isSignUp ? "Create an Account" : "Sign In"}</DialogTitle>
           <DialogDescription>

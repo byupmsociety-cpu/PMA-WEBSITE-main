@@ -1,4 +1,4 @@
-import React from "react";
+
 import { Link } from "react-router-dom";
 import AnimatedSection from "@/components/AnimatedSection";
 import { useAuth } from "@/contexts/AuthContext";
@@ -8,7 +8,7 @@ const HomeHero = () => {
   const isPmaMember = profile?.is_pma_member ?? false;
 
   return (
-    <section className="min-h-screen flex items-center relative overflow-hidden py-32">
+    <section className="min-h-screen flex items-center relative overflow-hidden py-16 md:py-32">
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background"></div>
         <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-[#4299E1]/10 dark:bg-[#4299E1]/20 rounded-full filter blur-3xl"></div>
@@ -19,20 +19,20 @@ const HomeHero = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
             <AnimatedSection animation="fade-in">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
+              <h1 className="text-center md:text-left text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
                 BYU Product Management <span className="text-gradient">Association</span>
               </h1>
             </AnimatedSection>
 
             <AnimatedSection animation="fade-in" delay={300}>
-              <p className="text-xl md:text-2xl text-muted-foreground mt-6">
+              <p className="text-center md:text-left text-xl md:text-2xl text-muted-foreground mt-6">
                 Empowering the next generation of product leaders through hands-on experience, industry connections,
                 and community.
               </p>
             </AnimatedSection>
 
             <AnimatedSection animation="fade-in" delay={600}>
-              <div className="mt-10 flex flex-col sm:flex-row gap-4">
+              <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center md:justify-start items-center md:items-start">
                 {user && isPmaMember ? (
                   <Link
                     to="/dashboard"
