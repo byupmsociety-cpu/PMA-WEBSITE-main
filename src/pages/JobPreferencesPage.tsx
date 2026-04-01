@@ -10,6 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Briefcase, Building2, MapPin, DollarSign, Bell, Save, Loader2 } from "lucide-react";
 
@@ -20,6 +21,7 @@ interface JobPreferences {
   locations: string[];
   company_sizes: string[];
   min_salary: number | null;
+  salary_type: 'annual' | 'hourly';
   is_actively_looking: boolean;
   notify_email: boolean;
   notify_in_app: boolean;
@@ -69,6 +71,7 @@ const defaultPreferences: JobPreferences = {
   locations: [],
   company_sizes: [],
   min_salary: null,
+  salary_type: 'annual',
   is_actively_looking: true,
   notify_email: true,
   notify_in_app: true,
@@ -118,6 +121,7 @@ const JobPreferencesPage = () => {
         locations: data.locations ?? [],
         company_sizes: data.company_sizes ?? [],
         min_salary: data.min_salary,
+        salary_type: data.salary_type || 'annual',
         is_actively_looking: data.is_actively_looking ?? true,
         notify_email: data.notify_email ?? true,
         notify_in_app: data.notify_in_app ?? true,
@@ -139,6 +143,7 @@ const JobPreferencesPage = () => {
       locations: preferences.locations,
       company_sizes: preferences.company_sizes,
       min_salary: preferences.min_salary,
+      salary_type: preferences.salary_type,
       is_actively_looking: preferences.is_actively_looking,
       notify_email: preferences.notify_email,
       notify_in_app: preferences.notify_in_app,
@@ -407,10 +412,10 @@ const JobPreferencesPage = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="max-w-xs">
+                <div className="flex items-center gap-2 max-w-sm">
                   <Input
                     type="number"
-                    placeholder="e.g., 80000"
+                    placeholder={preferences.salary_type === 'hourly' ? "e.g. 30" : "e.g., 80000"}
                     value={preferences.min_salary ?? ""}
                     onChange={(e) =>
                       setPreferences({
@@ -419,6 +424,18 @@ const JobPreferencesPage = () => {
                       })
                     }
                   />
+                  <Select 
+                    value={preferences.salary_type} 
+                    onValueChange={(val: 'annual' | 'hourly') => setPreferences({...preferences, salary_type: val})}
+                  >
+                    <SelectTrigger className="w-[140px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="annual">Annual ($)</SelectItem>
+                      <SelectItem value="hourly">Hourly ($/hr)</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </CardContent>
             </Card>

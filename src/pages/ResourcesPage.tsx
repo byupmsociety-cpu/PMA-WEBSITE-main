@@ -387,7 +387,7 @@ const ResourcesPage = () => {
   }
 
   return (
-    <div className="min-h-screen pt-24 pb-20 bg-background text-foreground">
+    <div className="min-h-screen pt-24 pb-20 bg-background text-foreground overflow-x-hidden">
       <div className="container mx-auto px-4 md:px-6">
         <AnimatedSection animation="slide-up">
           <div className="max-w-3xl mx-auto text-center mb-8">
@@ -424,10 +424,10 @@ const ResourcesPage = () => {
                 <TrendingUp className="w-4 h-4 text-primary" />
                 <h2 className="text-lg font-bold">Most Useful Resources</h2>
               </div>
-              <Carousel className="w-full">
+              <Carousel className="w-full" opts={{ loop: true }}>
                 <CarouselContent>
                   {topResources.map(({ resource, category }, idx) => (
-                    <CarouselItem key={idx} className="basis-1/3 md:basis-1/4 lg:basis-1/5 xl:basis-1/6">
+                    <CarouselItem key={idx} className="basis-[85%] sm:basis-1/2 md:basis-1/4 lg:basis-1/5 xl:basis-1/6">
                       <Card
                         className={`h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer ${resource.isPremium && !isPmaMember ? 'ring-1 ring-amber-500/30' : ''}`}
                         onClick={(e) => {
@@ -517,15 +517,33 @@ const ResourcesPage = () => {
                 </div>
 
                 {selectedCategoryData.subcategories ? (
-                  // Show subcategories in horizontal carousel for AI Tools
-                  <div className="space-y-8">
-                    {selectedCategoryData.subcategories.map((subcategory, subIdx) => (
-                      <div key={subIdx}>
-                        <h3 className="text-xl font-bold mb-4">{subcategory.title}</h3>
-                        <Carousel className="w-full">
-                          <CarouselContent>
+                  <div className="flex flex-col md:flex-row gap-8">
+                    {/* Sticky Sidebar for Desktop / Top Menu for Mobile */}
+                    <div className="md:w-64 shrink-0">
+                      <div className="sticky top-24 space-y-2 bg-card/50 backdrop-blur-sm p-4 rounded-xl border border-border">
+                        <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Categories</h3>
+                        <div className="flex overflow-x-auto md:flex-col gap-2 no-scrollbar pb-2 md:pb-0">
+                          {selectedCategoryData.subcategories.map((sub, idx) => (
+                            <a 
+                              key={idx} 
+                              href={`#sub-${sub.id}`}
+                              className="block whitespace-nowrap px-3 py-2 text-sm text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-md transition-colors"
+                            >
+                              {sub.title}
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Main Content Areas */}
+                    <div className="flex-1 space-y-12">
+                      {selectedCategoryData.subcategories.map((subcategory, subIdx) => (
+                        <div key={subIdx} id={`sub-${subcategory.id}`} className="scroll-mt-32">
+                          <h3 className="text-2xl font-bold mb-6 pb-2 border-b border-border text-foreground/90">{subcategory.title}</h3>
+                          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
                             {subcategory.resources.map((resource, idx) => (
-                              <CarouselItem key={idx} className="basis-1/3 md:basis-1/4 lg:basis-1/5 xl:basis-1/6">
+                              <AnimatedSection key={idx} animation="slide-up" delay={idx * 50}>
                                 <Card
                                   className={`h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer ${resource.isPremium && !isPmaMember ? 'ring-1 ring-amber-500/30' : ''}`}
                                   onClick={(e) => {
@@ -541,43 +559,41 @@ const ResourcesPage = () => {
                                     }
                                   }}
                                 >
-                                  <CardContent className="p-2">
-                                    <div className="mb-1.5">
-                                      <div className="w-full aspect-square rounded-md overflow-hidden bg-muted mb-1.5 relative">
+                                  <CardContent className="p-3">
+                                    <div className="mb-2">
+                                      <div className="w-full aspect-square rounded-md overflow-hidden bg-muted mb-2 relative">
                                         <ResourceImage resource={resource} isPmaMember={isPmaMember} />
                                         {resource.isPremium && !isPmaMember && (
                                           <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                                            <Lock className="w-4 h-4 text-white" />
+                                            <Lock className="w-5 h-5 text-white" />
                                           </div>
                                         )}
                                         {resource.isPaid && (
-                                          <Badge className="absolute top-1 right-1 bg-gradient-to-r from-primary to-blue-500 text-white text-[7px] px-1 py-0">
-                                            <Star className="w-2 h-2 mr-0.5 fill-current" />
+                                          <Badge className="absolute top-1 right-1 bg-gradient-to-r from-primary to-blue-500 text-white text-[9px] px-1.5 py-0.5">
+                                            <Star className="w-2.5 h-2.5 mr-1 fill-current" />
                                             Partner
                                           </Badge>
                                         )}
                                         {resource.isPremium && (
-                                          <Badge className="absolute top-1 left-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[7px] px-1 py-0">
-                                            <Crown className="w-2 h-2 mr-0.5 fill-current" />
+                                          <Badge className="absolute top-1 left-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[9px] px-1.5 py-0.5">
+                                            <Crown className="w-2.5 h-2.5 mr-1 fill-current" />
                                             Premium
                                           </Badge>
                                         )}
                                       </div>
-                                      <h3 className="text-[10px] font-semibold mb-0.5 text-card-foreground line-clamp-2">
+                                      <h3 className="text-xs sm:text-sm font-semibold mb-1 text-card-foreground line-clamp-2 leading-tight">
                                         {resource.title}
                                       </h3>
-                                      <p className="text-[9px] text-muted-foreground line-clamp-2">{resource.description}</p>
+                                      <p className="text-[10px] sm:text-xs text-muted-foreground line-clamp-2 leading-relaxed">{resource.description}</p>
                                     </div>
                                   </CardContent>
                                 </Card>
-                              </CarouselItem>
+                              </AnimatedSection>
                             ))}
-                          </CarouselContent>
-                          <CarouselPrevious />
-                          <CarouselNext />
-                        </Carousel>
-                      </div>
-                    ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 ) : (
                   // Regular grid view for other categories
@@ -750,10 +766,10 @@ const ResourcesPage = () => {
                     >
                       {category.icon}
                     </div>
-                    <h3 className="text-lg font-semibold mb-2 text-card-foreground group-hover:text-primary transition-colors">
+                    <h3 className="text-lg font-semibold mb-2 text-card-foreground group-hover:text-primary transition-colors truncate">
                       {category.title}
                     </h3>
-                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{category.description}</p>
+                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2 break-words">{category.description}</p>
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-muted-foreground">
                         {category.resources?.length ||

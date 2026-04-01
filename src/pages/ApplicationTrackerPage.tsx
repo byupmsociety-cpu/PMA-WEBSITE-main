@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, Plus, Trash2, Building2 } from "lucide-react";
 import AnimatedSection from "@/components/AnimatedSection";
 import MemberLockout from "@/components/MemberLockout";
@@ -244,7 +245,7 @@ const ApplicationTrackerPage = () => {
   }
 
   return (
-    <div className="min-h-screen pt-24 pb-20 bg-background">
+    <div className="min-h-screen pt-24 pb-20 bg-background overflow-x-hidden">
       <div className="container max-w-7xl mx-auto px-4">
         
         <AnimatedSection animation="slide-up">
@@ -262,11 +263,12 @@ const ApplicationTrackerPage = () => {
 
         {/* Kanban Board Layout */}
         <AnimatedSection animation="fade-in" delay={100} className="w-full">
-          <div className="flex gap-4 overflow-x-auto pb-4 snap-x">
+          {/* Desktop Kanban View */}
+          <div className="hidden md:flex gap-4 overflow-x-auto pb-4 snap-x">
             {STATUS_COLUMNS.map(col => {
               const colApps = applications.filter(a => a.status === col.id);
               return (
-                <div key={col.id} className="flex-1 min-w-[300px] snap-center">
+                <div key={col.id} className="shrink-0 w-[300px] snap-center">
                   <div className={`rounded-t-lg p-3 font-semibold text-sm border-t border-l border-r ${col.color}`}>
                     {col.title} <span className="text-muted-foreground ml-2">({colApps.length})</span>
                   </div>
@@ -311,6 +313,68 @@ const ApplicationTrackerPage = () => {
               );
             })}
           </div>
+
+          {/* Mobile Tabs View */}
+          <div className="block md:hidden">
+            <Tabs defaultValue="wishlist" className="w-full">
+              <TabsList className="flex w-full overflow-x-auto no-scrollbar justify-start bg-transparent p-0 border-b border-border mb-4 h-auto">
+                {STATUS_COLUMNS.map(col => {
+                  const count = applications.filter(a => a.status === col.id).length;
+                  return (
+                    <TabsTrigger 
+                      key={col.id} 
+                      value={col.id}
+                      className="shrink-0 px-4 py-2 border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary rounded-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+                    >
+                      {col.title} ({count})
+                    </TabsTrigger>
+                  );
+                })}
+              </TabsList>
+              
+              {STATUS_COLUMNS.map(col => {
+                const colApps = applications.filter(a => a.status === col.id);
+                return (
+                  <TabsContent key={col.id} value={col.id} className="mt-0">
+                    <div className="flex flex-col gap-3 pb-8">
+                      {colApps.map(app => (
+                        <Card key={app.id} className="cursor-pointer hover:border-primary/50 transition-colors shadow-sm" onClick={() => openEditModal(app)}>
+                          <CardContent className="p-4">
+                            <h3 className="font-bold text-sm leading-tight mb-1">{getDisplayTitle(app)}</h3>
+                            <div className="flex items-center text-xs text-muted-foreground mb-3">
+                              <Building2 className="w-3 h-3 mr-1" />
+                              {getDisplayCompany(app)}
+                            </div>
+                            
+                            <div onClick={(e) => e.stopPropagation()}>
+                              <Select
+                                value={app.status}
+                                onValueChange={(val: ApplicationStatus) => handleStatusChange(app.id, val)}
+                              >
+                                <SelectTrigger className="h-7 text-xs">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {STATUS_COLUMNS.map(s => (
+                                    <SelectItem key={s.id} value={s.id} className="text-xs">{s.title}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                      {colApps.length === 0 && (
+                        <div className="text-center p-8 text-sm text-muted-foreground italic border border-dashed rounded-lg border-border mx-2">
+                          No applications in {col.title}
+                        </div>
+                      )}
+                    </div>
+                  </TabsContent>
+                );
+              })}
+            </Tabs>
+          </div>
         </AnimatedSection>
 
         {/* Add/Edit Modal */}
@@ -320,7 +384,7 @@ const ApplicationTrackerPage = () => {
             setIsEditModalOpen(false);
           }
         }}>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent className="sm:max-w-[425px] w-[95vw] max-w-[95vw] p-4 md:p-6 max-h-[90vh] overflow-y-auto rounded-lg">
             <DialogHeader>
               <DialogTitle>{isEditModalOpen ? 'Edit Application' : 'Add Application'}</DialogTitle>
               <DialogDescription>

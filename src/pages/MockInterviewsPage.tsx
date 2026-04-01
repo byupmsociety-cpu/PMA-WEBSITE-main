@@ -91,8 +91,8 @@ const MockInterviewsPage = () => {
   return (
     <div className="min-h-screen bg-background pt-24 pb-12 px-4">
       <div className="container max-w-5xl mx-auto space-y-8">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-4 w-full sm:w-auto">
             <Button variant="ghost" size="icon" asChild className="shrink-0">
               <Link to="/dashboard">
                 <ArrowLeft className="h-5 w-5" />
@@ -110,7 +110,7 @@ const MockInterviewsPage = () => {
           </div>
           <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
             <DialogTrigger asChild>
-              <Button>
+              <Button className="w-full sm:w-auto">
                 <Plus className="mr-2 h-4 w-4" />
                 Offer Availability
               </Button>
@@ -187,10 +187,10 @@ const MockInterviewsPage = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "find" | "schedule" | "library")} className="space-y-6">
-          <TabsList className="grid w-full max-w-2xl grid-cols-3">
-            <TabsTrigger value="find">Find a Partner</TabsTrigger>
-            <TabsTrigger value="schedule">My Schedule</TabsTrigger>
-            <TabsTrigger value="library">Prompt Library</TabsTrigger>
+          <TabsList className="flex w-full overflow-x-auto no-scrollbar justify-start mb-2 h-auto bg-muted/50 p-1">
+            <TabsTrigger value="find" className="shrink-0 px-4 py-1.5">Find a Partner</TabsTrigger>
+            <TabsTrigger value="schedule" className="shrink-0 px-4 py-1.5">My Schedule</TabsTrigger>
+            <TabsTrigger value="library" className="shrink-0 px-4 py-1.5">Prompt Library</TabsTrigger>
           </TabsList>
 
           <TabsContent value="find" className="space-y-4">

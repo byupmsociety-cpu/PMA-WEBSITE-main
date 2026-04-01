@@ -53,7 +53,6 @@ const RECRUITING_STAGES = [
   { value: "applying", label: "Actively Applying", color: "bg-amber-500/10 text-amber-600 border-amber-500/20" },
   { value: "interviewing", label: "Currently Interviewing", color: "bg-purple-500/10 text-purple-600 border-purple-500/20" },
   { value: "offer", label: "Received Offer", color: "bg-green-500/10 text-green-600 border-green-500/20" },
-  { value: "not_looking", label: "Not Looking", color: "bg-gray-500/10 text-gray-600 border-gray-500/20" },
 ];
 
 const SCHOOL_YEARS = [

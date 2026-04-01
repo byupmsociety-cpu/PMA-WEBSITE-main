@@ -602,6 +602,62 @@ export type Database = {
         }
         Relationships: []
       }
+      job_preferences: {
+        Row: {
+          id: string
+          user_id: string
+          job_types: string[] | null
+          industries: string[] | null
+          locations: string[] | null
+          company_sizes: string[] | null
+          min_salary: number | null
+          salary_type: 'annual' | 'hourly' | null
+          is_actively_looking: boolean | null
+          notify_email: boolean | null
+          notify_in_app: boolean | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          job_types?: string[] | null
+          industries?: string[] | null
+          locations?: string[] | null
+          company_sizes?: string[] | null
+          min_salary?: number | null
+          salary_type?: 'annual' | 'hourly' | null
+          is_actively_looking?: boolean | null
+          notify_email?: boolean | null
+          notify_in_app?: boolean | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          job_types?: string[] | null
+          industries?: string[] | null
+          locations?: string[] | null
+          company_sizes?: string[] | null
+          min_salary?: number | null
+          salary_type?: 'annual' | 'hourly' | null
+          is_actively_looking?: boolean | null
+          notify_email?: boolean | null
+          notify_in_app?: boolean | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_preferences_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       job_postings: {
         Row: {
           id: string
