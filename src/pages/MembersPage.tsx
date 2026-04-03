@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import AnimatedSection from "@/components/AnimatedSection";
 import MemberLockout from "@/components/MemberLockout";
+import { MemberProfileModal } from "@/components/MemberProfileModal";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -76,6 +77,10 @@ const MembersPage = () => {
   const [showAlumniOnly, setShowAlumniOnly] = useState(false);
   const [showChatsOnly, setShowChatsOnly] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  
+  // Profile Modal State
+  const [selectedMember, setSelectedMember] = useState<MemberProfile | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleCopyEmail = (e: React.MouseEvent, email: string, memberId: string) => {
     e.stopPropagation();
@@ -172,8 +177,8 @@ const MembersPage = () => {
   }
 
   if (!isPmaMember) {
-    return <MemberLockout 
-      description="The member directory is exclusive to PMA club members. Join PMA to connect with fellow PM aspirants and see who's recruiting." 
+    return <MemberLockout
+      description="The member directory is exclusive to PMA club members. Join PMA to connect with fellow PM aspirants and see who's recruiting."
       features={[
         "Connect with 150+ active PMA members",
         "Find peers recruiting for the same roles",
@@ -184,11 +189,11 @@ const MembersPage = () => {
   }
 
   return (
-    <div className="min-h-screen pt-24 pb-20 bg-background">
-      <div className="container max-w-6xl mx-auto px-4">
+    <div className="min-h-screen pt-16 md:pt-24 pb-12 md:pb-20 bg-background overflow-x-hidden">
+      <div className="container max-w-6xl mx-auto px-4 max-w-full">
         {/* Header */}
         <AnimatedSection animation="slide-up">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 md:mb-8">
             <div>
               <h1 className="text-3xl font-bold mb-2">Member Directory</h1>
               <p className="text-muted-foreground">
@@ -210,9 +215,8 @@ const MembersPage = () => {
             {stageCounts.map((stage) => (
               <Card
                 key={stage.value}
-                className={`cursor-pointer transition-all ${
-                  filterStage === stage.value ? "ring-2 ring-primary" : ""
-                }`}
+                className={`cursor-pointer transition-all ${filterStage === stage.value ? "ring-2 ring-primary" : ""
+                  }`}
                 onClick={() => setFilterStage(filterStage === stage.value ? "all" : stage.value)}
               >
                 <CardContent className="p-3 text-center">
@@ -305,7 +309,13 @@ const MembersPage = () => {
 
               return (
                 <AnimatedSection key={member.id} animation="slide-up" delay={200 + idx * 30}>
-                  <Card className="h-full hover:shadow-lg transition-shadow">
+                  <Card 
+                    className="h-full hover:shadow-lg transition-all duration-300 border-border cursor-pointer group"
+                    onClick={() => {
+                        setSelectedMember(member);
+                        setIsModalOpen(true);
+                    }}
+                  >
                     <CardContent className="p-5">
                       <div className="flex items-start gap-4">
                         <Avatar className="h-14 w-14">
@@ -315,34 +325,36 @@ const MembersPage = () => {
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
+                          <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-2 mb-2 md:mb-1">
                             <h3 className="font-semibold truncate">{member.full_name || "Anonymous"}</h3>
-                            {member.linkedin_url && (
-                              <a
-                                href={member.linkedin_url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-muted-foreground hover:text-primary"
-                                onClick={(e) => e.stopPropagation()}
-                                title="LinkedIn Profile"
-                              >
-                                <Linkedin className="w-4 h-4" />
-                              </a>
-                            )}
-                            {member.email && (
-                              <div
-                                className="group flex items-center gap-1.5 text-muted-foreground ml-2 px-1.5 py-0.5 rounded-md border border-transparent hover:border-border hover:bg-muted/50 cursor-pointer transition-colors"
-                                onClick={(e) => handleCopyEmail(e, member.email!, member.id)}
-                                title="Copy Email"
-                              >
-                                <span className="text-xs">{member.email}</span>
-                                {copiedId === member.id ? (
-                                  <Check className="w-3.5 h-3.5 text-green-500" />
-                                ) : (
-                                  <Copy className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                )}
-                              </div>
-                            )}
+                            <div className="flex items-center gap-1.5 md:gap-2">
+                              {member.linkedin_url && (
+                                <a
+                                  href={member.linkedin_url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-muted-foreground hover:text-primary transition-colors shrink-0"
+                                  onClick={(e) => e.stopPropagation()}
+                                  title="LinkedIn Profile"
+                                >
+                                  <Linkedin className="w-4 h-4" />
+                                </a>
+                              )}
+                              {member.email && (
+                                <div
+                                  className="group flex items-center min-w-0 flex-1 hover:bg-muted/50 rounded-md py-0.5 px-1.5 -ml-1.5 transition-colors cursor-pointer"
+                                  onClick={(e) => handleCopyEmail(e, member.email!, member.id)}
+                                  title="Copy Email"
+                                >
+                                  <span className="text-xs text-muted-foreground truncate">{member.email}</span>
+                                  {copiedId === member.id ? (
+                                    <Check className="w-3 h-3 text-green-500 ml-1 shrink-0" />
+                                  ) : (
+                                    <Copy className="w-3 h-3 opacity-0 md:group-hover:opacity-100 transition-opacity ml-1 shrink-0 text-muted-foreground" />
+                                  )}
+                                </div>
+                              )}
+                            </div>
                           </div>
                           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                             {member.school_year && (
@@ -420,6 +432,12 @@ const MembersPage = () => {
           </div>
         )}
       </div>
+
+      <MemberProfileModal 
+        member={selectedMember} 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+      />
     </div>
   );
 };

@@ -180,7 +180,6 @@ const TeamPage: React.FC = () => {
                   <div className="absolute w-full h-full backface-hidden rotate-y-180">
                     <div
                       className="bg-black/40 border border-white/10 rounded-xl overflow-hidden backdrop-blur-sm h-full p-4 flex flex-col"
-                      onClick={(e) => e.stopPropagation()}
                     >
                       <div className="flex items-center justify-between mb-4">
                         <h3 className="text-lg font-bold">{member.name}</h3>
@@ -211,7 +210,11 @@ const TeamPage: React.FC = () => {
                                 d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
                               />
                             </svg>
-                            <a href={`mailto:${member.email}`} className="text-sm text-on-dark hover:text-white flex-1 min-w-0 truncate">
+                            <a 
+                              href={`mailto:${member.email}`} 
+                              className="text-sm text-on-dark hover:text-white flex-1 min-w-0 truncate"
+                              onClick={(e) => e.stopPropagation()}
+                            >
                               {member.email}
                             </a>
                             <button
@@ -242,6 +245,7 @@ const TeamPage: React.FC = () => {
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-sm text-on-dark hover:text-white break-all"
+                              onClick={(e) => e.stopPropagation()}
                             >
                               LinkedIn Profile
                             </a>

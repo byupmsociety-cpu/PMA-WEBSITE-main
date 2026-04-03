@@ -39,6 +39,7 @@ export interface UpcomingEvent {
   title: string;
   start_time: string;
   location: string | null;
+  registration_link: string | null;
 }
 
 export interface DashboardProfile {
@@ -230,7 +231,7 @@ export function useDashboardData(): DashboardData & {
     const now = new Date().toISOString();
     const { data, error } = await supabase
       .from("events")
-      .select("id, title, start_time, location")
+      .select("id, title, start_time, location, registration_link")
       .gte("start_time", now)
       .eq("is_public", true)
       .order("start_time", { ascending: true })
