@@ -6,23 +6,27 @@ type KpiCardProps = {
   helperText?: string;
   icon?: React.ReactNode;
   loading?: boolean;
+  action?: React.ReactNode;
 };
 
-export default function KpiCard({ title, value, helperText, icon, loading }: KpiCardProps) {
+export default function KpiCard({ title, value, helperText, icon, loading, action }: KpiCardProps) {
   return (
-    <Card className="border-border/60">
+    <Card className="border-border/60 flex flex-col">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium text-muted-foreground">
           {title}
         </CardTitle>
         {icon ? <div className="text-muted-foreground">{icon}</div> : null}
       </CardHeader>
-      <CardContent className="space-y-1">
+      <CardContent className="space-y-1 flex flex-col flex-1">
         <div className="text-2xl font-semibold tracking-tight">
           {loading ? <span className="text-muted-foreground">—</span> : value}
         </div>
         {helperText ? (
           <p className="text-xs text-muted-foreground">{helperText}</p>
+        ) : null}
+        {action ? (
+          <div className="mt-auto pt-3">{action}</div>
         ) : null}
       </CardContent>
     </Card>
