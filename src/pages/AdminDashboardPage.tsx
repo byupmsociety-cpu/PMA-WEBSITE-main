@@ -161,30 +161,22 @@ const AdminDashboardPage = () => {
               icon={<Users />}
               loading={loadingMetrics}
             />
-            <div className="space-y-2">
-              <KpiCard
-                title="Feedback to review"
-                value={metrics.feedbackPending.toLocaleString()}
-                helperText="New user feedback submissions"
-                icon={<MessageSquare />}
-                loading={loadingMetrics}
-              />
-              <Button asChild size="sm" variant="outline" className="w-full">
-                <Link to="/admin/feedback">Review feedback</Link>
-              </Button>
-            </div>
-            <div className="space-y-2">
-              <KpiCard
-                title="Resumes to review"
-                value={metrics.resumeReviewsPending.toLocaleString()}
-                helperText="Pending resume submissions"
-                icon={<FileText />}
-                loading={loadingMetrics}
-              />
-              <Button asChild size="sm" variant="outline" className="w-full">
-                <Link to="/admin/resumes">Review resumes</Link>
-              </Button>
-            </div>
+            <KpiCard
+              title="Feedback to review"
+              value={metrics.feedbackPending.toLocaleString()}
+              helperText="New user feedback submissions"
+              icon={<MessageSquare />}
+              loading={loadingMetrics}
+              action={<Button asChild size="sm" className="w-full"><Link to="/admin/feedback">Review feedback</Link></Button>}
+            />
+            <KpiCard
+              title="Resumes to review"
+              value={metrics.resumeReviewsPending.toLocaleString()}
+              helperText="Pending resume submissions"
+              icon={<FileText />}
+              loading={loadingMetrics}
+              action={<Button asChild size="sm" className="w-full"><Link to="/admin/resumes">Review resumes</Link></Button>}
+            />
             <KpiCard
               title="Upcoming events"
               value={metrics.eventsUpcoming.toLocaleString()}

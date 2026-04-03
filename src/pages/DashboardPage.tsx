@@ -148,12 +148,7 @@ const DashboardPage = () => {
       <div className="py-8">
         <div className="container max-w-7xl mx-auto px-4">
           <div className="space-y-6">
-            <Skeleton className="h-24 w-full" />
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {[1, 2, 3, 4].map(i => (
-                <Skeleton key={i} className="h-24" />
-              ))}
-            </div>
+            <Skeleton className="h-16 w-full" />
             <div className="grid lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 space-y-4">
                 <Skeleton className="h-64" />
@@ -255,33 +250,28 @@ const DashboardPage = () => {
           <DashboardHeader
             fullName={profile?.full_name || null}
             isPmaMember={isPmaMember}
-            newJobsCount={newJobsCount}
-            roadmapProgress={roadmapProgress}
-            memberCount={memberCount}
-            upcomingEventsCount={upcomingEvents.length}
-            hasRoadmap={hasRoadmap}
           />
 
           <div className="grid lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
 
-              {isPmaMember && (
-                <div className="grid sm:grid-cols-2 gap-4">
+              <div className="grid sm:grid-cols-2 gap-4">
+                <RoadmapProgressCard
+                  progress={roadmapProgress}
+                  nextItem={nextRoadmapItem}
+                  hasRoadmap={hasRoadmap}
+                  completedCount={roadmapCompletedCount}
+                  totalCount={roadmapTotalCount}
+                />
+                {isPmaMember && (
                   <JobsAlertCard
                     newJobsCount={newJobsCount}
                     savedJobsCount={savedJobsCount}
                     featuredJob={featuredJob}
                     hasPreferences={hasJobPreferences}
                   />
-                  <RoadmapProgressCard
-                    progress={roadmapProgress}
-                    nextItem={nextRoadmapItem}
-                    hasRoadmap={hasRoadmap}
-                    completedCount={roadmapCompletedCount}
-                    totalCount={roadmapTotalCount}
-                  />
-                </div>
-              )}
+                )}
+              </div>
 
               <UpcomingEventsCard events={upcomingEvents} />
 
