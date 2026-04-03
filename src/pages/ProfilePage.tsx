@@ -195,8 +195,8 @@ const ProfilePage = () => {
   const roleLabel = (profile?.role ?? "guest").toUpperCase();
 
   return (
-    <div className="min-h-screen bg-background pt-24 pb-20 px-4">
-      <div className="container max-w-5xl mx-auto space-y-8">
+    <div className="min-h-screen pt-16 md:pt-24 pb-12 md:pb-20 bg-background overflow-x-hidden">
+      <div className="container max-w-6xl mx-auto px-4 max-w-full space-y-8">
         
         {/* Header Title */}
         <div>

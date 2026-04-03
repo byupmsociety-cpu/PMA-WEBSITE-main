@@ -271,8 +271,8 @@ const JobsPage = () => {
   }
 
   return (
-    <div className="min-h-screen pt-24 pb-20 bg-background">
-      <div className="container max-w-5xl mx-auto px-4">
+    <div className="min-h-screen pt-16 md:pt-24 pb-12 md:pb-20 bg-background overflow-x-hidden">
+      <div className="container max-w-6xl mx-auto px-4 max-w-full">
         <AnimatedSection animation="slide-up">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
             <div>

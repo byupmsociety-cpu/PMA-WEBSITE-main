@@ -209,8 +209,8 @@ const JobPreferencesPage = () => {
   }
 
   return (
-    <div className="min-h-screen pt-24 pb-20 bg-background">
-      <div className="container max-w-4xl mx-auto px-4">
+    <div className="min-h-screen pt-16 md:pt-24 pb-12 md:pb-20 bg-background overflow-x-hidden">
+      <div className="container max-w-6xl mx-auto px-4 max-w-full">
         <AnimatedSection animation="slide-up">
           <div className="mb-8">
             <h1 className="text-3xl font-bold mb-2">Job Preferences</h1>

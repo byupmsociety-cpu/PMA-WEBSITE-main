@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, ArrowRight, MapPin, Clock } from "lucide-react";
+import { Calendar, ArrowRight, MapPin, Clock, ExternalLink } from "lucide-react";
 import { format, isToday, isTomorrow } from "date-fns";
 
 interface Event {
@@ -10,6 +10,7 @@ interface Event {
   title: string;
   start_time: string;
   location: string | null;
+  registration_link: string | null;
 }
 
 interface UpcomingEventsCardProps {
@@ -47,29 +48,52 @@ export function UpcomingEventsCard({ events }: UpcomingEventsCardProps) {
           <>
             <div className="space-y-2">
               {events.slice(0, 3).map((event) => (
-                <Link
+                <div
                   key={event.id}
-                  to="/events"
-                  className="block p-3 rounded-lg border transition-colors hover:border-primary/30"
+                  className="flex items-center gap-3 p-3 rounded-lg border transition-colors hover:border-primary/30"
                 >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm truncate">{event.title}</p>
-                      <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          {formatEventDate(event.start_time)} at {formatEventTime(event.start_time)}
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-sm truncate">{event.title}</p>
+                    <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        {formatEventDate(event.start_time)} at {formatEventTime(event.start_time)}
+                      </span>
+                      {event.location && (
+                        <span className="flex items-center gap-1 truncate">
+                          <MapPin className="h-3 w-3 shrink-0" />
+                          {event.location}
                         </span>
-                        {event.location && (
-                          <span className="flex items-center gap-1 truncate">
-                            <MapPin className="h-3 w-3 shrink-0" />
-                            {event.location}
-                          </span>
-                        )}
-                      </div>
+                      )}
                     </div>
                   </div>
-                </Link>
+                  {event.registration_link ? (
+                    <a
+                      href={event.registration_link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Button
+                        size="sm"
+                        className="shrink-0 h-7 px-3 text-xs bg-primary hover:bg-primary/90 text-primary-foreground"
+                      >
+                        RSVP
+                        <ExternalLink className="h-3 w-3 ml-1" />
+                      </Button>
+                    </a>
+                  ) : (
+                    <Link to="/events">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="shrink-0 h-7 px-3 text-xs"
+                      >
+                        Details
+                      </Button>
+                    </Link>
+                  )}
+                </div>
               ))}
             </div>
             <Button variant="ghost" size="sm" className="w-full" asChild>

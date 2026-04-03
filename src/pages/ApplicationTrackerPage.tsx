@@ -42,7 +42,7 @@ interface JobApplication {
   notes: string | null;
   applied_date: string | null;
   created_at: string;
-  
+
   // Joined data from job_posting if it exists
   job_posting?: {
     company: string;
@@ -57,7 +57,7 @@ const ApplicationTrackerPage = () => {
 
   const [applications, setApplications] = useState<JobApplication[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   // Modal State
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -117,7 +117,7 @@ const ApplicationTrackerPage = () => {
 
   const handleStatusChange = async (appId: string, newStatus: ApplicationStatus) => {
     // Optimistic UI update
-    setApplications(prev => prev.map(app => 
+    setApplications(prev => prev.map(app =>
       app.id === appId ? { ...app, status: newStatus } : app
     ));
 
@@ -206,7 +206,7 @@ const ApplicationTrackerPage = () => {
         loadApplications();
       }
     }
-    
+
     setSaving(false);
   };
 
@@ -233,8 +233,8 @@ const ApplicationTrackerPage = () => {
   }
 
   if (!isPmaMember) {
-    return <MemberLockout 
-      description="The Application Tracker is an exclusive feature for PMA Members. Please join to track your internship progress!" 
+    return <MemberLockout
+      description="The Application Tracker is an exclusive feature for PMA Members. Please join to track your internship progress!"
       features={[
         "Organize your entire job search in one place",
         "Track interview stages and response dates",
@@ -245,16 +245,16 @@ const ApplicationTrackerPage = () => {
   }
 
   return (
-    <div className="min-h-screen pt-24 pb-20 bg-background overflow-x-hidden">
-      <div className="container max-w-7xl mx-auto px-4">
-        
+    <div className="min-h-screen pt-16 md:pt-24 pb-12 md:pb-20 bg-background overflow-x-hidden">
+      <div className="container max-w-7xl mx-auto px-4 max-w-full">
+
         <AnimatedSection animation="slide-up">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+          <div className="flex flex-col items-center text-center md:flex-row md:items-center md:text-left md:justify-between gap-4 mb-6 md:mb-8">
             <div>
-              <h1 className="text-3xl font-bold mb-2">Application Tracker</h1>
+              <h1 className="text-3xl font-bold mb-2 break-words">Application Tracker</h1>
               <p className="text-muted-foreground">Manage and track your PM recruiting pipeline</p>
             </div>
-            <Button onClick={openAddModal}>
+            <Button className="w-full md:w-auto shrink-0" onClick={openAddModal}>
               <Plus className="w-4 h-4 mr-2" />
               Add Application
             </Button>
@@ -273,7 +273,7 @@ const ApplicationTrackerPage = () => {
                     {col.title} <span className="text-muted-foreground ml-2">({colApps.length})</span>
                   </div>
                   <div className="bg-slate-50/50 dark:bg-slate-900/50 p-3 rounded-b-lg border-b border-l border-r min-h-[500px] flex flex-col gap-3">
-                    
+
                     {colApps.map(app => (
                       <Card key={app.id} className="cursor-pointer hover:border-primary/50 transition-colors shadow-sm" onClick={() => openEditModal(app)}>
                         <CardContent className="p-4">
@@ -282,7 +282,7 @@ const ApplicationTrackerPage = () => {
                             <Building2 className="w-3 h-3 mr-1" />
                             {getDisplayCompany(app)}
                           </div>
-                          
+
                           {/* Quick Status Select */}
                           <div onClick={(e) => e.stopPropagation()}>
                             <Select
@@ -302,7 +302,7 @@ const ApplicationTrackerPage = () => {
                         </CardContent>
                       </Card>
                     ))}
-                    
+
                     {colApps.length === 0 && (
                       <div className="text-center p-4 text-sm text-muted-foreground italic border border-dashed rounded-lg border-border">
                         Empty
@@ -317,21 +317,23 @@ const ApplicationTrackerPage = () => {
           {/* Mobile Tabs View */}
           <div className="block md:hidden">
             <Tabs defaultValue="wishlist" className="w-full">
-              <TabsList className="flex w-full overflow-x-auto no-scrollbar justify-start bg-transparent p-0 border-b border-border mb-4 h-auto">
-                {STATUS_COLUMNS.map(col => {
-                  const count = applications.filter(a => a.status === col.id).length;
-                  return (
-                    <TabsTrigger 
-                      key={col.id} 
-                      value={col.id}
-                      className="shrink-0 px-4 py-2 border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary rounded-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:shadow-none"
-                    >
-                      {col.title} ({count})
-                    </TabsTrigger>
-                  );
-                })}
-              </TabsList>
-              
+              <div className="overflow-x-auto -mx-4 px-4 no-scrollbar pb-0">
+                <TabsList className="flex w-max min-w-full justify-start bg-transparent p-0 border-b border-border mb-4 h-auto flex-nowrap">
+                  {STATUS_COLUMNS.map(col => {
+                    const count = applications.filter(a => a.status === col.id).length;
+                    return (
+                      <TabsTrigger
+                        key={col.id}
+                        value={col.id}
+                        className="shrink-0 px-4 py-2 border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary rounded-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+                      >
+                        {col.title} ({count})
+                      </TabsTrigger>
+                    );
+                  })}
+                </TabsList>
+              </div>
+
               {STATUS_COLUMNS.map(col => {
                 const colApps = applications.filter(a => a.status === col.id);
                 return (
@@ -345,7 +347,7 @@ const ApplicationTrackerPage = () => {
                               <Building2 className="w-3 h-3 mr-1" />
                               {getDisplayCompany(app)}
                             </div>
-                            
+
                             <div onClick={(e) => e.stopPropagation()}>
                               <Select
                                 value={app.status}
@@ -397,7 +399,7 @@ const ApplicationTrackerPage = () => {
                 <Input
                   id="company"
                   value={formData.company_name}
-                  onChange={(e) => setFormData({...formData, company_name: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, company_name: e.target.value })}
                   placeholder="e.g. Google"
                 />
               </div>
@@ -406,13 +408,13 @@ const ApplicationTrackerPage = () => {
                 <Input
                   id="title"
                   value={formData.job_title}
-                  onChange={(e) => setFormData({...formData, job_title: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, job_title: e.target.value })}
                   placeholder="e.g. Product Manager Intern"
                 />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="status">Status</Label>
-                <Select value={formData.status} onValueChange={(v: ApplicationStatus) => setFormData({...formData, status: v})}>
+                <Select value={formData.status} onValueChange={(v: ApplicationStatus) => setFormData({ ...formData, status: v })}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -426,7 +428,7 @@ const ApplicationTrackerPage = () => {
                 <Textarea
                   id="notes"
                   value={formData.notes || ''}
-                  onChange={(e) => setFormData({...formData, notes: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                   placeholder="Link to job description, interview timeline, etc."
                   rows={4}
                 />
@@ -434,9 +436,9 @@ const ApplicationTrackerPage = () => {
             </div>
             <DialogFooter className="flex-col sm:flex-row gap-2">
               {isEditModalOpen && editingAppId && (
-                <Button 
-                  type="button" 
-                  variant="destructive" 
+                <Button
+                  type="button"
+                  variant="destructive"
                   className="mr-auto"
                   onClick={() => {
                     if (window.confirm("Are you sure you want to delete this application?")) {

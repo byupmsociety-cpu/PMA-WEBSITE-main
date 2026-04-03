@@ -18,15 +18,15 @@ import { format } from "date-fns";
 const MockInterviewsPage = () => {
   const { profile, user } = useAuth();
   const isPmaMember = profile?.is_pma_member || false;
-  
-  const { 
-    openSlots, 
-    mySlots, 
-    myInterviews, 
+
+  const {
+    openSlots,
+    mySlots,
+    myInterviews,
     myFeedback,
-    isLoading, 
-    createSlot, 
-    deleteSlot, 
+    isLoading,
+    createSlot,
+    deleteSlot,
     bookInterview,
     updateInterview,
     cancelInterview,
@@ -58,11 +58,11 @@ const MockInterviewsPage = () => {
   const handleCreateSlot = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newSlotDate || !newSlotTime) return;
-    
+
     // Create Date objects (keeping it simple for MVP)
     const start = new Date(`${newSlotDate}T${newSlotTime}`);
     const end = new Date(start.getTime() + newDuration * 60 * 1000);
-    
+
     await createSlot({
       startTime: start.toISOString(),
       endTime: end.toISOString(),
@@ -70,15 +70,15 @@ const MockInterviewsPage = () => {
       interviewType: newInterviewType,
       durationMinutes: newDuration,
     });
-    
+
     setIsAddOpen(false);
     setNewSlotDate("");
     setNewSlotTime("");
   };
 
   if (!isPmaMember) {
-    return <MemberLockout 
-      description="The peer-to-peer mock interview system is exclusively available to official PMA members." 
+    return <MemberLockout
+      description="The peer-to-peer mock interview system is exclusively available to official PMA members."
       features={[
         "Schedule 1-on-1 mock interviews with peers",
         "Access our official PM interview question bank",
@@ -89,8 +89,8 @@ const MockInterviewsPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pt-24 pb-12 px-4">
-      <div className="container max-w-5xl mx-auto space-y-8">
+    <div className="min-h-screen pt-16 md:pt-24 pb-12 md:pb-20 bg-background overflow-x-hidden">
+      <div className="container max-w-6xl mx-auto px-4 max-w-full space-y-6 md:space-y-8">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4 w-full sm:w-auto">
             <Button variant="ghost" size="icon" asChild className="shrink-0">
@@ -122,21 +122,21 @@ const MockInterviewsPage = () => {
               <form onSubmit={handleCreateSlot} className="space-y-4 pt-4">
                 <div className="space-y-2">
                   <Label>Date</Label>
-                  <Input 
-                    type="date" 
-                    required 
+                  <Input
+                    type="date"
+                    required
                     min={new Date().toISOString().split('T')[0]}
-                    value={newSlotDate} 
-                    onChange={(e) => setNewSlotDate(e.target.value)} 
+                    value={newSlotDate}
+                    onChange={(e) => setNewSlotDate(e.target.value)}
                   />
                 </div>
                 <div className="space-y-2">
                   <Label>Start Time</Label>
-                  <Input 
-                    type="time" 
-                    required 
-                    value={newSlotTime} 
-                    onChange={(e) => setNewSlotTime(e.target.value)} 
+                  <Input
+                    type="time"
+                    required
+                    value={newSlotTime}
+                    onChange={(e) => setNewSlotTime(e.target.value)}
                   />
                 </div>
                 <div className="grid grid-cols-3 gap-3">
@@ -186,11 +186,11 @@ const MockInterviewsPage = () => {
           </Dialog>
         </div>
 
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "find" | "schedule" | "library")} className="space-y-6">
-          <TabsList className="flex w-full overflow-x-auto no-scrollbar justify-start mb-2 h-auto bg-muted/50 p-1">
-            <TabsTrigger value="find" className="shrink-0 px-4 py-1.5">Find a Partner</TabsTrigger>
-            <TabsTrigger value="schedule" className="shrink-0 px-4 py-1.5">My Schedule</TabsTrigger>
-            <TabsTrigger value="library" className="shrink-0 px-4 py-1.5">Prompt Library</TabsTrigger>
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "find" | "schedule" | "library")} className="space-y-6 w-full max-w-full">
+          <TabsList className="flex w-full overflow-x-auto snap-x no-scrollbar justify-start mb-2 h-auto bg-muted/50 p-1 shrink-0">
+            <TabsTrigger value="find" className="shrink-0 snap-start px-4 py-1.5">Find a Partner</TabsTrigger>
+            <TabsTrigger value="schedule" className="shrink-0 snap-start px-4 py-1.5">My Schedule</TabsTrigger>
+            <TabsTrigger value="library" className="shrink-0 snap-start px-4 py-1.5">Prompt Library</TabsTrigger>
           </TabsList>
 
           <TabsContent value="find" className="space-y-4">
@@ -232,8 +232,8 @@ const MockInterviewsPage = () => {
                           {format(new Date(slot.start_time), "h:mm a")} - {format(new Date(slot.end_time), "h:mm a")}
                         </div>
                       </div>
-                      <Button 
-                        className="w-full mt-auto" 
+                      <Button
+                        className="w-full mt-auto"
                         onClick={() => bookInterview({ slotId: slot.id })}
                       >
                         Book Interview
@@ -261,7 +261,7 @@ const MockInterviewsPage = () => {
                     const roleLabel = isInterviewer ? "You are Interviewing" : "You are the Candidate";
                     const feedbackForInterview = (myFeedback || []).find((f: any) => f.interview_id === interview.id) as any;
                     const meetingLinkValue = meetingLinkDraft[interview.id] ?? interview.meeting_link ?? "";
-                    
+
                     return (
                       <Card key={interview.id} className="bg-card">
                         <CardHeader className="pb-3">
@@ -276,95 +276,95 @@ const MockInterviewsPage = () => {
                           </div>
                         </CardHeader>
                         <CardContent className="space-y-3">
-                           <div className="flex items-center justify-between text-sm text-muted-foreground bg-muted/30 p-2 rounded-md">
-                             <div className="flex items-center gap-2">
-                               <Calendar className="h-4 w-4" />
-                               {format(new Date(interview.slot.start_time), "MMM d")}
-                             </div>
-                             <div className="flex items-center gap-2">
-                               <Clock className="h-4 w-4" />
-                               {format(new Date(interview.slot.start_time), "h:mm a")}
-                             </div>
-                           </div>
-                           <div className="space-y-2">
-                             <Label className="text-xs">Meeting link (Zoom/Google Meet)</Label>
-                             <div className="flex gap-2">
-                               <Input
-                                 placeholder="Paste a meeting link..."
-                                 value={meetingLinkValue}
-                                 onChange={(e) =>
-                                   setMeetingLinkDraft((prev) => ({ ...prev, [interview.id]: e.target.value }))
-                                 }
-                               />
-                               <Button
-                                 variant="outline"
-                                 onClick={() =>
-                                   updateInterview({
-                                     interviewId: interview.id,
-                                     updates: { meeting_link: meetingLinkValue.trim() === "" ? null : meetingLinkValue.trim() },
-                                   })
-                                 }
-                               >
-                                 Save
-                               </Button>
-                             </div>
-                             <p className="text-xs text-muted-foreground">
-                               Tip: add a Google Meet link from your calendar event and paste it here.
-                             </p>
-                           </div>
+                          <div className="flex items-center justify-between text-sm text-muted-foreground bg-muted/30 p-2 rounded-md">
+                            <div className="flex items-center gap-2">
+                              <Calendar className="h-4 w-4" />
+                              {format(new Date(interview.slot.start_time), "MMM d")}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Clock className="h-4 w-4" />
+                              {format(new Date(interview.slot.start_time), "h:mm a")}
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-xs">Meeting link (Zoom/Google Meet)</Label>
+                            <div className="flex gap-2">
+                              <Input
+                                placeholder="Paste a meeting link..."
+                                value={meetingLinkValue}
+                                onChange={(e) =>
+                                  setMeetingLinkDraft((prev) => ({ ...prev, [interview.id]: e.target.value }))
+                                }
+                              />
+                              <Button
+                                variant="outline"
+                                onClick={() =>
+                                  updateInterview({
+                                    interviewId: interview.id,
+                                    updates: { meeting_link: meetingLinkValue.trim() === "" ? null : meetingLinkValue.trim() },
+                                  })
+                                }
+                              >
+                                Save
+                              </Button>
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                              Tip: add a Google Meet link from your calendar event and paste it here.
+                            </p>
+                          </div>
 
-                           <div className="flex flex-wrap gap-2 pt-2">
-                             {interview.status === "scheduled" ? (
-                               <>
-                                 <Button variant="secondary" onClick={() => completeInterview({ interviewId: interview.id })}>
-                                   Mark completed
-                                 </Button>
-                                 <Button
-                                   variant="ghost"
-                                   className="text-destructive"
-                                   onClick={() => cancelInterview({ interviewId: interview.id })}
-                                 >
-                                   Cancel
-                                 </Button>
-                               </>
-                             ) : null}
+                          <div className="flex flex-wrap gap-2 pt-2">
+                            {interview.status === "scheduled" ? (
+                              <>
+                                <Button variant="secondary" onClick={() => completeInterview({ interviewId: interview.id })}>
+                                  Mark completed
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  className="text-destructive"
+                                  onClick={() => cancelInterview({ interviewId: interview.id })}
+                                >
+                                  Cancel
+                                </Button>
+                              </>
+                            ) : null}
 
-                             {isInterviewer ? (
-                               <Button
-                                 onClick={() => {
+                            {isInterviewer ? (
+                              <Button
+                                onClick={() => {
                                   const existing = (myFeedback || []).find((f: any) => f.interview_id === interview.id) as any;
                                   if (existing?.rubric) setRubric(existing.rubric as any);
                                   setNotes(existing?.notes ?? "");
                                   setStrengths(existing?.strengths ?? "");
                                   setImprovements(existing?.improvements ?? "");
                                   setActionItems(existing?.action_items ?? "");
-                                   setFeedbackInterviewId(interview.id);
-                                   setFeedbackOpen(true);
-                                 }}
-                                 disabled={interview.status !== "completed"}
-                               >
-                                 Leave feedback
-                               </Button>
-                             ) : null}
+                                  setFeedbackInterviewId(interview.id);
+                                  setFeedbackOpen(true);
+                                }}
+                                disabled={interview.status !== "completed"}
+                              >
+                                Leave feedback
+                              </Button>
+                            ) : null}
 
-                             {!isInterviewer && feedbackForInterview ? (
-                               <Button
-                                 variant="outline"
-                                 onClick={() => {
-                                   setFeedbackInterviewId(interview.id);
-                                   setFeedbackOpen(true);
-                                 }}
-                               >
-                                 View feedback
-                               </Button>
-                             ) : null}
-                           </div>
+                            {!isInterviewer && feedbackForInterview ? (
+                              <Button
+                                variant="outline"
+                                onClick={() => {
+                                  setFeedbackInterviewId(interview.id);
+                                  setFeedbackOpen(true);
+                                }}
+                              >
+                                View feedback
+                              </Button>
+                            ) : null}
+                          </div>
 
-                           {!isInterviewer && interview.status === "completed" && !feedbackForInterview ? (
-                             <p className="text-xs text-muted-foreground">
-                               Feedback hasn’t been submitted yet.
-                             </p>
-                           ) : null}
+                          {!isInterviewer && interview.status === "completed" && !feedbackForInterview ? (
+                            <p className="text-xs text-muted-foreground">
+                              Feedback hasn’t been submitted yet.
+                            </p>
+                          ) : null}
                         </CardContent>
                       </Card>
                     );
@@ -385,13 +385,13 @@ const MockInterviewsPage = () => {
                   mySlots?.filter(s => !s.is_booked).map(slot => (
                     <Card key={slot.id} className="border-dashed">
                       <CardContent className="p-4 flex items-center justify-between">
-                         <div className="space-y-1">
-                           <p className="text-sm font-medium">{format(new Date(slot.start_time), "MMM d, yyyy")}</p>
-                           <p className="text-xs text-muted-foreground">{format(new Date(slot.start_time), "h:mm a")} - {format(new Date(slot.end_time), "h:mm a")}</p>
-                         </div>
-                         <Button variant="ghost" size="icon" className="text-destructive" onClick={() => deleteSlot(slot.id)}>
-                           <Trash2 className="h-4 w-4" />
-                         </Button>
+                        <div className="space-y-1">
+                          <p className="text-sm font-medium">{format(new Date(slot.start_time), "MMM d, yyyy")}</p>
+                          <p className="text-xs text-muted-foreground">{format(new Date(slot.start_time), "h:mm a")} - {format(new Date(slot.end_time), "h:mm a")}</p>
+                        </div>
+                        <Button variant="ghost" size="icon" className="text-destructive" onClick={() => deleteSlot(slot.id)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </CardContent>
                     </Card>
                   ))
@@ -410,7 +410,7 @@ const MockInterviewsPage = () => {
                 Use these examples when you are acting as the Interviewer to evaluate your peer.
               </p>
             </div>
-            
+
             <div className="grid gap-6 md:grid-cols-2">
               <Card>
                 <CardHeader>

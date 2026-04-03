@@ -387,13 +387,13 @@ const ResourcesPage = () => {
   }
 
   return (
-    <div className="min-h-screen pt-24 pb-20 bg-background text-foreground overflow-x-hidden">
-      <div className="container mx-auto px-4 md:px-6">
+    <div className="min-h-screen pt-16 md:pt-24 pb-12 md:pb-20 bg-background text-foreground overflow-x-hidden">
+      <div className="container max-w-6xl mx-auto px-4 md:px-6 max-w-full">
         <AnimatedSection animation="slide-up">
-          <div className="max-w-3xl mx-auto text-center mb-8">
-            <h1 className="text-3xl md:text-4xl font-bold mb-4">
+          <div className="w-full max-w-3xl mx-auto text-center mb-8 px-2 md:px-0">
+            <h1 className="text-3xl md:text-4xl font-bold mb-4 break-words">
               PM{" "}
-              <span className="text-gradient bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">
+              <span className="text-gradient bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent break-words">
                 Content Library
               </span>
             </h1>
@@ -402,14 +402,14 @@ const ResourcesPage = () => {
             </p>
 
             {!selectedCategory && (
-              <div className="relative max-w-xl mx-auto">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
+              <div className="relative w-full max-w-xl mx-auto px-4 md:px-0">
+                <Search className="absolute left-7 md:left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
                 <Input
                   type="text"
                   placeholder="Search resources..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 py-6 text-base"
+                  className="pl-10 py-6 text-base w-full max-w-full"
                 />
               </div>
             )}
@@ -424,10 +424,11 @@ const ResourcesPage = () => {
                 <TrendingUp className="w-4 h-4 text-primary" />
                 <h2 className="text-lg font-bold">Most Useful Resources</h2>
               </div>
+              <div className="overflow-hidden">
               <Carousel className="w-full" opts={{ loop: true }}>
-                <CarouselContent>
+                <CarouselContent className="-ml-2 md:-ml-4">
                   {topResources.map(({ resource, category }, idx) => (
-                    <CarouselItem key={idx} className="basis-[85%] sm:basis-1/2 md:basis-1/4 lg:basis-1/5 xl:basis-1/6">
+                    <CarouselItem key={idx} className="pl-2 md:pl-4 basis-4/5 sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5">
                       <Card
                         className={`h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer ${resource.isPremium && !isPmaMember ? 'ring-1 ring-amber-500/30' : ''}`}
                         onClick={(e) => {
@@ -454,7 +455,7 @@ const ResourcesPage = () => {
                           </div>
 
                           <div className="mb-1.5">
-                            <div className="w-full aspect-square rounded-md overflow-hidden bg-muted mb-1.5 relative">
+                            <div className="w-full aspect-video sm:aspect-square rounded-md overflow-hidden bg-muted mb-1.5 relative">
                               <ResourceImage resource={resource} isPmaMember={isPmaMember} />
                               {resource.isPremium && !isPmaMember && (
                                 <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
@@ -489,6 +490,7 @@ const ResourcesPage = () => {
                 <CarouselPrevious />
                 <CarouselNext />
               </Carousel>
+              </div>
             </div>
           </AnimatedSection>
         )}
@@ -524,8 +526,8 @@ const ResourcesPage = () => {
                         <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Categories</h3>
                         <div className="flex overflow-x-auto md:flex-col gap-2 no-scrollbar pb-2 md:pb-0">
                           {selectedCategoryData.subcategories.map((sub, idx) => (
-                            <a 
-                              key={idx} 
+                            <a
+                              key={idx}
                               href={`#sub-${sub.id}`}
                               className="block whitespace-nowrap px-3 py-2 text-sm text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-md transition-colors"
                             >
@@ -535,7 +537,7 @@ const ResourcesPage = () => {
                         </div>
                       </div>
                     </div>
-                    
+
                     {/* Main Content Areas */}
                     <div className="flex-1 space-y-12">
                       {selectedCategoryData.subcategories.map((subcategory, subIdx) => (
