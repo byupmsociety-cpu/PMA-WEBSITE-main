@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 import {
   Target,
   BookOpen,
@@ -147,7 +147,7 @@ const DashboardPage = () => {
   if (loading) {
     return (
       <div className="py-8">
-        <div className="container max-w-7xl mx-auto px-4">
+        <div className="container max-w-7xl mx-auto px-6">
           <div className="space-y-6">
             <Skeleton className="h-16 w-full" />
             <div className="grid lg:grid-cols-3 gap-6">
@@ -168,7 +168,7 @@ const DashboardPage = () => {
 
   if (!profile?.persona) {
     return (
-      <div className="py-12 px-4">
+      <div className="py-12 px-6">
         <div className="container max-w-4xl mx-auto">
           <Card className="border-2 border-primary/20">
             <CardHeader className="text-center space-y-4">
@@ -246,14 +246,14 @@ const DashboardPage = () => {
 
   return (
     <div className="py-8">
-      <div className="container max-w-7xl mx-auto px-4">
-        <div className="space-y-8">
+      <div className="container max-w-7xl mx-auto px-6">
+        <div className="space-y-6">
           <DashboardHeader
             fullName={profile?.full_name || null}
             isPmaMember={isPmaMember}
           />
 
-          <div className="grid md:grid-cols-2 gap-6 mb-6">
+          <div className="grid md:grid-cols-2 gap-6">
             <RoadmapProgressCard
               progress={roadmapProgress}
               nextItem={nextRoadmapItem}
