@@ -4,55 +4,53 @@
 
 @layer base {
   :root {
-    /* PMA Brand Colors */
-    --pma-dark-blue: 215 96% 32%;    /* #215096 - Dark blue from logo */
-    --pma-light-blue: 210 100% 66%;  /* #4299E1 - Light blue from logo */
-    --pma-accent-blue: 210 100% 75%; /* #50A0E0 - Accent blue from logo */
-    
-    /* Light Mode - matching hero section aesthetic */
-    --background: 210 100% 98%; /* very light blue background */
-    --foreground: 215 96% 32%;
+    /* BYU Marriott Brand Colors — see docs/BRAND_STYLE_GUIDE.md */
+    /* Light Mode */
+    --background: 210 20% 98%; /* near-white, slight Navy-family tint */
+    --foreground: 210 100% 18%; /* Navy */
     --card: 0 0% 100%; /* white cards for contrast */
-    --card-foreground: 215 96% 32%;
+    --card-foreground: 210 100% 18%; /* Navy */
     --popover: 0 0% 100%; /* white popovers for contrast */
-    --popover-foreground: 215 96% 32%;
-    --primary: 215 96% 32%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 210 100% 66%;
-    --secondary-foreground: 215 96% 32%;
-    --muted: 210 40% 96%; /* light blue muted background */
-    --muted-foreground: 215 25% 18%; /* darker for WCAG AA contrast on light bg */
-    --accent: 210 100% 66%;
-    --accent-foreground: 215 96% 32%;
+    --popover-foreground: 210 100% 18%; /* Navy */
+    --primary: 210 100% 18%; /* Navy */
+    --primary-foreground: 0 0% 100%; /* White */
+    --secondary: 218 100% 32%; /* Royal */
+    --secondary-foreground: 0 0% 100%; /* White */
+    --muted: 203 20% 96%; /* light Slate Gray-family surface */
+    --muted-foreground: 203 7% 52%; /* Slate Gray */
+    --accent: 203 24% 47%; /* Slate Blue (single approved accent hex) */
+    --accent-foreground: 0 0% 100%; /* White passes contrast against Slate Blue */
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 215 96% 32%;
+    --border: 203 20% 88%;
+    --input: 203 20% 88%;
+    --ring: 210 100% 18%; /* Navy */
     --radius: 0.5rem;
   }
 
   .dark {
-    /* Dark Mode - matching header navigation bg-black/40 */
-    --background: 0 0% 6%; /* page floor */
+    /* Dark Mode — Navy stays the brand anchor (hue 210) for primary/ring, Royal
+       (hue 218) for secondary; lightness is inverted from the light-mode values
+       so each color still has enough contrast against a dark background. */
+    --background: 210 30% 8%; /* dark Navy-tinted page floor */
     --foreground: 0 0% 98%;
-    --card: 0 0% 11%; /* cards visibly lighter than background */
+    --card: 210 25% 12%; /* visibly lighter than background */
     --card-foreground: 0 0% 98%;
-    --popover: 0 0% 11%; /* match cards for consistency */
+    --popover: 210 25% 12%; /* match cards for consistency */
     --popover-foreground: 0 0% 98%;
-    --primary: 210 100% 66%;
-    --primary-foreground: 215 96% 32%;
-    --secondary: 215 96% 32%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 9%; /* subtle surfaces and muted areas */
-    --muted-foreground: 215 15% 72%; /* lighter for WCAG AA contrast on dark bg */
-    --accent: 210 100% 66%;
-    --accent-foreground: 0 0% 98%;
+    --primary: 210 90% 62%; /* lighter Navy-family tint so it pops on dark bg */
+    --primary-foreground: 210 100% 12%; /* dark Navy text for contrast on the tint */
+    --secondary: 218 85% 58%; /* lighter Royal tint */
+    --secondary-foreground: 210 100% 12%; /* dark Navy text for contrast */
+    --muted: 210 20% 14%; /* subtle surfaces and muted areas */
+    --muted-foreground: 203 15% 72%; /* lighter Slate Gray for WCAG AA on dark bg */
+    --accent: 203 30% 60%; /* lighter Slate Blue tint */
+    --accent-foreground: 210 100% 12%; /* dark Navy text for contrast */
     --destructive: 0 62% 30%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 20%; /* clearly visible borders */
-    --input: 0 0% 14%; /* inputs stand out from background */
-    --ring: 210 100% 66%;
+    --border: 210 15% 22%; /* clearly visible borders */
+    --input: 210 15% 16%; /* inputs stand out from background */
+    --ring: 210 90% 62%; /* matches primary */
   }
 }
 
@@ -62,12 +60,61 @@
   }
 
   body {
-    @apply bg-background text-foreground antialiased overflow-x-hidden w-full;
+    @apply bg-background text-foreground antialiased overflow-x-hidden w-full font-sans;
     font-feature-settings: "ss01", "ss02", "cv01", "cv02", "cv03";
+    font-size: 1.125rem; /* 18px — brand's minimum body size */
   }
 
   html {
     @apply scroll-smooth;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading;
+  }
+
+  h1 {
+    font-size: 2.25rem; /* 36px on mobile */
+    font-weight: 800;
+    line-height: 1.15;
+  }
+
+  h2 {
+    font-size: 2rem; /* 32px */
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  h3 {
+    font-size: 1.5rem; /* 24px */
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  h4 {
+    font-size: 1.25rem; /* 20px */
+    font-weight: 600;
+    line-height: 1.35;
+  }
+
+  h5,
+  h6 {
+    /* Not specified by the style guide's H1-H4 scale; extended here for
+       consistency — step down from H4 while staying in the heading family. */
+    font-size: 1.125rem; /* 18px */
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  @media (min-width: 768px) {
+    h1 {
+      font-size: 2.75rem; /* 44px */
+    }
   }
 }
 
@@ -92,12 +139,12 @@
   }
 
   .text-gradient {
-    @apply bg-gradient-to-r from-[#215096] to-[#4299E1] bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent;
   }
 
   /* Accessible gradient: both stops meet WCAG AA on light backgrounds */
   .text-gradient-accessible {
-    @apply bg-gradient-to-r from-[#215096] to-[#2d6aa8] bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-primary to-[#2d6aa8] bg-clip-text text-transparent;
   }
 
   /* High-contrast text for dark backgrounds (WCAG AA) */
@@ -152,13 +199,13 @@ input.has-picker-icon[type="datetime-local"]::-webkit-calendar-picker-indicator 
 /* Slow pulsing animation for Hackathon CTA */
 @keyframes pulse-slow {
   0% {
-    box-shadow: 0 0 0 0 rgba(66, 153, 225, 0.5);
+    box-shadow: 0 0 0 0 rgba(0, 61, 165, 0.5);
   }
   99% {
-    box-shadow: 0 0 0 8px rgba(66, 153, 225, 0);
+    box-shadow: 0 0 0 8px rgba(0, 61, 165, 0);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(66, 153, 225, 0.5);
+    box-shadow: 0 0 0 0 rgba(0, 61, 165, 0.5);
   }
 }
 

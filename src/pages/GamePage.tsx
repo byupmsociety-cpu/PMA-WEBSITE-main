@@ -327,8 +327,8 @@ const GamePage = () => {
 
     // Clear canvas with PMA brand gradient
     const gradient = ctx.createLinearGradient(0, 0, 0, gameDimensions.height);
-    gradient.addColorStop(0, '#215096'); // PMA dark blue top
-    gradient.addColorStop(1, '#4299E1'); // PMA light blue bottom
+    gradient.addColorStop(0, '#002E5D'); // BYU Marriott Navy top
+    gradient.addColorStop(1, '#003DA5'); // BYU Marriott Royal bottom
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, gameDimensions.width, gameDimensions.height);
 
@@ -354,7 +354,7 @@ const GamePage = () => {
       ctx.fillRect(pipe.x, gameDimensions.height - pipe.bottomHeight, PIPE_WIDTH, pipe.bottomHeight);
       
       // Pipe caps (PMA blue)
-      ctx.fillStyle = '#215096';
+      ctx.fillStyle = '#002E5D';
       ctx.fillRect(pipe.x - 5, pipe.topHeight - 20, PIPE_WIDTH + 10, 20);
       ctx.fillRect(pipe.x - 5, gameDimensions.height - pipe.bottomHeight, PIPE_WIDTH + 10, 20);
       ctx.fillStyle = '#FFFFFF';
@@ -386,7 +386,7 @@ const GamePage = () => {
       ctx.beginPath();
       ctx.ellipse(cougarX + BIRD_SIZE/2, cougarY + BIRD_SIZE/2, BIRD_SIZE/2, BIRD_SIZE/2.2, 0, 0, Math.PI * 2);
       ctx.fill();
-      ctx.strokeStyle = '#215096';
+      ctx.strokeStyle = '#002E5D';
       ctx.lineWidth = 2;
       ctx.stroke();
     }
@@ -394,7 +394,7 @@ const GamePage = () => {
     // Draw score (PMA themed)
     ctx.fillStyle = '#FFFFFF';
     ctx.font = 'bold 28px Arial';
-    ctx.strokeStyle = '#215096';
+    ctx.strokeStyle = '#002E5D';
     ctx.lineWidth = 2;
     ctx.strokeText(`Score: ${gameState.score}`, 10, 35);
     ctx.fillText(`Score: ${gameState.score}`, 10, 35);
@@ -402,7 +402,7 @@ const GamePage = () => {
     // Draw PMA logo in corner
     ctx.fillStyle = '#FFFFFF';
     ctx.font = 'bold 14px Arial';
-    ctx.strokeStyle = '#215096';
+    ctx.strokeStyle = '#002E5D';
     ctx.lineWidth = 1;
     ctx.strokeText('BYU PMA', gameDimensions.width - 70, 25);
     ctx.fillText('BYU PMA', gameDimensions.width - 70, 25);
@@ -426,7 +426,7 @@ const GamePage = () => {
       <div className="w-full">
         {/* Main Game Screen - Always visible when not playing */}
         {!gameState.isPlaying && (
-          <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-[#215096] to-[#4299E1] text-white p-4 py-8 pt-20">
+          <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-primary to-secondary text-white p-4 py-8 pt-20">
             <div className="text-center mb-6 max-w-lg">
               <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 text-white">
                 BYU PMA <span className="text-gradient">Cougar Flight</span>
@@ -479,7 +479,7 @@ const GamePage = () => {
                 {!gameState.isGameOver ? (
                   <button
                     onClick={startGame}
-                    className="bg-white hover:bg-gray-100 text-[#215096] font-bold text-lg sm:text-xl px-8 sm:px-12 py-4 sm:py-6 rounded-lg transition-colors shadow-lg transform hover:scale-105 w-full sm:w-auto"
+                    className="bg-white hover:bg-gray-100 text-primary font-bold text-lg sm:text-xl px-8 sm:px-12 py-4 sm:py-6 rounded-lg transition-colors shadow-lg transform hover:scale-105 w-full sm:w-auto"
                   >
                     Start Game
                   </button>
@@ -497,13 +497,13 @@ const GamePage = () => {
                           gameSpeed: 2.3
                         });
                       }}
-                      className="bg-white hover:bg-gray-100 text-[#215096] font-bold text-lg sm:text-xl px-6 sm:px-8 py-3 sm:py-4 rounded-lg transition-colors shadow-lg transform hover:scale-105 w-full sm:w-auto"
+                      className="bg-white hover:bg-gray-100 text-primary font-bold text-lg sm:text-xl px-6 sm:px-8 py-3 sm:py-4 rounded-lg transition-colors shadow-lg transform hover:scale-105 w-full sm:w-auto"
                     >
                       🔄 Play Again
                     </button>
                     <Link
                       to="/"
-                      className="bg-gradient-to-r from-[#215096] to-[#4299E1] !text-white font-bold text-lg sm:text-xl px-6 sm:px-8 py-3 sm:py-4 rounded-lg hover:from-[#1a3d7a] hover:to-[#3a8bd1] transition-all text-center shadow-lg transform hover:scale-105 w-full sm:w-auto drop-shadow-md"
+                      className="bg-gradient-to-r from-primary to-secondary !text-white font-bold text-lg sm:text-xl px-6 sm:px-8 py-3 sm:py-4 rounded-lg hover:from-[#1a3d7a] hover:to-[#3a8bd1] transition-all text-center shadow-lg transform hover:scale-105 w-full sm:w-auto drop-shadow-md"
                     >
                       Club Home Page
                     </Link>
@@ -539,7 +539,7 @@ const GamePage = () => {
         {showPlayerForm && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-30">
             <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4">
-              <h3 className="text-2xl font-bold text-[#215096] mb-6 text-center">
+              <h3 className="text-2xl font-bold text-primary mb-6 text-center">
                 Join the Leaderboard!
               </h3>
               <div className="space-y-4">
@@ -556,7 +556,7 @@ const GamePage = () => {
                         setFormErrors(prev => ({...prev, firstName: undefined}));
                       }
                     }}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#215096] text-black ${
+                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-black ${
                       formErrors.firstName ? 'border-red-500' : 'border-gray-300'
                     }`}
                     placeholder="Enter your first name"
@@ -578,7 +578,7 @@ const GamePage = () => {
                         setFormErrors(prev => ({...prev, lastName: undefined}));
                       }
                     }}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#215096] text-black ${
+                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-black ${
                       formErrors.lastName ? 'border-red-500' : 'border-gray-300'
                     }`}
                     placeholder="Enter your last name"
@@ -600,7 +600,7 @@ const GamePage = () => {
                         setFormErrors(prev => ({...prev, email: undefined}));
                       }
                     }}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#215096] text-black ${
+                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-black ${
                       formErrors.email ? 'border-red-500' : 'border-gray-300'
                     }`}
                     placeholder="Enter your email"
@@ -632,7 +632,7 @@ const GamePage = () => {
                       }
                     }}
                     disabled={!currentPlayer.firstName || !currentPlayer.lastName || !currentPlayer.email}
-                    className="flex-1 px-4 py-2 bg-[#215096] text-white rounded-md hover:bg-[#1a3d7a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 px-4 py-2 bg-primary text-white rounded-md hover:bg-[#1a3d7a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Start Game
                   </button>
@@ -644,7 +644,7 @@ const GamePage = () => {
 
         {/* Game Canvas - Only show when actively playing */}
         {gameState.isPlaying && !gameState.isGameOver && (
-          <div className="fixed inset-0 w-full h-full flex items-center justify-center bg-gradient-to-b from-[#215096] to-[#4299E1]">
+          <div className="fixed inset-0 w-full h-full flex items-center justify-center bg-gradient-to-b from-primary to-secondary">
             <canvas
               ref={canvasRef}
               width={gameDimensions.width}

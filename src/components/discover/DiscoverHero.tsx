@@ -305,7 +305,7 @@ const PMQuizDialog = () => {
               Export CSV
             </Button>
             {isPmaMember && saved && (
-              <Button asChild size="sm" className="bg-gradient-to-r from-[#215096] to-[#4299E1] !text-white">
+              <Button asChild size="sm" className="bg-gradient-to-r from-primary to-secondary !text-white">
                 <Link to="/roadmap">View Dashboard</Link>
               </Button>
             )}
@@ -412,7 +412,7 @@ const PMQuizDialog = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="bg-gradient-to-r from-[#215096] to-[#4299E1] !text-white px-8 py-3 rounded-lg text-lg font-medium hover:opacity-90 transition-all drop-shadow-md">
+        <Button className="bg-gradient-to-r from-primary to-secondary !text-white px-8 py-3 rounded-lg text-lg font-medium hover:opacity-90 transition-all drop-shadow-md">
           Take the PM Quiz
         </Button>
       </DialogTrigger>
@@ -440,7 +440,7 @@ const PMQuizDialog = () => {
                 )}
                 <Button 
                   onClick={handleNext}
-                  className="bg-gradient-to-r from-[#215096] to-[#4299E1] !text-white drop-shadow-md ml-auto"
+                  className="bg-gradient-to-r from-primary to-secondary !text-white drop-shadow-md ml-auto"
                 >
                   {currentStep === 6 ? 'Get Results' : 'Next'}
                 </Button>

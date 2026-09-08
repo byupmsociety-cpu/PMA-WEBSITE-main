@@ -49,7 +49,7 @@ const AboutSection = () => {
           <AnimatedSection animation="slide-up" delay={200}>
             <Card className="bg-white/80 dark:bg-black/40 border border-border backdrop-blur-sm">
               <CardContent className="p-6">
-                <div className="h-12 w-12 rounded-full bg-gradient-to-r from-[#215096] to-[#4299E1] flex items-center justify-center mb-6">
+                <div className="h-12 w-12 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center mb-6">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -76,7 +76,7 @@ const AboutSection = () => {
           <AnimatedSection animation="slide-up" delay={300}>
             <Card className="bg-white/80 dark:bg-black/40 border border-border backdrop-blur-sm">
               <CardContent className="p-6">
-                <div className="h-12 w-12 rounded-full bg-gradient-to-r from-[#215096] to-[#4299E1] flex items-center justify-center mb-6">
+                <div className="h-12 w-12 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center mb-6">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -109,7 +109,7 @@ const AboutSection = () => {
             </h2>
             <a
               href="/discover"
-              className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-[#215096] to-[#4299E1] rounded-xl !text-white font-bold text-lg hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl drop-shadow-md"
+              className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-primary to-secondary rounded-xl !text-white font-bold text-lg hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl drop-shadow-md"
             >
               Discover PM
             </a>

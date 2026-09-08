@@ -10,6 +10,18 @@ const Footer = () => {
             <p className="text-muted-foreground text-sm">
               Empowering the next generation of product managers at Brigham Young University.
             </p>
+            <p className="text-muted-foreground text-sm mt-2">
+              A student association of the{' '}
+              <a
+                href="https://marriott.byu.edu"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:underline dark:text-secondary"
+              >
+                BYU Marriott School of Business
+              </a>
+              .
+            </p>
             <div className="flex mt-4 space-x-4">
               <a href="https://instagram.com/byupmassociation" target="_blank" rel="noopener noreferrer" aria-label="BYU PMA on Instagram" className="text-muted-foreground hover:text-primary dark:hover:text-white transition-colors">
                 {/* Instagram Icon */}

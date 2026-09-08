@@ -18,6 +18,10 @@ const config: Config = {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ["IBM Plex Sans", "ui-sans-serif", "system-ui", "sans-serif"],
+        heading: ["Libre Franklin", "ui-sans-serif", "system-ui", "sans-serif"],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -68,13 +72,13 @@ const config: Config = {
           to: { height: "0" },
         },
         "pulse-slow": {
-          "0%, 100%": { 
+          "0%, 100%": {
             opacity: "1",
-            boxShadow: "0 0 0 0 rgba(66, 153, 225, 0.5)"
+            boxShadow: "0 0 0 0 rgba(0, 61, 165, 0.5)"
           },
-          "50%": { 
+          "50%": {
             opacity: "0.85",
-            boxShadow: "0 0 0 8px rgba(66, 153, 225, 0)"
+            boxShadow: "0 0 0 8px rgba(0, 61, 165, 0)"
           },
         },
       },
