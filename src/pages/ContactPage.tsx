@@ -54,7 +54,7 @@ const ContactPage = () => {
                   <h2 className="text-2xl font-bold mb-4">Contact Information</h2>
                   <div className="space-y-4">
                     <div className="flex items-start">
-                      <div className="h-10 w-10 rounded-full bg-gradient-to-r from-[#215096] to-[#4299E1] flex items-center justify-center mr-4">
+                      <div className="h-10 w-10 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center mr-4">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
                         </svg>
@@ -66,7 +66,7 @@ const ContactPage = () => {
                     </div>
                     
                     <div className="flex items-start">
-                      <div className="h-10 w-10 rounded-full bg-gradient-to-r from-[#215096] to-[#4299E1] flex items-center justify-center mr-4">
+                      <div className="h-10 w-10 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center mr-4">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                           <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
@@ -79,7 +79,7 @@ const ContactPage = () => {
                     </div>
                     
                     <div className="flex items-start">
-                      <div className="h-10 w-10 rounded-full bg-gradient-to-r from-[#215096] to-[#4299E1] flex items-center justify-center mr-4">
+                      <div className="h-10 w-10 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center mr-4">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                         </svg>
@@ -182,7 +182,7 @@ const ContactPage = () => {
                     <div>
                       <button 
                         type="submit"
-                        className="w-full bg-gradient-to-r from-[#215096] to-[#4299E1] !text-white py-3 rounded-md hover:opacity-90 transition-opacity font-medium drop-shadow-md"
+                        className="w-full bg-gradient-to-r from-primary to-secondary !text-white py-3 rounded-md hover:opacity-90 transition-opacity font-medium drop-shadow-md"
                       >
                         Send Message
                       </button>

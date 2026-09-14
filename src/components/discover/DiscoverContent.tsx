@@ -59,7 +59,7 @@ export const WhyPMSection = () => (
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
               <div className="text-center">
-                <div className="h-16 w-16 rounded-full bg-gradient-to-r from-[#215096] to-[#4299E1] flex items-center justify-center mx-auto mb-4">
+                <div className="h-16 w-16 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center mx-auto mb-4">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 text-white">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                   </svg>
@@ -68,7 +68,7 @@ export const WhyPMSection = () => (
                 <p className="text-muted-foreground">Flexible schedules and remote work options that let you maintain a healthy lifestyle</p>
               </div>
               <div className="text-center">
-                <div className="h-16 w-16 rounded-full bg-gradient-to-r from-[#215096] to-[#4299E1] flex items-center justify-center mx-auto mb-4">
+                <div className="h-16 w-16 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center mx-auto mb-4">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 text-white">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
                   </svg>
@@ -77,7 +77,7 @@ export const WhyPMSection = () => (
                 <p className="text-muted-foreground">Work on exciting products that directly impact business growth and user experience</p>
               </div>
               <div className="text-center">
-                <div className="h-16 w-16 rounded-full bg-gradient-to-r from-[#215096] to-[#4299E1] flex items-center justify-center mx-auto mb-4">
+                <div className="h-16 w-16 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center mx-auto mb-4">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 text-white">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
@@ -167,7 +167,7 @@ export const PMSkillGenerator = () => {
         <Button
           onClick={spinWheel}
           disabled={isSpinning}
-          className="bg-gradient-to-r from-[#215096] to-[#4299E1] !text-white drop-shadow-md"
+          className="bg-gradient-to-r from-primary to-secondary !text-white drop-shadow-md"
         >
           {isSpinning ? 'Spinning...' : 'Spin the Wheel'}
         </Button>
@@ -218,7 +218,7 @@ export const PMJargonQuiz = () => {
           {showDefinition ? (
             <div className="space-y-4">
               <p className="text-muted-foreground">{quizTerm?.definition}</p>
-              <Button onClick={startNewQuiz} className="bg-gradient-to-r from-[#215096] to-[#4299E1] !text-white drop-shadow-md">
+              <Button onClick={startNewQuiz} className="bg-gradient-to-r from-primary to-secondary !text-white drop-shadow-md">
                 Next Term
               </Button>
             </div>
@@ -263,7 +263,7 @@ export const PMDailyChallenge = () => {
           <Button onClick={() => setShowExample(!showExample)} variant="outline" className="border-border hover:bg-muted">
             {showExample ? 'Hide Example' : 'Show Example'}
           </Button>
-          <Button onClick={handleNextChallenge} className="bg-gradient-to-r from-[#215096] to-[#4299E1] !text-white drop-shadow-md">
+          <Button onClick={handleNextChallenge} className="bg-gradient-to-r from-primary to-secondary !text-white drop-shadow-md">
             Next Challenge
           </Button>
         </div>

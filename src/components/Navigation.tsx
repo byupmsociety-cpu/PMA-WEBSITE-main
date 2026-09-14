@@ -138,7 +138,7 @@ const Navigation = () => {
                         className={`relative px-1 py-2 text-sm font-medium transition-colors
                         ${activeLink === link.path ? 'text-primary dark:text-white' : 'text-muted-foreground hover:text-primary'}
                         after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0
-                        after:bg-gradient-to-r after:from-[#215096] after:to-[#4299E1] after:origin-bottom-right
+                        after:bg-gradient-to-r after:from-primary after:to-secondary after:origin-bottom-right
                         after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left
                         ${activeLink === link.path ? 'after:scale-x-100' : ''}`}
                         onClick={() => setActiveLink(link.path)}

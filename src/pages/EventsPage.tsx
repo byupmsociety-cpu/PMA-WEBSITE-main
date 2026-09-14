@@ -164,7 +164,7 @@ const EventsPage = () => {
             {[...Array(5)].map((_, index) => (
               <div key={index} className="bg-card/80 border border-border rounded-lg p-6 backdrop-blur-sm animate-pulse">
                 <div className="flex flex-col md:flex-row">
-                  <div className="md:w-64 p-6 bg-gradient-to-br from-[#215096]/30 to-[#4299E1]/30">
+                  <div className="md:w-64 p-6 bg-gradient-to-br from-primary/30 to-secondary/30">
                     <div className="h-4 bg-muted rounded mb-2"></div>
                     <div className="h-3 bg-muted rounded"></div>
                   </div>
@@ -222,7 +222,24 @@ const EventsPage = () => {
             </p>
           </div>
         </AnimatedSection>
-        
+
+        <AnimatedSection animation="fade-in" delay={50}>
+          <div className="flex justify-center mb-16">
+            <iframe
+              src="https://luma.com/embed/calendar/cal-82eg3LzQnk5FD0J/events"
+              width="600"
+              height="450"
+              frameBorder="0"
+              style={{ border: "1px solid #bfcbda88", borderRadius: "4px" }}
+              allowFullScreen
+              aria-hidden="false"
+              tabIndex={0}
+              className="w-full max-w-[600px]"
+              title="BYU PMA Luma Calendar"
+            />
+          </div>
+        </AnimatedSection>
+
         <AnimatedSection animation="slide-up" delay={100}>
           <div className="flex justify-center mb-12">
             <div className="inline-flex bg-card/50 rounded-lg p-1 backdrop-blur-sm">
@@ -230,7 +247,7 @@ const EventsPage = () => {
                 onClick={() => setFilter('upcoming')}
                 className={`px-4 py-2 rounded-lg transition-all ${
                   filter === 'upcoming'
-                    ? 'bg-gradient-to-r from-[#215096] to-[#4299E1] !text-white drop-shadow-md'
+                    ? 'bg-gradient-to-r from-primary to-secondary !text-white drop-shadow-md'
                     : 'bg-muted/50 text-muted-foreground hover:text-foreground'
                 }`}
               >
@@ -240,7 +257,7 @@ const EventsPage = () => {
                 onClick={() => setFilter('past')}
                 className={`px-4 py-2 rounded-lg transition-all ${
                   filter === 'past'
-                    ? 'bg-gradient-to-r from-[#215096] to-[#4299E1] !text-white drop-shadow-md'
+                    ? 'bg-gradient-to-r from-primary to-secondary !text-white drop-shadow-md'
                     : 'bg-muted/50 text-muted-foreground hover:text-foreground'
                 }`}
               >
@@ -257,7 +274,7 @@ const EventsPage = () => {
                     <CardContent className="p-0">
                       <div className="flex flex-col md:flex-row">
                         {/* Date Section */}
-                        <div className="md:w-48 p-6 bg-gradient-to-br from-[#215096]/30 to-[#4299E1]/30 flex flex-col justify-center items-center md:items-start text-center md:text-left">
+                        <div className="md:w-48 p-6 bg-gradient-to-br from-primary/30 to-secondary/30 flex flex-col justify-center items-center md:items-start text-center md:text-left">
                           <div className="text-lg font-semibold mb-1">{new Date(event.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}</div>
                           <div className="text-sm text-muted-foreground">{new Date(event.date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</div>
                         </div>
@@ -279,14 +296,14 @@ const EventsPage = () => {
                                 href={event.registrationLink}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center gap-2 bg-gradient-to-r from-[#215096] to-[#4299E1] !text-white hover:opacity-90 text-sm drop-shadow-md px-4 py-2 rounded-md font-medium"
+                                className="inline-flex items-center gap-2 bg-gradient-to-r from-primary to-secondary !text-white hover:opacity-90 text-sm drop-shadow-md px-4 py-2 rounded-md font-medium"
                               >
                                 Register on Luma
                               </a>
                             )}
                             <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button className="inline-flex items-center gap-2 bg-gradient-to-r from-[#215096] to-[#4299E1] !text-white hover:opacity-90 text-sm drop-shadow-md">
+                              <Button className="inline-flex items-center gap-2 bg-gradient-to-r from-primary to-secondary !text-white hover:opacity-90 text-sm drop-shadow-md">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
                                   <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
                                 </svg>
@@ -481,7 +498,7 @@ const EventsPage = () => {
                 href={selectedFlyer}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-4 py-2 bg-gradient-to-r from-[#215096] to-[#4299E1] !text-white rounded-lg hover:opacity-90 transition-opacity drop-shadow-md"
+                className="px-4 py-2 bg-gradient-to-r from-primary to-secondary !text-white rounded-lg hover:opacity-90 transition-opacity drop-shadow-md"
               >
                 Open in New Tab
               </a>
