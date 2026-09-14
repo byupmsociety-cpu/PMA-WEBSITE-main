@@ -73,7 +73,7 @@ const HomeHero = () => {
             </AnimatedSection>
           </div>
 
-          <AnimatedSection animation="slide-up" className="hidden lg:flex justify-center">
+          <AnimatedSection animation="slide-up" className="flex justify-center mt-4 lg:mt-0">
             <iframe
               src="https://luma.com/embed/event/evt-9LS6JEYF3Bfi8dy/simple"
               width="600"
@@ -83,7 +83,7 @@ const HomeHero = () => {
               allow="fullscreen; payment"
               aria-hidden="false"
               tabIndex={0}
-              className="w-full max-w-[600px]"
+              className="w-full max-w-[600px] h-[520px] sm:h-[620px] lg:h-[780px]"
               title="Register for our next event"
             />
           </AnimatedSection>

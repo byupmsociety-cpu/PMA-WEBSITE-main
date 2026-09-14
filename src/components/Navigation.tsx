@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import ThemeToggle from './ThemeToggle';
 import { Button } from './ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import AuthModal from './AuthModal';
@@ -152,7 +151,6 @@ const Navigation = () => {
             </nav>
             
             <div className="flex items-center space-x-2">
-              <ThemeToggle />
               {user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild className="hidden md:flex">
@@ -401,9 +399,6 @@ const Navigation = () => {
                 </li>
               </ul>
             </nav>
-            <div className="p-4 border-t border-border">
-              <ThemeToggle />
-            </div>
           </div>
         </SheetContent>
       </Sheet>

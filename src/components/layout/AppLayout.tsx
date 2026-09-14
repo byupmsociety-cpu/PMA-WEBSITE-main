@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import ThemeToggle from '../ThemeToggle';
 import { Button } from '../ui/button';
 import { FeedbackModal } from '../FeedbackModal';
 import { Avatar, AvatarFallback } from '../ui/avatar';
@@ -211,11 +210,6 @@ const AppLayout = () => {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <div className="px-2 py-1 flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground px-2">Theme</span>
-                  <ThemeToggle />
-                </div>
-                <DropdownMenuSeparator />
                 <DropdownMenuItem onSelect={handleSignOut} className="cursor-pointer gap-2 text-destructive focus:text-destructive">
                   <LogOut className="h-4 w-4" />
                   Sign out
@@ -269,7 +263,6 @@ const AppLayout = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            <ThemeToggle />
             <span className="font-semibold tracking-tight">PMA Portal</span>
           </div>
         </header>
