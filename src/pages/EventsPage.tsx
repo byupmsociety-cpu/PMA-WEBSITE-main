@@ -222,7 +222,24 @@ const EventsPage = () => {
             </p>
           </div>
         </AnimatedSection>
-        
+
+        <AnimatedSection animation="fade-in" delay={50}>
+          <div className="flex justify-center mb-16">
+            <iframe
+              src="https://luma.com/embed/calendar/cal-82eg3LzQnk5FD0J/events"
+              width="600"
+              height="450"
+              frameBorder="0"
+              style={{ border: "1px solid #bfcbda88", borderRadius: "4px" }}
+              allowFullScreen
+              aria-hidden="false"
+              tabIndex={0}
+              className="w-full max-w-[600px]"
+              title="BYU PMA Luma Calendar"
+            />
+          </div>
+        </AnimatedSection>
+
         <AnimatedSection animation="slide-up" delay={100}>
           <div className="flex justify-center mb-12">
             <div className="inline-flex bg-card/50 rounded-lg p-1 backdrop-blur-sm">

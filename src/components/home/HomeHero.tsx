@@ -61,43 +61,31 @@ const HomeHero = () => {
                     Join BYU PMA
                   </a>
                 )}
-                <Link
-                  to="/team"
+                <a
+                  href="https://luma.com/calendar/cal-82eg3LzQnk5FD0J"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="inline-flex items-center justify-center px-6 py-3 bg-transparent border border-border rounded-lg text-foreground font-medium hover:bg-white/10 transition-all"
                 >
-                  Meet Our Team
-                </Link>
+                  Subscribe to Calendar
+                </a>
               </div>
             </AnimatedSection>
           </div>
 
-          <AnimatedSection animation="slide-up" className="hidden lg:block">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-4">
-                <div className="h-64 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 border border-border p-1">
-                  <div className="h-full w-full rounded-lg bg-white/50 dark:bg-black/50 backdrop-blur-sm overflow-hidden">
-                    <img src="/img/Home1.png" alt="BYU PMA Event" className="h-full w-full object-cover" />
-                  </div>
-                </div>
-                <div className="h-40 rounded-xl bg-gradient-to-br from-secondary/20 to-primary/20 border border-border p-1">
-                  <div className="h-full w-full rounded-lg bg-white/50 dark:bg-black/50 backdrop-blur-sm overflow-hidden">
-                    <img src="/img/Home2.png" alt="BYU PMA Workshop" className="h-full w-full object-cover" />
-                  </div>
-                </div>
-              </div>
-              <div className="space-y-4 mt-8">
-                <div className="h-40 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 border border-border p-1">
-                  <div className="h-full w-full rounded-lg bg-white/50 dark:bg-black/50 backdrop-blur-sm overflow-hidden">
-                    <img src="/img/Home3.png" alt="BYU PMA Networking" className="h-full w-full object-cover" />
-                  </div>
-                </div>
-                <div className="h-64 rounded-xl bg-gradient-to-br from-secondary/20 to-primary/20 border border-border p-1">
-                  <div className="h-full w-full rounded-lg bg-white/50 dark:bg-black/50 backdrop-blur-sm overflow-hidden">
-                    <img src="/img/Home4.png" alt="BYU PMA Team" className="h-full w-full object-cover" />
-                  </div>
-                </div>
-              </div>
-            </div>
+          <AnimatedSection animation="slide-up" className="hidden lg:flex justify-center">
+            <iframe
+              src="https://luma.com/embed/event/evt-9LS6JEYF3Bfi8dy/simple"
+              width="600"
+              height="780"
+              frameBorder="0"
+              style={{ border: "1px solid #bfcbda88", borderRadius: "4px" }}
+              allow="fullscreen; payment"
+              aria-hidden="false"
+              tabIndex={0}
+              className="w-full max-w-[600px]"
+              title="Register for our next event"
+            />
           </AnimatedSection>
         </div>
       </div>
