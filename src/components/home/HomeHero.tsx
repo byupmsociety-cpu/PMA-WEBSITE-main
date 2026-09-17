@@ -26,8 +26,8 @@ const HomeHero = () => {
 
             <AnimatedSection animation="fade-in" delay={300}>
               <p className="text-center md:text-left text-xl md:text-2xl text-muted-foreground mt-6">
-                Empowering the next generation of product leaders through hands-on experience, industry connections,
-                and community.
+                A product manager decides what gets built, why, and for whom, then works with engineers and
+                designers until it's real.
               </p>
             </AnimatedSection>
 
