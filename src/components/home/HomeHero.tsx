@@ -75,16 +75,16 @@ const HomeHero = () => {
 
           <AnimatedSection animation="slide-up" className="flex justify-center mt-4 lg:mt-0">
             <iframe
-              src="https://luma.com/embed/event/evt-9LS6JEYF3Bfi8dy/simple"
+              src="https://luma.com/embed/calendar/cal-82eg3LzQnk5FD0J/events"
               width="600"
-              height="780"
+              height="450"
               frameBorder="0"
               style={{ border: "1px solid #bfcbda88", borderRadius: "4px" }}
-              allow="fullscreen; payment"
+              allowFullScreen
               aria-hidden="false"
               tabIndex={0}
-              className="w-full max-w-[600px] h-[520px] sm:h-[620px] lg:h-[780px]"
-              title="Register for our next event"
+              className="w-full max-w-[600px]"
+              title="BYU PMA Luma Calendar"
             />
           </AnimatedSection>
         </div>
