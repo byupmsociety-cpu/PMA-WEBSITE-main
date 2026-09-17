@@ -29,14 +29,29 @@ const ContactPage = () => {
               </div>
             </div>
 
+            <div className="w-full rounded-2xl border border-border bg-gradient-to-r from-primary to-secondary p-8 text-white">
+              <div className="flex justify-center mb-4">
+                <svg className="w-10 h-10" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M8.843 0a2.522 2.522 0 0 0-2.517 2.522 2.522 2.522 0 0 0 2.517 2.523h2.522V2.522A2.522 2.522 0 0 0 8.843 0Zm0 6.729H2.522A2.522 2.522 0 0 0 0 9.251a2.522 2.522 0 0 0 2.522 2.523h6.32a2.522 2.522 0 0 0 2.523-2.523A2.522 2.522 0 0 0 8.843 6.73Zm14.634 2.522a2.522 2.522 0 0 0-2.522-2.522 2.522 2.522 0 0 0-2.523 2.522v2.523h2.523a2.522 2.522 0 0 0 2.522-2.523Zm-6.729 0V2.522A2.522 2.522 0 0 0 14.226 0a2.522 2.522 0 0 0-2.522 2.522v6.729a2.522 2.522 0 0 0 2.522 2.523 2.522 2.522 0 0 0 2.522-2.523ZM14.226 24a2.522 2.522 0 0 0 2.522-2.523 2.522 2.522 0 0 0-2.522-2.522h-2.522v2.522A2.522 2.522 0 0 0 14.226 24Zm0-6.729h6.32a2.522 2.522 0 0 0 2.523-2.522 2.522 2.522 0 0 0-2.522-2.523h-6.32a2.522 2.522 0 0 0-2.523 2.523 2.522 2.522 0 0 0 2.522 2.522ZM0 14.749a2.522 2.522 0 0 0 2.522 2.522 2.522 2.522 0 0 0 2.523-2.522v-2.522H2.522A2.522 2.522 0 0 0 0 14.749Zm6.729 0v6.728A2.522 2.522 0 0 0 9.251 24a2.522 2.522 0 0 0 2.523-2.523v-6.728a2.522 2.522 0 0 0-2.523-2.523 2.522 2.522 0 0 0-2.522 2.523Z" />
+                </svg>
+              </div>
+              <h2 className="text-2xl font-bold mb-2">Join Us on Slack</h2>
+              <p className="text-white/80 mb-6">
+                Announcements, event chat, and the everyday community for BYU PMA members.
+              </p>
+              <a
+                href="https://join.slack.com/t/byu-pma/shared_invite/zt-4a760gf8j-aObyA0ZHlvDNJbOA19Yk5A"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center px-8 py-3 bg-white text-primary rounded-xl font-bold hover:scale-105 transition-all duration-300 shadow-lg"
+              >
+                Join the Slack
+              </a>
+            </div>
+
             <div>
               <h2 className="text-2xl font-bold mb-6">Connect With Us</h2>
               <div className="flex justify-center space-x-6">
-                <a href="https://join.slack.com/t/byu-pma/shared_invite/zt-4a760gf8j-aObyA0ZHlvDNJbOA19Yk5A" target="_blank" rel="noopener noreferrer" aria-label="Join BYU PMA on Slack" className="h-14 w-14 rounded-full bg-muted/50 flex items-center justify-center hover:bg-muted/70 transition-colors">
-                  <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8.843 0a2.522 2.522 0 0 0-2.517 2.522 2.522 2.522 0 0 0 2.517 2.523h2.522V2.522A2.522 2.522 0 0 0 8.843 0Zm0 6.729H2.522A2.522 2.522 0 0 0 0 9.251a2.522 2.522 0 0 0 2.522 2.523h6.32a2.522 2.522 0 0 0 2.523-2.523A2.522 2.522 0 0 0 8.843 6.73Zm14.634 2.522a2.522 2.522 0 0 0-2.522-2.522 2.522 2.522 0 0 0-2.523 2.522v2.523h2.523a2.522 2.522 0 0 0 2.522-2.523Zm-6.729 0V2.522A2.522 2.522 0 0 0 14.226 0a2.522 2.522 0 0 0-2.522 2.522v6.729a2.522 2.522 0 0 0 2.522 2.523 2.522 2.522 0 0 0 2.522-2.523ZM14.226 24a2.522 2.522 0 0 0 2.522-2.523 2.522 2.522 0 0 0-2.522-2.522h-2.522v2.522A2.522 2.522 0 0 0 14.226 24Zm0-6.729h6.32a2.522 2.522 0 0 0 2.523-2.522 2.522 2.522 0 0 0-2.522-2.523h-6.32a2.522 2.522 0 0 0-2.523 2.523 2.522 2.522 0 0 0 2.522 2.522ZM0 14.749a2.522 2.522 0 0 0 2.522 2.522 2.522 2.522 0 0 0 2.523-2.522v-2.522H2.522A2.522 2.522 0 0 0 0 14.749Zm6.729 0v6.728A2.522 2.522 0 0 0 9.251 24a2.522 2.522 0 0 0 2.523-2.523v-6.728a2.522 2.522 0 0 0-2.523-2.523 2.522 2.522 0 0 0-2.522 2.523Z" />
-                  </svg>
-                </a>
                 <a href="https://www.linkedin.com/company/byu-pma/posts/?feedView=all" target="_blank" rel="noopener noreferrer" aria-label="BYU PMA on LinkedIn" className="h-14 w-14 rounded-full bg-muted/50 flex items-center justify-center hover:bg-muted/70 transition-colors">
                   <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
