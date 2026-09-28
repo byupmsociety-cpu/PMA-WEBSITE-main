@@ -148,7 +148,7 @@ export const CompaniesCTA = () => (
       <AnimatedSection animation="slide-up">
         <div className="max-w-3xl mx-auto bg-card/80 border border-border rounded-2xl p-8 md:p-12 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-card-foreground">
-            Let's build something <span className="text-gradient">together</span>
+            Help inspire the next generation of <span className="text-gradient">product managers</span>
           </h2>
           <p className="text-lg text-muted-foreground mb-8">
             Tell us which option interests you and we'll follow up with next steps and timing for this semester.
