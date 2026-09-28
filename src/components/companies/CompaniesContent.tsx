@@ -10,12 +10,15 @@ type EngagementOption = {
   icon: LucideIcon;
   title: string;
   description: string;
+  // Placeholder art in public/img/companies; swap for real event photos
+  image: string;
   highlights: string[];
 };
 
 const engagementOptions: EngagementOption[] = [
   {
     id: 'ai-foundry',
+    image: '/img/companies/ai-foundry.svg',
     icon: Bot,
     title: 'Sponsor an AI Foundry Project',
     description:
@@ -24,6 +27,7 @@ const engagementOptions: EngagementOption[] = [
   },
   {
     id: 'internships',
+    image: '/img/companies/internships.svg',
     icon: GraduationCap,
     title: 'Offer a PM Internship for Credit',
     description:
@@ -32,6 +36,7 @@ const engagementOptions: EngagementOption[] = [
   },
   {
     id: 'career-fair',
+    image: '/img/companies/career-fair.svg',
     icon: Users,
     title: 'Join the Career Fair',
     description:
@@ -40,6 +45,7 @@ const engagementOptions: EngagementOption[] = [
   },
   {
     id: 'speaker',
+    image: '/img/companies/speaker.svg',
     icon: Mic,
     title: 'Host a Guest Speaker or Info Session',
     description:
@@ -48,6 +54,7 @@ const engagementOptions: EngagementOption[] = [
   },
   {
     id: 'on-site',
+    image: '/img/companies/on-site.svg',
     icon: Building2,
     title: 'Host PMA On-Site',
     description:
@@ -59,28 +66,37 @@ const engagementOptions: EngagementOption[] = [
 export const CompaniesHero = () => (
   <section className="pt-32 pb-20 bg-muted/20">
     <div className="container mx-auto px-4 md:px-6">
-      <AnimatedSection animation="slide-up">
-        <div className="max-w-3xl mx-auto text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">
-            Partner with <span className="text-gradient">BYU PMA</span>
-          </h1>
-          <p className="text-lg md:text-xl text-muted-foreground mb-8">
-            Our members are BYU's next generation of product managers. Here's how your company can work with them,
-            from sponsoring a project to hiring your next intern.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button
-              asChild
-              className="bg-gradient-to-r from-primary to-secondary !text-white px-8 py-3 rounded-lg text-lg font-medium hover:opacity-90 transition-all drop-shadow-md"
-            >
-              <a href="#ways-to-engage">See ways to engage</a>
-            </Button>
-            <Button asChild variant="outline" className="px-8 py-3 rounded-lg text-lg font-medium">
-              <a href={`mailto:${CONTACT_EMAIL}?subject=Company%20Partnership`}>Email us</a>
-            </Button>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <AnimatedSection animation="slide-up">
+          <div className="text-center lg:text-left">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6">
+              Partner with <span className="text-gradient">BYU PMA</span>
+            </h1>
+            <p className="text-lg md:text-xl text-muted-foreground mb-8">
+              Our members are BYU's next generation of product managers. Here's how your company can work with them,
+              from sponsoring a project to hiring your next intern.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+              <Button
+                asChild
+                className="bg-gradient-to-r from-primary to-secondary !text-white px-8 py-3 rounded-lg text-lg font-medium hover:opacity-90 transition-all drop-shadow-md"
+              >
+                <a href="#ways-to-engage">See ways to engage</a>
+              </Button>
+              <Button asChild variant="outline" className="px-8 py-3 rounded-lg text-lg font-medium">
+                <a href={`mailto:${CONTACT_EMAIL}?subject=Company%20Partnership`}>Email us</a>
+              </Button>
+            </div>
           </div>
-        </div>
-      </AnimatedSection>
+        </AnimatedSection>
+        <AnimatedSection animation="slide-up" delay={150}>
+          <img
+            src="/img/companies/hero.svg"
+            alt="BYU PMA students working with company partners"
+            className="w-full aspect-[3/2] object-cover rounded-2xl border border-border shadow-lg"
+          />
+        </AnimatedSection>
+      </div>
     </div>
   </section>
 );
@@ -98,17 +114,25 @@ export const EngagementOptions = () => (
           const Icon = option.icon;
           return (
             <AnimatedSection key={option.id} animation="slide-up" delay={(index % 3) * 100 + 100}>
-              <div id={option.id} className="h-full bg-card/80 border border-border rounded-xl p-6 flex flex-col">
-                <div className="h-12 w-12 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center mb-4">
-                  <Icon className="w-6 h-6 text-white" />
+              <div id={option.id} className="h-full bg-card/80 border border-border rounded-xl overflow-hidden flex flex-col">
+                <img
+                  src={option.image}
+                  alt={option.title}
+                  loading="lazy"
+                  className="w-full aspect-video object-cover"
+                />
+                <div className="p-6 pt-0 flex flex-col flex-1">
+                  <div className="h-12 w-12 -mt-6 rounded-full bg-gradient-to-r from-primary to-secondary ring-4 ring-card flex items-center justify-center mb-4">
+                    <Icon className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold mb-3 text-card-foreground">{option.title}</h3>
+                  <p className="text-muted-foreground mb-4">{option.description}</p>
+                  <ul className="mt-auto space-y-1 text-sm text-muted-foreground list-disc list-inside">
+                    {option.highlights.map((highlight) => (
+                      <li key={highlight}>{highlight}</li>
+                    ))}
+                  </ul>
                 </div>
-                <h3 className="text-xl font-bold mb-3 text-card-foreground">{option.title}</h3>
-                <p className="text-muted-foreground mb-4">{option.description}</p>
-                <ul className="mt-auto space-y-1 text-sm text-muted-foreground list-disc list-inside">
-                  {option.highlights.map((highlight) => (
-                    <li key={highlight}>{highlight}</li>
-                  ))}
-                </ul>
               </div>
             </AnimatedSection>
           );
