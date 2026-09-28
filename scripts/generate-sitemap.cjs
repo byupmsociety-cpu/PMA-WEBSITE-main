@@ -18,6 +18,7 @@ const routes = [
   "/resources",
   "/contact",
   "/discover",
+  "/companies",
   "/game",
 ];
 

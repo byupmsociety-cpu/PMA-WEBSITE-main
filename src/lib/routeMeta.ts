@@ -41,6 +41,10 @@ export const ROUTE_META: Record<string, { title: string; description: string }> 
     title: "Discover PM | BYU PMA",
     description: "Discover product management paths and opportunities with BYU PMA.",
   },
+  "/companies": {
+    title: "For Companies | BYU PMA",
+    description: "Partner with BYU PMA: sponsor an AI Foundry project, offer PM internships, join the career fair, host a speaker, or host PMA on-site.",
+  },
   "/game": {
     title: "Game | BYU PMA",
     description: "BYU PMA game and engagement.",
