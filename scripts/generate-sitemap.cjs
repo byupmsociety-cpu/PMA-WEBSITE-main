@@ -17,7 +17,7 @@ const routes = [
   "/events",
   "/resources",
   "/contact",
-  "/discover",
+  "/students",
   "/game",
 ];
 

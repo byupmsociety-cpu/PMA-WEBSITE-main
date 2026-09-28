@@ -471,13 +471,19 @@ const DiscoverHero = () => {
       <div className="relative h-full w-full flex items-center justify-center text-center">
         <div>
           <h1 className="text-5xl md:text-6xl font-bold mb-6 text-white">
-            Discover Your <span className="text-gradient">Product Management</span> Path
+            Your Path Into <span className="text-gradient">Product Management</span>
           </h1>
           <p className="text-xl text-gray-200 mb-8">
-            ↓ Build your BYU-customized path to a Product Management Career ↓
+            Majors, classes, and answers to the questions BYU students ask us most
           </p>
-          <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <PMQuizDialog />
+            <a
+              href="#faq"
+              className="px-8 py-3 rounded-lg text-lg font-medium text-white border border-white/60 hover:bg-white/10 transition-all"
+            >
+              Read the FAQ
+            </a>
           </div>
         </div>
       </div>

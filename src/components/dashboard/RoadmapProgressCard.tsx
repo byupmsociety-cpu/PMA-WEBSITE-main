@@ -32,7 +32,7 @@ export function RoadmapProgressCard({
             </p>
           </div>
           <Button size="sm" asChild>
-            <Link to="/discover">Take the Quiz</Link>
+            <Link to="/students">Take the Quiz</Link>
           </Button>
         </CardContent>
       </Card>

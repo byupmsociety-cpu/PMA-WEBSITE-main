@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import { Analytics } from "@vercel/analytics/react";
@@ -12,7 +12,7 @@ import TeamPage from "./pages/TeamPage";
 import ResourcesPage from "./pages/ResourcesPage";
 import EventsPage from "./pages/EventsPage";
 import ContactPage from "./pages/ContactPage";
-import DiscoverPage from "./pages/DiscoverPage";
+import StudentsPage from "./pages/StudentsPage";
 import NotFound from "./pages/NotFound";
 import ScrollToTop from "./components/ScrollToTop";
 import RouteMeta from "./components/RouteMeta";
@@ -66,7 +66,8 @@ const App = () => (
                 <Route path="/hackathon/share" element={<HackathonSharePage />} />
                 <Route path="/hackathon/faq" element={<HackathonFAQPage />} />
                 <Route path="/contact" element={<ContactPage />} />
-                <Route path="/discover" element={<DiscoverPage />} />
+                <Route path="/students" element={<StudentsPage />} />
+                <Route path="/discover" element={<Navigate to="/students" replace />} />
                 <Route path="/auth" element={<AuthPage />} />
                 <Route path="/blocked" element={<BlockedPage />} />
                 <Route path="/roadmap" element={<RoadmapPage />} />
