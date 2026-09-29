@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Bot, GraduationCap, Users, Mic, Building2, Mail, type LucideIcon } from 'lucide-react';
 import AnimatedSection from '@/components/AnimatedSection';
 import { Button } from '@/components/ui/button';
+import { companyImages } from './placeholderImages';
 
 const CONTACT_EMAIL = 'pm-assoc@byu.edu';
 
@@ -10,7 +11,6 @@ type EngagementOption = {
   icon: LucideIcon;
   title: string;
   description: string;
-  // Placeholder art in public/img/companies; swap for real event photos
   image: string;
   highlights: string[];
 };
@@ -18,7 +18,7 @@ type EngagementOption = {
 const engagementOptions: EngagementOption[] = [
   {
     id: 'ai-foundry',
-    image: '/img/companies/ai-foundry.svg',
+    image: companyImages.aiFoundry,
     icon: Bot,
     title: 'Sponsor an AI Foundry Project',
     description:
@@ -27,7 +27,7 @@ const engagementOptions: EngagementOption[] = [
   },
   {
     id: 'internships',
-    image: '/img/companies/internships.svg',
+    image: companyImages.internships,
     icon: GraduationCap,
     title: 'Offer a PM Internship for Credit',
     description:
@@ -36,7 +36,7 @@ const engagementOptions: EngagementOption[] = [
   },
   {
     id: 'career-fair',
-    image: '/img/companies/career-fair.svg',
+    image: companyImages.careerFair,
     icon: Users,
     title: 'Join the Career Fair',
     description:
@@ -45,7 +45,7 @@ const engagementOptions: EngagementOption[] = [
   },
   {
     id: 'speaker',
-    image: '/img/companies/speaker.svg',
+    image: companyImages.speaker,
     icon: Mic,
     title: 'Host a Guest Speaker or Info Session',
     description:
@@ -54,7 +54,7 @@ const engagementOptions: EngagementOption[] = [
   },
   {
     id: 'on-site',
-    image: '/img/companies/on-site.svg',
+    image: companyImages.onSite,
     icon: Building2,
     title: 'Host PMA On-Site',
     description:
@@ -91,7 +91,7 @@ export const CompaniesHero = () => (
         </AnimatedSection>
         <AnimatedSection animation="slide-up" delay={150}>
           <img
-            src="/img/companies/hero.svg"
+            src={companyImages.hero}
             alt="BYU PMA students working with company partners"
             className="w-full aspect-[3/2] object-cover rounded-2xl border border-border shadow-lg"
           />
