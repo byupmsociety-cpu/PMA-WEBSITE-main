@@ -110,10 +110,10 @@ const AboutSection = () => {
               New to Product Management or want to learn more?
             </h2>
             <a
-              href="/discover"
+              href="/students"
               className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-primary to-secondary rounded-xl !text-white font-bold text-lg hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl drop-shadow-md"
             >
-              Discover PM
+              For Students
             </a>
           </div>
         </AnimatedSection>
