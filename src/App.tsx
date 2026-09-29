@@ -13,6 +13,7 @@ import ResourcesPage from "./pages/ResourcesPage";
 import EventsPage from "./pages/EventsPage";
 import ContactPage from "./pages/ContactPage";
 import StudentsPage from "./pages/StudentsPage";
+import CompaniesPage from "./pages/CompaniesPage";
 import NotFound from "./pages/NotFound";
 import ScrollToTop from "./components/ScrollToTop";
 import RouteMeta from "./components/RouteMeta";
@@ -67,6 +68,7 @@ const App = () => (
                 <Route path="/hackathon/faq" element={<HackathonFAQPage />} />
                 <Route path="/contact" element={<ContactPage />} />
                 <Route path="/students" element={<StudentsPage />} />
+                <Route path="/companies" element={<CompaniesPage />} />
                 <Route path="/discover" element={<Navigate to="/students" replace />} />
                 <Route path="/auth" element={<AuthPage />} />
                 <Route path="/blocked" element={<BlockedPage />} />

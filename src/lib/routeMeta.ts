@@ -41,6 +41,10 @@ export const ROUTE_META: Record<string, { title: string; description: string }> 
     title: "For Students | BYU PMA",
     description: "What product management is, which majors and classes lead there, and answers to common student questions.",
   },
+  "/companies": {
+    title: "For Companies | BYU PMA",
+    description: "Partner with BYU PMA: sponsor an AI Foundry project, offer PM internships, join the career fair, host a speaker, or host PMA on-site.",
+  },
   "/game": {
     title: "Game | BYU PMA",
     description: "BYU PMA game and engagement.",
