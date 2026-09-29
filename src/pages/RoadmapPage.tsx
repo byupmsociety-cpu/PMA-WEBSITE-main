@@ -227,7 +227,7 @@ const RoadmapPage = () => {
                   background, interests, and goals.
                 </p>
                 <Button asChild>
-                  <Link to="/discover">Take the PM Quiz</Link>
+                  <Link to="/students">Take the PM Quiz</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -252,7 +252,7 @@ const RoadmapPage = () => {
               </p>
             </div>
             <Button variant="outline" asChild>
-              <Link to="/discover">
+              <Link to="/students">
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Retake Quiz
               </Link>
