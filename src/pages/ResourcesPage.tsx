@@ -7,7 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Badge } from "@/components/ui/badge";
 import { useSearchParams } from "react-router-dom";
-import { User } from "@supabase/supabase-js";
+import { useAuth } from "@/contexts/AuthContext";
+import LockedResourcesView from "@/components/LockedResourcesView";
 import PaidResourceModal from "@/components/PaidResourceModal";
 import PremiumResourceModal from "@/components/PremiumResourceModal";
 
@@ -122,8 +123,8 @@ const ResourcesPage = () => {
   const [topResources, setTopResources] = useState<Array<{ resource: Resource; category: Category; clicks: number }>>(
     [],
   );
-  const [user, setUser] = useState<User | null>(null);
-  const [isPmaMember, setIsPmaMember] = useState(false);
+  const { user, profile, isBlocked, loading: authLoading } = useAuth();
+  const isPmaMember = !!profile?.is_pma_member && !isBlocked;
   const [selectedPaidResource, setSelectedPaidResource] = useState<{ title: string; url: string } | null>(null);
   const [selectedPremiumResource, setSelectedPremiumResource] = useState<{ title: string; url: string } | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -138,26 +139,6 @@ const ResourcesPage = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
     void loadResourcesData();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      setTimeout(() => {
-        if (session?.user) {
-          fetchMembershipStatus(session.user.id);
-        } else {
-          setIsPmaMember(false);
-        }
-      }, 0);
-    });
-
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchMembershipStatus(session.user.id);
-      }
-    });
-
-    return () => subscription.unsubscribe();
   }, []);
 
   useEffect(() => {
@@ -293,16 +274,6 @@ const ResourcesPage = () => {
     setLoadingData(false);
   };
 
-  const fetchMembershipStatus = async (userId: string) => {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("is_pma_member")
-      .eq("user_id", userId)
-      .single();
-
-    setIsPmaMember(profile?.is_pma_member ?? false);
-  };
-
   const trackResourceClick = async (resource: Resource, categoryId: string, e?: React.MouseEvent) => {
     if (resource.isPaid) {
       e?.preventDefault();
@@ -374,7 +345,7 @@ const ResourcesPage = () => {
 
   const selectedCategoryData = selectedCategory ? categories.find((c) => c.id === selectedCategory) : null;
 
-  if (loadingData) {
+  if (loadingData || authLoading) {
     return (
       <div className="min-h-screen pt-24 pb-20 bg-background text-foreground">
         <div className="container mx-auto px-4 md:px-6">
@@ -383,6 +354,24 @@ const ResourcesPage = () => {
           </div>
         </div>
       </div>
+    );
+  }
+
+  if (!isPmaMember) {
+    return (
+      <LockedResourcesView
+        isLoggedIn={!!user}
+        categories={categories.map((category) => ({
+          id: category.id,
+          title: category.title,
+          description: category.description,
+          icon: category.icon,
+          color: category.color,
+          resourceCount:
+            (category.resources?.length ?? 0) +
+            (category.subcategories?.reduce((acc, sub) => acc + sub.resources.length, 0) ?? 0),
+        }))}
+      />
     );
   }
 

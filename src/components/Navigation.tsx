@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Lock } from 'lucide-react';
+import { Lock, LogIn, LogOut, Shield } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
+import { signOutAndReload } from '@/lib/signOut';
 
 const Navigation = () => {
   const location = useLocation();
@@ -10,8 +11,9 @@ const Navigation = () => {
   const [visible, setVisible] = useState(true);
   const [activeLink, setActiveLink] = useState('/');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { isGuest, loading: authLoading } = useAuth();
-  const showGuestBanner = location.pathname === '/dashboard' && isGuest && !authLoading;
+  const { user, profile, isAdmin, isSuperAdmin, isBlocked, loading: authLoading } = useAuth();
+  const isPmaMember = !!profile?.is_pma_member && !isBlocked;
+  const showAdminLink = (isAdmin || isSuperAdmin) && !isBlocked;
 
   // Handle scroll behavior to hide/show navbar (disabled when mobile menu is open)
   useEffect(() => {
@@ -37,10 +39,10 @@ const Navigation = () => {
     setMobileMenuOpen(false);
   };
 
-  const links: { name: string; path: string; featured?: boolean }[] = [
+  const links: { name: string; path: string; featured?: boolean; locked?: boolean }[] = [
     { name: 'Home', path: '/' },
     { name: 'Events', path: '/events' },
-    { name: 'Resources', path: '/resources' },
+    { name: 'Resources', path: '/resources', locked: !authLoading && !isPmaMember },
     { name: 'Discover PM', path: '/discover' },
     { name: 'Contact', path: '/contact' }
   ];
@@ -91,7 +93,10 @@ const Navigation = () => {
                         ${activeLink === link.path ? 'after:scale-x-100' : ''}`}
                         onClick={() => setActiveLink(link.path)}
                       >
-                        {link.name}
+                        <span className="inline-flex items-center gap-1">
+                          {link.name}
+                          {link.locked && <Lock className="h-3 w-3" aria-label="Members only" />}
+                        </span>
                       </Link>
                     )}
                   </li>
@@ -100,6 +105,36 @@ const Navigation = () => {
             </nav>
 
             <div className="flex items-center space-x-2">
+              {!authLoading && (
+                <div className="hidden md:flex items-center gap-2">
+                  {showAdminLink && (
+                    <Link
+                      to="/admin"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md text-muted-foreground hover:text-primary hover:bg-muted transition-colors"
+                    >
+                      <Shield className="h-4 w-4" />
+                      Admin
+                    </Link>
+                  )}
+                  {user ? (
+                    <button
+                      onClick={signOutAndReload}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md border border-border text-muted-foreground hover:text-primary hover:bg-muted transition-colors"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      Sign out
+                    </button>
+                  ) : (
+                    <Link
+                      to="/auth"
+                      className="inline-flex items-center gap-1.5 px-4 py-1.5 text-sm font-semibold rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                    >
+                      <LogIn className="h-4 w-4" />
+                      Member login
+                    </Link>
+                  )}
+                </div>
+              )}
               <button
                 className="md:hidden text-foreground p-2 rounded-md hover:bg-muted transition-colors"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -155,33 +190,53 @@ const Navigation = () => {
                         }`}
                         onClick={() => handleLinkClick(link.path)}
                       >
-                        {link.name}
+                        <span className="inline-flex items-center gap-2">
+                          {link.name}
+                          {link.locked && <Lock className="h-4 w-4" aria-label="Members only" />}
+                        </span>
                       </Link>
                     )}
                   </li>
                 ))}
               </ul>
             </nav>
+            {!authLoading && (
+              <div className="border-t border-border p-6 space-y-2">
+                {showAdminLink && (
+                  <Link
+                    to="/admin"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-2 px-4 py-3 text-base font-medium rounded-md text-muted-foreground hover:text-primary hover:bg-muted transition-colors"
+                  >
+                    <Shield className="h-4 w-4" />
+                    Admin
+                  </Link>
+                )}
+                {user ? (
+                  <button
+                    onClick={() => { setMobileMenuOpen(false); signOutAndReload(); }}
+                    className="w-full flex items-center gap-2 px-4 py-3 text-base font-medium rounded-md border border-border text-muted-foreground hover:text-primary hover:bg-muted transition-colors"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Sign out
+                  </button>
+                ) : (
+                  <Link
+                    to="/auth"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center justify-center gap-2 px-4 py-3 text-base font-semibold rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                  >
+                    <LogIn className="h-4 w-4" />
+                    Member login
+                  </Link>
+                )}
+              </div>
+            )}
           </div>
         </SheetContent>
       </Sheet>
     </header>
 
-    {/* Guest banner: fixed at top when header hidden, sits below header when visible */}
-    {showGuestBanner && (
-      <div
-        className={`fixed left-0 right-0 z-40 border-b border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/50 shadow-sm transition-all duration-300 ${
-          visible ? 'top-16' : 'top-0'
-        }`}
-      >
-        <div className="container mx-auto px-4 md:px-6 py-3 flex items-center gap-2">
-          <Lock className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
-          <p className="text-sm text-amber-900 dark:text-amber-100">
-            You're using a free account. Become a PMA member to unlock job alerts, personalized roadmaps, member directory, and all premium features.
-          </p>
-        </div>
-      </div>
-    )}
     </>
   );
 };

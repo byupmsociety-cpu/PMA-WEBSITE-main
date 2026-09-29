@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import { Analytics } from "@vercel/analytics/react";
@@ -18,31 +18,22 @@ import ScrollToTop from "./components/ScrollToTop";
 import RouteMeta from "./components/RouteMeta";
 import GamePage from './pages/GamePage';
 import AuthPage from "./pages/AuthPage";
-import DashboardRoute from "./components/DashboardRoute";
 import HackathonPage from "./pages/HackathonPage";
 import HackathonSharePage from "./pages/HackathonSharePage";
 import HackathonFAQPage from "./pages/HackathonFAQPage";
-import ProfilePage from "./pages/ProfilePage";
 import AdminDashboardPage from "./pages/AdminDashboardPage";
 import AdminTeamPage from "./pages/AdminTeamPage";
 import AdminEventsPage from "./pages/AdminEventsPage";
 import AdminResourcesPage from "./pages/AdminResourcesPage";
 import BlockedPage from "./pages/BlockedPage";
 import AdminAccessPage from "./pages/AdminAccessPage";
-import JobPreferencesPage from "./pages/JobPreferencesPage";
 import AdminJobsPage from "./pages/AdminJobsPage";
-import JobsPage from "./pages/JobsPage";
 import RoadmapPage from "./pages/RoadmapPage";
-import MembersPage from "./pages/MembersPage";
-import ApplicationTrackerPage from "./pages/ApplicationTrackerPage";
-import MockInterviewsPage from "./pages/MockInterviewsPage";
-import ResumesPage from "./pages/ResumesPage";
 import AdminResumesPage from "./pages/AdminResumesPage";
 import AdminInterviewsPage from "./pages/AdminInterviewsPage";
 import AdminFeedbackPage from "./pages/AdminFeedbackPage";
 import AppLayout from "./components/layout/AppLayout";
 import PublicLayout from "./components/layout/PublicLayout";
-import HybridLayout from "./components/layout/HybridLayout";
 import MeetingPresentationPage from "./pages/MeetingPresentationPage";
 
 const queryClient = new QueryClient();
@@ -71,27 +62,21 @@ const App = () => (
                 <Route path="/blocked" element={<BlockedPage />} />
                 <Route path="/roadmap" element={<RoadmapPage />} />
                 <Route path="/meeting" element={<MeetingPresentationPage />} />
+                <Route path="/events" element={<EventsPage />} />
+                {/* Members-only: ResourcesPage gates itself on is_pma_member */}
+                <Route path="/resources" element={<ResourcesPage />} />
                 <Route path="*" element={<NotFound />} />
               </Route>
 
-              {/* Hybrid Routes (Public or Member Portal depending on auth state) */}
-              <Route element={<HybridLayout />}>
-                <Route path="/events" element={<EventsPage />} />
-                <Route path="/resources" element={<ResourcesPage />} />
-              </Route>
+              {/* Retired member-portal pages. Logging in now only unlocks /resources,
+                  so these redirect there. The page components are kept in src/pages
+                  and can be restored by pointing a route back at them. */}
+              {["/dashboard", "/jobs", "/members", "/tracker", "/interviews", "/resumes", "/preferences", "/profile"].map((path) => (
+                <Route key={path} path={path} element={<Navigate to="/resources" replace />} />
+              ))}
 
-              {/* Authenticated / Member Portal Routes */}
+              {/* Admin Portal Routes */}
               <Route element={<AppLayout />}>
-                <Route path="/dashboard" element={<DashboardRoute />} />
-                <Route path="/jobs" element={<JobsPage />} />
-                <Route path="/members" element={<MembersPage />} />
-                <Route path="/tracker" element={<ApplicationTrackerPage />} />
-                <Route path="/interviews" element={<MockInterviewsPage />} />
-                <Route path="/resumes" element={<ResumesPage />} />
-                <Route path="/preferences" element={<JobPreferencesPage />} />
-                <Route path="/profile" element={<ProfilePage />} />
-
-                {/* Admin Routes */}
                 <Route path="/admin" element={<AdminDashboardPage />} />
                 <Route path="/admin/access" element={<AdminAccessPage />} />
                 <Route path="/admin/team" element={<AdminTeamPage />} />

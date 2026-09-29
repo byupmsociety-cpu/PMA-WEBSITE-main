@@ -27,16 +27,16 @@ const AuthPage = () => {
   }, [searchParams]);
 
   useEffect(() => {
-    // Check if user is already logged in - always take them to dashboard
+    // Check if user is already logged in - always take them to resources
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
-        navigate("/dashboard");
+        navigate("/resources");
       }
     });
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
-        navigate("/dashboard");
+        navigate("/resources");
       }
     });
 
@@ -62,7 +62,7 @@ const AuthPage = () => {
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/dashboard`,
+        emailRedirectTo: `${window.location.origin}/resources`,
         data: {
           full_name: fullName,
           school_year: schoolYear,
@@ -120,7 +120,7 @@ const AuthPage = () => {
           <CardDescription>
             {isSignUp
               ? "Join PMA with your BYU email to start your PM journey"
-              : "Sign in to access your dashboard and resources"}
+              : "Sign in to access member resources"}
           </CardDescription>
         </CardHeader>
         <CardContent>
