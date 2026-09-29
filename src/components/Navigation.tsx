@@ -43,7 +43,8 @@ const Navigation = () => {
     { name: 'Home', path: '/' },
     { name: 'Events', path: '/events' },
     { name: 'Resources', path: '/resources', locked: !authLoading && !isPmaMember },
-    { name: 'Discover PM', path: '/discover' },
+    { name: 'For Students', path: '/students' },
+    { name: 'For Companies', path: '/companies' },
     { name: 'Contact', path: '/contact' }
   ];
 
