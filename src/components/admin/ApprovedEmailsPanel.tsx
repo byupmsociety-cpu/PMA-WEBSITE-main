@@ -334,8 +334,8 @@ export default function ApprovedEmailsPanel() {
       toast({
         title: nextDisabled ? "Entry disabled" : "Entry enabled",
         description: nextDisabled
-          ? "This email will no longer be auto-approved on signup."
-          : "This email can be auto-approved again on signup.",
+          ? "This email will no longer be auto-approved, and an existing member account with it is moved back to guest."
+          : "This email is approved again, and an existing guest account with it is upgraded.",
       });
       await loadRows();
     }
@@ -381,6 +381,7 @@ export default function ApprovedEmailsPanel() {
             <p className="text-sm text-muted-foreground mb-2">
               Upload a CSV with a header row containing an <code>email</code> column.
               If a <code>status</code> column is present, users marked as <strong>Active/Approved</strong> will be added or enabled, while <strong>Inactive/Requested</strong> users will have their access disabled. Only <span className="font-mono">@byu.edu</span> addresses are processed.
+              Changes apply to people who already have an account too, not just new signups. Admin accounts are never changed.
             </p>
             <form onSubmit={handleCsvUpload} className="flex flex-col sm:flex-row gap-3 items-start">
               <Input
