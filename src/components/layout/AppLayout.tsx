@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
+import { signOutAndReload } from '@/lib/signOut';
 import { Button } from '../ui/button';
 import { FeedbackModal } from '../FeedbackModal';
 import { Avatar, AvatarFallback } from '../ui/avatar';
@@ -16,16 +16,8 @@ import {
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
 import {
-  LayoutDashboard,
   Calendar,
   BookOpen,
-  Users,
-  Briefcase,
-  Layers,
-  Video,
-  FileText,
-  User,
-  Settings,
   LogOut,
   Menu,
   Shield,
@@ -92,19 +84,7 @@ const AppLayout = () => {
   
   const handleSignOut = () => {
     setMobileMenuOpen(false);
-    const reload = () => {
-      Object.keys(localStorage).forEach((key) => {
-        if (key.includes('-auth-token') || key.startsWith('sb-')) {
-          localStorage.removeItem(key);
-        }
-      });
-      window.location.href = '/';
-    };
-    const timeout = setTimeout(reload, 2000);
-    supabase.auth.signOut({ scope: 'local' }).finally(() => {
-      clearTimeout(timeout);
-      reload();
-    });
+    signOutAndReload();
   };
 
   const closeMenu = () => setMobileMenuOpen(false);
@@ -140,30 +120,16 @@ const AppLayout = () => {
         </div>
 
         <div className="flex-1 px-3">
-          <SidebarGroup title="Home" isCollapsed={collapsed}>
-            <NavItem to="/dashboard" icon={LayoutDashboard} onClick={closeMenu} isCollapsed={collapsed}>Dashboard</NavItem>
-          </SidebarGroup>
-
-          <SidebarGroup title="Community & Learning" isCollapsed={collapsed}>
+          <SidebarGroup title="Site" isCollapsed={collapsed}>
             <NavItem to="/events" icon={Calendar} onClick={closeMenu} isCollapsed={collapsed}>Upcoming Events</NavItem>
             <NavItem to="/resources" icon={BookOpen} onClick={closeMenu} isCollapsed={collapsed}>Resource Vault</NavItem>
-            <NavItem to="/members" icon={Users} onClick={closeMenu} isCollapsed={collapsed}>Member Directory</NavItem>
           </SidebarGroup>
 
-          <SidebarGroup title="Career Hub" isCollapsed={collapsed}>
-            <NavItem to="/jobs" icon={Briefcase} onClick={closeMenu} isCollapsed={collapsed}>Job Board</NavItem>
-            <NavItem to="/tracker" icon={Layers} onClick={closeMenu} isCollapsed={collapsed}>Application Tracker</NavItem>
-            <NavItem to="/interviews" icon={Video} onClick={closeMenu} isCollapsed={collapsed}>Mock Interviews</NavItem>
-            <NavItem to="/resumes" icon={FileText} onClick={closeMenu} isCollapsed={collapsed}>Resume Review</NavItem>
-          </SidebarGroup>
-          
-          <SidebarGroup title="Account" isCollapsed={collapsed}>
-            <NavItem to="/profile" icon={User} onClick={closeMenu} isCollapsed={collapsed}>Profile</NavItem>
-            <NavItem to="/preferences" icon={Settings} onClick={closeMenu} isCollapsed={collapsed}>Job Preferences</NavItem>
-            {(isAdmin || isSuperAdmin) && !isBlocked && (
+          {(isAdmin || isSuperAdmin) && !isBlocked && (
+            <SidebarGroup title="Officers" isCollapsed={collapsed}>
               <NavItem to="/admin" icon={Shield} onClick={closeMenu} isCollapsed={collapsed}>Admin Dashboard</NavItem>
-            )}
-          </SidebarGroup>
+            </SidebarGroup>
+          )}
         </div>
 
         {/* Bottom Actions Area */}

@@ -28,7 +28,7 @@ const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
       if (session?.user && isOpen) {
         onSuccess?.();
         onClose();
-        navigate("/dashboard");
+        navigate("/resources");
       }
     });
 
@@ -54,7 +54,7 @@ const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/dashboard`,
+        emailRedirectTo: `${window.location.origin}/resources`,
         data: {
           full_name: fullName,
         },
