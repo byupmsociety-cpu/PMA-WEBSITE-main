@@ -7,8 +7,17 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { getAdminErrorMessage } from "@/lib/admin-utils";
-
-type DefaultRole = "member" | "admin";
+import {
+  applyRosterSync,
+  fetchAllProfiles,
+  parseRosterFile,
+  planRosterSync,
+  syncAccountsForEmail,
+  type DefaultRole,
+  type ParsedRoster,
+  type SyncChange,
+  type SyncPlan,
+} from "@/lib/rosterSync";
 
 interface ApprovedEmailRow {
   id: string;
@@ -29,9 +38,13 @@ export default function ApprovedEmailsPanel() {
   const [newRole, setNewRole] = useState<DefaultRole>("member");
   const [saving, setSaving] = useState(false);
   const [savingRoleId, setSavingRoleId] = useState<string | null>(null);
-  const [csvFile, setCsvFile] = useState<File | null>(null);
-  const [csvRole, setCsvRole] = useState<DefaultRole>("member");
-  const [uploadingCsv, setUploadingCsv] = useState(false);
+  const [rosterFile, setRosterFile] = useState<File | null>(null);
+  const [rosterRole, setRosterRole] = useState<DefaultRole>("member");
+  const [previewing, setPreviewing] = useState(false);
+  const [applying, setApplying] = useState(false);
+  const [roster, setRoster] = useState<ParsedRoster | null>(null);
+  const [plan, setPlan] = useState<SyncPlan | null>(null);
+  const [fileInputKey, setFileInputKey] = useState(0);
 
   useEffect(() => {
     void loadRows();
@@ -94,9 +107,13 @@ export default function ApprovedEmailsPanel() {
         variant: "destructive",
       });
     } else {
+      const upgraded = await syncAccountsSafely(newEmail.toLowerCase(), newRole);
       toast({
         title: "Email added",
-        description: "The email has been added to the pre-approved list.",
+        description:
+          upgraded > 0
+            ? "Added to the pre-approved list, and their existing account now has member access."
+            : "The email has been added to the pre-approved list.",
       });
       setNewEmail("");
       setNewRole("member");
@@ -106,170 +123,79 @@ export default function ApprovedEmailsPanel() {
     setSaving(false);
   };
 
-  const handleCsvUpload = async (e: React.FormEvent) => {
+  // Returns how many accounts changed; failures are reported but don't undo the list change
+  const syncAccountsSafely = async (email: string, approvedRole: DefaultRole | null) => {
+    try {
+      return await syncAccountsForEmail(email, approvedRole);
+    } catch (error) {
+      toast({
+        title: "List updated, but the account wasn't",
+        description: getAdminErrorMessage(error as { message: string }),
+        variant: "destructive",
+      });
+      return 0;
+    }
+  };
+
+  const resetRoster = () => {
+    setRosterFile(null);
+    setRoster(null);
+    setPlan(null);
+    setRosterRole("member");
+    setFileInputKey((k) => k + 1);
+  };
+
+  const handlePreview = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!csvFile) {
+    if (!rosterFile) {
       toast({
         title: "No file selected",
-        description: "Choose a CSV file with a header row containing an email column.",
+        description: "Choose the BYU Clubs member export (.xls) or a CSV with an email column.",
         variant: "destructive",
       });
       return;
     }
 
-    setUploadingCsv(true);
+    setPreviewing(true);
     try {
-      const text = await csvFile.text();
-      
-      // Robustly parse the CSV handling quoted strings
-      const parseCsvRow = (line: string) => {
-        return line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(s => s.replace(/^"|"$/g, '').trim());
-      };
-
-      const lines = text
-        .split(/\r?\n/)
-        .map((line) => line.trim())
-        .filter((line) => line.length > 0);
-
-      if (lines.length <= 1) {
-        toast({
-          title: "CSV is empty",
-          description: "The CSV must include a header row and at least one data row.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      const header = parseCsvRow(lines[0]).map((h) => h.toLowerCase());
-      const emailIndex = header.findIndex((h) => h === "email" || h.includes("email"));
-      const statusIndex = header.findIndex((h) => h === "status" || h.includes("status"));
-
-      if (emailIndex === -1) {
-        toast({
-          title: "Missing email column",
-          description: "The first row must include a column named email.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      const existingEmailsMap = new Map<string, ApprovedEmailRow>();
-      rows.forEach((row) => existingEmailsMap.set(row.email.toLowerCase(), row));
-
-      const emailsToAdd = new Set<string>();
-      const emailsToEnable = new Set<string>();
-      const emailsToDisable = new Set<string>();
-
-      for (const line of lines.slice(1)) {
-        const cols = parseCsvRow(line);
-        const rawEmail = (cols[emailIndex] ?? "").trim().toLowerCase();
-        
-        if (!rawEmail || !rawEmail.endsWith("@byu.edu")) continue;
-
-        const statusRaw = statusIndex !== -1 ? (cols[statusIndex] || "").trim().toLowerCase() : "active";
-        const isGrantedAccess = statusRaw === "active" || statusRaw === "approved";
-        
-        const existingRow = existingEmailsMap.get(rawEmail);
-
-        if (isGrantedAccess) {
-          if (!existingRow) {
-            emailsToAdd.add(rawEmail);
-          } else if (existingRow.is_disabled) {
-            emailsToEnable.add(rawEmail);
-          }
-        } else {
-          // Status is inactive, requested, etc.
-          if (existingRow && !existingRow.is_disabled) {
-            emailsToDisable.add(rawEmail);
-          }
-        }
-      }
-
-      if (emailsToAdd.size === 0 && emailsToEnable.size === 0 && emailsToDisable.size === 0) {
-        toast({
-          title: "No changes needed",
-          description: "All valid @byu.edu users in the CSV are already up to date.",
-        });
-        return;
-      }
-
-      let appliedChanges = false;
-      let hasError = false;
-
-      // 1. Add new users
-      if (emailsToAdd.size > 0) {
-        const inserts = Array.from(emailsToAdd).map((email) => ({
-          email,
-          default_role: csvRole,
-        }));
-        const { error } = await supabase.from("approved_pma_members").insert(inserts);
-        if (error) {
-          hasError = true;
-          toast({
-            title: "Error adding users",
-            description: getAdminErrorMessage(error),
-            variant: "destructive",
-          });
-        } else {
-          appliedChanges = true;
-        }
-      }
-
-      // 2. Enable existing users
-      if (emailsToEnable.size > 0) {
-        const { error } = await supabase
-          .from("approved_pma_members")
-          .update({ is_disabled: false })
-          .in("email", Array.from(emailsToEnable));
-        
-        if (error) {
-          hasError = true;
-          toast({
-            title: "Error enabling users",
-            description: getAdminErrorMessage(error),
-            variant: "destructive",
-          });
-        } else {
-          appliedChanges = true;
-        }
-      }
-
-      // 3. Disable inactive/requested users
-      if (emailsToDisable.size > 0) {
-        const { error } = await supabase
-          .from("approved_pma_members")
-          .update({ is_disabled: true })
-          .in("email", Array.from(emailsToDisable));
-        
-        if (error) {
-          hasError = true;
-          toast({
-            title: "Error disabling users",
-            description: getAdminErrorMessage(error),
-            variant: "destructive",
-          });
-        } else {
-          appliedChanges = true;
-        }
-      }
-
-      if (appliedChanges && !hasError) {
-        toast({
-          title: "CSV processing complete",
-          description: `Added ${emailsToAdd.size}, enabled ${emailsToEnable.size}, disabled ${emailsToDisable.size} users.`,
-        });
-        setCsvFile(null);
-        setCsvRole("member");
-        await loadRows();
-      } else if (appliedChanges && hasError) {
-        // Partial success
-        setCsvFile(null);
-        setCsvRole("member");
-        await loadRows();
-      }
-
+      const parsed = await parseRosterFile(rosterFile);
+      const profiles = await fetchAllProfiles();
+      setRoster(parsed);
+      setPlan(planRosterSync(parsed.entries, rows, profiles, rosterRole));
+    } catch (error) {
+      setRoster(null);
+      setPlan(null);
+      toast({
+        title: "Couldn't read that file",
+        description: error instanceof Error ? error.message : getAdminErrorMessage(error as { message: string }),
+        variant: "destructive",
+      });
     } finally {
-      setUploadingCsv(false);
+      setPreviewing(false);
+    }
+  };
+
+  const handleApply = async () => {
+    if (!plan) return;
+    setApplying(true);
+    try {
+      const errors = await applyRosterSync(plan, rosterRole);
+      if (errors.length === 0) {
+        toast({
+          title: "Roster synced",
+          description: `${plan.accountUpgrade.length} account(s) upgraded, ${plan.accountDowngrade.length} moved to guest; list: ${plan.listAdd.length} added, ${plan.listEnable.length} re-enabled, ${plan.listDisable.length} disabled.`,
+        });
+      } else {
+        toast({
+          title: "Some changes failed",
+          description: errors.join(" · "),
+          variant: "destructive",
+        });
+      }
+      resetRoster();
+      await loadRows();
+    } finally {
+      setApplying(false);
     }
   };
 
@@ -296,7 +222,8 @@ export default function ApprovedEmailsPanel() {
     setSavingRoleId(null);
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (row: ApprovedEmailRow) => {
+    const id = row.id;
     const { error } = await supabase
       .from("approved_pma_members")
       .delete()
@@ -309,9 +236,13 @@ export default function ApprovedEmailsPanel() {
         variant: "destructive",
       });
     } else {
+      const downgraded = await syncAccountsSafely(row.email, null);
       toast({
         title: "Email removed",
-        description: "The email has been removed from the list.",
+        description:
+          downgraded > 0
+            ? "Removed from the list, and their account was moved back to guest."
+            : "The email has been removed from the list.",
       });
       await loadRows();
     }
@@ -331,11 +262,12 @@ export default function ApprovedEmailsPanel() {
         variant: "destructive",
       });
     } else {
+      const changed = await syncAccountsSafely(row.email, nextDisabled ? null : row.default_role);
       toast({
         title: nextDisabled ? "Entry disabled" : "Entry enabled",
         description: nextDisabled
-          ? "This email will no longer be auto-approved on signup."
-          : "This email can be auto-approved again on signup.",
+          ? `This email will no longer be auto-approved${changed > 0 ? ", and their account was moved back to guest" : ""}.`
+          : `This email is approved again${changed > 0 ? ", and their existing account now has member access" : ""}.`,
       });
       await loadRows();
     }
@@ -375,24 +307,29 @@ export default function ApprovedEmailsPanel() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Bulk Upload (CSV)</CardTitle>
+            <CardTitle>Sync from BYU Clubs Roster</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <p className="text-sm text-muted-foreground mb-2">
-              Upload a CSV with a header row containing an <code>email</code> column.
-              If a <code>status</code> column is present, users marked as <strong>Active/Approved</strong> will be added or enabled, while <strong>Inactive/Requested</strong> users will have their access disabled. Only <span className="font-mono">@byu.edu</span> addresses are processed.
+            <p className="text-sm text-muted-foreground">
+              Upload the member export from BYU Clubs (<code>.xls</code>) as-is. Anyone with unexpired dues, plus
+              officers, gets access; everyone else in the file loses it. Existing accounts are updated too. People
+              not in the file, admins, and blocked accounts are never changed. A plain CSV with an{" "}
+              <code>email</code> column (and optional <code>status</code> column) also works. You'll see a preview
+              before anything is saved.
             </p>
-            <form onSubmit={handleCsvUpload} className="flex flex-col sm:flex-row gap-3 items-start">
+            <form onSubmit={handlePreview} className="flex flex-col sm:flex-row gap-3 items-start">
               <Input
+                key={fileInputKey}
                 type="file"
-                accept=".csv"
+                accept=".xls,.xlsx,.csv"
                 onChange={(event) => {
-                  const file = event.target.files?.[0] ?? null;
-                  setCsvFile(file);
+                  setRosterFile(event.target.files?.[0] ?? null);
+                  setRoster(null);
+                  setPlan(null);
                 }}
               />
-              <Select value={csvRole} onValueChange={(val) => setCsvRole(val as DefaultRole)}>
-                <SelectTrigger className="w-full sm:w-40">
+              <Select value={rosterRole} onValueChange={(val) => setRosterRole(val as DefaultRole)}>
+                <SelectTrigger className="w-full sm:w-40" aria-label="Role for new entries">
                   <SelectValue placeholder="Default role" />
                 </SelectTrigger>
                 <SelectContent>
@@ -400,13 +337,23 @@ export default function ApprovedEmailsPanel() {
                   <SelectItem value="admin">admin</SelectItem>
                 </SelectContent>
               </Select>
-              <Button type="submit" disabled={uploadingCsv}>
-                {uploadingCsv ? "Uploading..." : "Upload CSV"}
+              <Button type="submit" disabled={previewing || applying}>
+                {previewing ? "Reading..." : "Preview changes"}
               </Button>
             </form>
           </CardContent>
         </Card>
       </div>
+
+      {plan && roster && (
+        <RosterPreview
+          plan={plan}
+          roster={roster}
+          applying={applying}
+          onApply={() => void handleApply()}
+          onCancel={resetRoster}
+        />
+      )}
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0">
@@ -487,7 +434,7 @@ export default function ApprovedEmailsPanel() {
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => handleDelete(row.id)}
+                          onClick={() => handleDelete(row)}
                           disabled={savingRoleId === row.id}
                         >
                           Remove
@@ -512,3 +459,93 @@ export default function ApprovedEmailsPanel() {
   );
 }
 
+const RosterChangeList = ({
+  title,
+  changes,
+  tone,
+}: {
+  title: string;
+  changes: SyncChange[];
+  tone: "add" | "remove";
+}) => {
+  if (changes.length === 0) return null;
+  const countClass = tone === "add" ? "text-green-700 dark:text-green-400" : "text-destructive";
+  return (
+    <details className="rounded-lg border border-border px-4 py-3">
+      <summary className="cursor-pointer text-sm font-medium">
+        <span className={countClass}>{changes.length}</span> {title}
+      </summary>
+      <ul className="mt-3 space-y-1.5 max-h-64 overflow-y-auto">
+        {changes.map((c) => (
+          <li key={c.email} className="text-xs flex flex-wrap gap-x-2">
+            <span className="font-medium">{c.name || c.email}</span>
+            {c.name && <span className="font-mono text-muted-foreground">{c.email}</span>}
+            <span className="text-muted-foreground">· {c.reason}</span>
+          </li>
+        ))}
+      </ul>
+    </details>
+  );
+};
+
+const RosterPreview = ({
+  plan,
+  roster,
+  applying,
+  onApply,
+  onCancel,
+}: {
+  plan: SyncPlan;
+  roster: ParsedRoster;
+  applying: boolean;
+  onApply: () => void;
+  onCancel: () => void;
+}) => {
+  const paid = roster.entries.filter((e) => e.paid).length;
+  const totalChanges =
+    plan.listAdd.length +
+    plan.listEnable.length +
+    plan.listDisable.length +
+    plan.accountUpgrade.length +
+    plan.accountDowngrade.length;
+  const modeLabel =
+    roster.mode === "dues"
+      ? "unexpired dues or officer"
+      : roster.mode === "status"
+        ? "Status is Active or Approved"
+        : "everyone listed";
+
+  return (
+    <Card className="border-primary/30">
+      <CardHeader>
+        <CardTitle>Preview</CardTitle>
+        <p className="text-sm text-muted-foreground">
+          {roster.entries.length} BYU emails in the file, {paid} count as paid ({modeLabel}).
+          {roster.skippedNonByu > 0 && ` ${roster.skippedNonByu} non-BYU emails skipped.`} Nothing has been saved yet.
+        </p>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {totalChanges === 0 ? (
+          <p className="text-sm">Everything already matches this roster. No changes needed.</p>
+        ) : (
+          <>
+            <RosterChangeList title="existing accounts get member access" changes={plan.accountUpgrade} tone="add" />
+            <RosterChangeList title="existing accounts lose member access" changes={plan.accountDowngrade} tone="remove" />
+            <RosterChangeList title="emails added to the pre-approved list" changes={plan.listAdd} tone="add" />
+            <RosterChangeList title="list entries re-enabled" changes={plan.listEnable} tone="add" />
+            <RosterChangeList title="list entries disabled" changes={plan.listDisable} tone="remove" />
+          </>
+        )}
+        <p className="text-xs text-muted-foreground">{plan.unchanged} people in the file are already up to date.</p>
+        <div className="flex gap-3 pt-2">
+          <Button onClick={onApply} disabled={applying || totalChanges === 0}>
+            {applying ? "Applying..." : `Apply ${totalChanges} change${totalChanges === 1 ? "" : "s"}`}
+          </Button>
+          <Button variant="outline" onClick={onCancel} disabled={applying}>
+            Cancel
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
