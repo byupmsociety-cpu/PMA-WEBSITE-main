@@ -22,7 +22,8 @@ import {
   Menu,
   Shield,
   Lock,
-  UserCircle
+  UserCircle,
+  Users
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -123,6 +124,7 @@ const AppLayout = () => {
           <SidebarGroup title="Site" isCollapsed={collapsed}>
             <NavItem to="/events" icon={Calendar} onClick={closeMenu} isCollapsed={collapsed}>Upcoming Events</NavItem>
             <NavItem to="/resources" icon={BookOpen} onClick={closeMenu} isCollapsed={collapsed}>Resource Vault</NavItem>
+            <NavItem to="/team" icon={Users} onClick={closeMenu} isCollapsed={collapsed}>Meet the Team</NavItem>
           </SidebarGroup>
 
           {(isAdmin || isSuperAdmin) && !isBlocked && (
