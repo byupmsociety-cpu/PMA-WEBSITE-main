@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import AnimatedSection from "@/components/AnimatedSection";
-import { ChevronDown, Linkedin, Lock } from "lucide-react";
+import { Link } from "react-router-dom";
+import { ArrowRight, ChevronDown, Linkedin } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { FACULTY, FORMER_OFFICERS, PRESIDENCY, type Officer } from "@/lib/officers";
 
@@ -89,15 +90,15 @@ const TeamPage: React.FC = () => {
           </section>
         ))}
 
-        <section className="mb-10 rounded-lg border border-border bg-card p-5">
-          <div className="flex flex-wrap items-center gap-3">
-            <h2 className="text-xl md:text-2xl">Contact Them</h2>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-sm font-medium text-muted-foreground">
-              <Lock className="h-3.5 w-3.5" aria-hidden="true" />
-              Available for paid members
-            </span>
-          </div>
-        </section>
+        <div className="mb-10 text-center">
+          <Link
+            to="/resources"
+            className="inline-flex items-center gap-2 rounded-lg border border-primary px-6 py-3 font-semibold text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
+          >
+            Connect with the team on the Resources page
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </Link>
+        </div>
 
         <Collapsible className="mb-10 rounded-lg border border-border bg-card">
           <CollapsibleTrigger className="group flex w-full items-center justify-between p-4 text-left">
