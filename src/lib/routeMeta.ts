@@ -121,6 +121,10 @@ export const ROUTE_META: Record<string, { title: string; description: string }> 
     title: "Admin Resumes | BYU PMA",
     description: "Review member resumes and provide actionable feedback.",
   },
+  "/admin/analytics": {
+    title: "Admin Analytics | BYU PMA",
+    description: "Site traffic, page views, and member logins.",
+  },
   "/admin/interviews": {
     title: "Admin Mock Interviews | BYU PMA",
     description: "Monitor mock interview activity and manage interviews.",

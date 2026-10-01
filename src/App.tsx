@@ -17,6 +17,7 @@ import CompaniesPage from "./pages/CompaniesPage";
 import NotFound from "./pages/NotFound";
 import ScrollToTop from "./components/ScrollToTop";
 import RouteMeta from "./components/RouteMeta";
+import PageViewTracker from "./components/PageViewTracker";
 import GamePage from './pages/GamePage';
 import AuthPage from "./pages/AuthPage";
 import HackathonPage from "./pages/HackathonPage";
@@ -33,6 +34,7 @@ import RoadmapPage from "./pages/RoadmapPage";
 import AdminResumesPage from "./pages/AdminResumesPage";
 import AdminInterviewsPage from "./pages/AdminInterviewsPage";
 import AdminFeedbackPage from "./pages/AdminFeedbackPage";
+import AdminAnalyticsPage from "./pages/AdminAnalyticsPage";
 import AppLayout from "./components/layout/AppLayout";
 import PublicLayout from "./components/layout/PublicLayout";
 import MeetingPresentationPage from "./pages/MeetingPresentationPage";
@@ -49,6 +51,7 @@ const App = () => (
           <BrowserRouter>
             <ScrollToTop />
             <RouteMeta />
+            <PageViewTracker />
             <Routes>
               {/* Public Marketing Routes */}
               <Route element={<PublicLayout />}>
@@ -89,6 +92,7 @@ const App = () => (
                 <Route path="/admin/resumes" element={<AdminResumesPage />} />
                 <Route path="/admin/interviews" element={<AdminInterviewsPage />} />
                 <Route path="/admin/feedback" element={<AdminFeedbackPage />} />
+                <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />
               </Route>
 
               <Route path="/game" element={<GamePage />} />

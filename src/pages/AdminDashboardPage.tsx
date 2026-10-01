@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import KpiCard from "@/components/admin/KpiCard";
-import { Users, Calendar, UsersRound, RefreshCw, Shield, BookOpen, Briefcase, FileText, Video, MessageSquare } from "lucide-react";
+import { Users, Calendar, UsersRound, RefreshCw, Shield, BookOpen, Briefcase, FileText, Video, MessageSquare, BarChart3 } from "lucide-react";
 
 const AdminDashboardPage = () => {
   const { user, isAdmin, isSuperAdmin, loading } = useAuth();
@@ -215,6 +215,23 @@ const AdminDashboardPage = () => {
                   </div>
                   <Button asChild className="w-full">
                     <Link to="/admin/access">Manage access</Link>
+                  </Button>
+                </div>
+
+                <div className="rounded-xl border bg-card p-5 space-y-4 hover:border-primary/40 transition-colors">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="space-y-1">
+                      <h4 className="font-semibold">Analytics</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Page views, visitors, and who logs in.
+                      </p>
+                    </div>
+                    <div className="text-primary/70 bg-primary/10 p-2 rounded-lg">
+                      <BarChart3 className="h-5 w-5" />
+                    </div>
+                  </div>
+                  <Button asChild className="w-full">
+                    <Link to="/admin/analytics">View analytics</Link>
                   </Button>
                 </div>
 

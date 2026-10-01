@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { trackLogin } from "@/lib/analytics";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -81,7 +82,7 @@ const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
     e.preventDefault();
     setLoading(true);
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -93,6 +94,7 @@ const AuthModal = ({ isOpen, onClose, onSuccess }: AuthModalProps) => {
         variant: "destructive",
       });
     } else {
+      if (data.user) trackLogin(data.user.id);
       toast({
         title: "Success!",
         description: "Signed in successfully.",
