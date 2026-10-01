@@ -44,13 +44,19 @@ const PresidencyConnect = () => {
                 </div>
 
                 <div className="mt-auto flex flex-wrap items-center gap-2">
-                  {member.bookingUrl && (
+                  {member.bookingUrl ? (
                     <Button asChild className="flex-1 min-w-[10rem]">
                       <a href={member.bookingUrl} target="_blank" rel="noopener noreferrer">
                         <CalendarDays className="w-4 h-4" />
                         Book a time
                       </a>
                     </Button>
+                  ) : (
+                    <span title="Calendly link coming soon">
+                      <Button variant="outline" size="icon" disabled aria-label="Calendly link coming soon">
+                        <CalendarDays className="w-4 h-4" />
+                      </Button>
+                    </span>
                   )}
                   {member.email && (
                     <Button asChild variant="outline" size="icon">
