@@ -45,6 +45,7 @@ const Navigation = () => {
     { name: 'Resources', path: '/resources', locked: !authLoading && !isPmaMember },
     { name: 'For Students', path: '/students' },
     { name: 'For Companies', path: '/companies' },
+    { name: 'Team', path: '/team' },
     { name: 'Contact', path: '/contact' }
   ];
 
