@@ -11,6 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import LockedResourcesView from "@/components/LockedResourcesView";
 import PaidResourceModal from "@/components/PaidResourceModal";
 import PremiumResourceModal from "@/components/PremiumResourceModal";
+import PresidencyConnect from "@/components/PresidencyConnect";
 
 interface DbResourceCategory {
   id: string;
@@ -404,6 +405,8 @@ const ResourcesPage = () => {
             )}
           </div>
         </AnimatedSection>
+
+        {!selectedCategory && !searchQuery && <PresidencyConnect />}
 
         {/* Most Useful Resources Carousel */}
         {!selectedCategory && !searchQuery && topResources.length > 0 && (
