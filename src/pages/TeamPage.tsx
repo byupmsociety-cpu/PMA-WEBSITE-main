@@ -92,10 +92,10 @@ const TeamPage: React.FC = () => {
 
         <div className="mb-10 text-center">
           <Link
-            to="/resources"
+            to="/contact"
             className="inline-flex items-center gap-2 rounded-lg border border-primary px-6 py-3 font-semibold text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
           >
-            Connect with the team on the Resources page
+            Contact
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
         </div>
