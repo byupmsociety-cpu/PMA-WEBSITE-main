@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { MessageSquare } from 'lucide-react';
 import AnimatedSection from '@/components/AnimatedSection';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -220,6 +222,16 @@ const EventsPage = () => {
             <p className="text-lg text-muted-foreground">
               Join us for workshops, speakers, and networking opportunities.
             </p>
+            <Button asChild size="lg" className="mt-8 bg-gradient-to-r from-primary to-secondary !text-white hover:opacity-90 drop-shadow-md">
+              <Link to="/events/ask">
+                <span className="relative flex h-2 w-2 mr-1">
+                  <span className="absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 animate-ping" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500" />
+                </span>
+                Live event: Ask a question
+                <MessageSquare className="w-4 h-4 ml-1" />
+              </Link>
+            </Button>
           </div>
         </AnimatedSection>
 
