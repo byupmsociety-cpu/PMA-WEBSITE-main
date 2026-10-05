@@ -25,6 +25,10 @@ export const ROUTE_META: Record<string, { title: string; description: string }> 
     title: "Hackathon FAQ | BYU PMA",
     description: "Frequently asked questions about the BYU × Utah PMA AI Product Hackathon.",
   },
+  "/events/ask": {
+    title: "Ask a Question | BYU PMA",
+    description: "Submit a question for the live BYU PMA Q&A.",
+  },
   "/events": {
     title: "Events | BYU PMA",
     description: "Upcoming events, workshops, and meetings from the BYU Product Management Association.",
