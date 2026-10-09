@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import AnimatedSection from "@/components/AnimatedSection";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { FileText, Linkedin, Building2, Coffee, Briefcase, Cpu, ArrowLeft, Search, TrendingUp, Star, GraduationCap, BookOpen, Users, Lightbulb, Lock, Crown } from "lucide-react";
+import { Briefcase, Cpu, ArrowLeft, Search, TrendingUp, Star, BookOpen, Users, Lock, Crown, Video, Play, ExternalLink } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Badge } from "@/components/ui/badge";
@@ -12,31 +13,8 @@ import LockedResourcesView from "@/components/LockedResourcesView";
 import PaidResourceModal from "@/components/PaidResourceModal";
 import PremiumResourceModal from "@/components/PremiumResourceModal";
 import PresidencyConnect from "@/components/PresidencyConnect";
-
-interface DbResourceCategory {
-  id: string;
-  slug: string;
-  title: string;
-  description: string;
-  icon: string;
-  color: string;
-  display_order: number;
-}
-
-interface DbResource {
-  id: string;
-  category_id: string;
-  subcategory: string | null;
-  title: string;
-  description: string;
-  url: string;
-  image_url: string;
-  tips: string[] | null;
-  is_paid: boolean;
-  is_premium: boolean;
-  is_featured: boolean;
-  display_order: number;
-}
+import ApmPlaybook from "@/components/resources/ApmPlaybook";
+import { RESOURCE_CATEGORIES, type ResourceIcon } from "@/lib/resources";
 
 interface Resource {
   title: string;
@@ -49,58 +27,94 @@ interface Resource {
   isFeatured?: boolean;
 }
 
-interface Subcategory {
-  id: string;
-  title: string;
-  resources: Resource[];
-}
-
 interface Category {
   id: string;
   title: string;
   description: string;
   icon: React.ReactNode;
   color: string;
-  resources?: Resource[];
-  subcategories?: Subcategory[];
+  resources: Resource[];
 }
 
-const ICON_MAP: Record<string, React.ReactNode> = {
-  Cpu: <Cpu className="w-6 h-6" />,
-  FileText: <FileText className="w-6 h-6" />,
-  Linkedin: <Linkedin className="w-6 h-6" />,
-  Building2: <Building2 className="w-6 h-6" />,
-  Coffee: <Coffee className="w-6 h-6" />,
-  Briefcase: <Briefcase className="w-6 h-6" />,
-  GraduationCap: <GraduationCap className="w-6 h-6" />,
+const ICON_MAP: Record<ResourceIcon, React.ReactNode> = {
   BookOpen: <BookOpen className="w-6 h-6" />,
+  Video: <Video className="w-6 h-6" />,
+  Briefcase: <Briefcase className="w-6 h-6" />,
   Users: <Users className="w-6 h-6" />,
-  Lightbulb: <Lightbulb className="w-6 h-6" />,
+  Cpu: <Cpu className="w-6 h-6" />,
 };
+
+const CATEGORIES: Category[] = RESOURCE_CATEGORIES.map((category) => ({
+  id: category.slug,
+  title: category.title,
+  description: category.description,
+  icon: ICON_MAP[category.icon],
+  color: category.color,
+  resources: category.resources.map((resource) => ({
+    title: resource.title,
+    description: resource.description,
+    url: resource.url,
+    image: resource.imageUrl ?? "",
+    tips: resource.tips.length > 0 ? resource.tips : undefined,
+    isPaid: resource.isPaid,
+    isFeatured: resource.isFeatured,
+  })),
+}));
+
+const FEATURED_RESOURCES = CATEGORIES.flatMap((category) =>
+  category.resources.filter((resource) => resource.isFeatured).map((resource) => ({ resource, category })),
+);
+
+const resourceAnchorId = (title: string) => `resource-${title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+
+const isInAppGuide = (resource: Resource) => {
+  const url = resource.url?.trim() ?? "";
+  return url === "" || url === "#";
+};
+
+const getDomain = (urlString: string) => {
+  try {
+    return new URL(urlString).hostname.replace(/^www\./, "");
+  } catch {
+    return null;
+  }
+};
+
+const getYouTubeId = (urlString: string) => {
+  try {
+    const url = new URL(urlString);
+    const host = url.hostname.replace(/^(www|m)\./, "");
+    if (host === "youtu.be") return url.pathname.split("/")[1] || null;
+    if (host === "youtube.com" && url.pathname === "/watch") return url.searchParams.get("v");
+    return null;
+  } catch {
+    return null;
+  }
+};
+
+type ImageSource = { src: string; kind: "cover" | "video" | "favicon" };
 
 const ResourceImage = ({ resource, isPmaMember }: { resource: Resource; isPmaMember: boolean }) => {
   const [sourceIndex, setSourceIndex] = useState(0);
 
-  const getDomain = (urlString: string) => {
-    try { return new URL(urlString).hostname.replace('www.', ''); } catch (e) { return null; }
-  };
+  const sources: ImageSource[] = [];
+  if (resource.image && (resource.image.startsWith("http") || resource.image.startsWith("/assets/"))) {
+    sources.push({ src: resource.image, kind: "cover" });
+  }
+  const youTubeId = getYouTubeId(resource.url);
+  if (youTubeId) {
+    sources.push({ src: `https://img.youtube.com/vi/${youTubeId}/hqdefault.jpg`, kind: "video" });
+  }
   const domain = getDomain(resource.url);
-
-  const sources = [];
-  if (resource.image && resource.image.startsWith('http')) {
-    sources.push(resource.image);
-  }
-  if (resource.image && resource.image.startsWith('/assets/')) {
-    sources.push(resource.image);
-  }
   if (domain) {
-    sources.push(`https://logo.clearbit.com/${domain}?size=240`);
+    sources.push({ src: `https://www.google.com/s2/favicons?domain=${domain}&sz=128`, kind: "favicon" });
   }
 
-  const currentSrc = sources[sourceIndex];
-  const premiumOpacity = resource.isPremium && !isPmaMember ? 'opacity-60' : '';
+  const current = sources[sourceIndex];
+  const premiumOpacity = resource.isPremium && !isPmaMember ? "opacity-60" : "";
+  const handleError = () => setSourceIndex((i) => i + 1);
 
-  if (!currentSrc || sourceIndex >= sources.length) {
+  if (!current) {
     return (
       <div className={`w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-primary/5 text-primary/40 font-bold ${premiumOpacity}`}>
         <span className="text-4xl">{resource.title.charAt(0)}</span>
@@ -108,172 +122,155 @@ const ResourceImage = ({ resource, isPmaMember }: { resource: Resource; isPmaMem
     );
   }
 
+  if (current.kind === "favicon") {
+    return (
+      <div className={`w-full h-full flex items-center justify-center bg-white dark:bg-muted p-6 ${premiumOpacity}`}>
+        <img src={current.src} alt={resource.title} loading="lazy" className="w-16 h-16 object-contain" onError={handleError} />
+      </div>
+    );
+  }
+
   return (
-    <img
-      src={currentSrc}
-      alt={resource.title}
-      className={`w-full h-full transition-opacity ${currentSrc.includes('clearbit') ? 'object-contain p-6 bg-white dark:bg-zinc-900' : 'object-cover'} ${premiumOpacity}`}
-      onError={() => setSourceIndex(i => i + 1)}
-    />
+    <div className="relative w-full h-full">
+      <img
+        src={current.src}
+        alt={resource.title}
+        loading="lazy"
+        className={`w-full h-full object-cover ${premiumOpacity}`}
+        onError={handleError}
+      />
+      {current.kind === "video" && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-full bg-black/60 flex items-center justify-center">
+            <Play className="w-5 h-5 text-white fill-current ml-0.5" />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const ResourceBadges = ({ resource, isPmaMember }: { resource: Resource; isPmaMember: boolean }) => (
+  <>
+    {resource.isPremium && !isPmaMember && (
+      <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+        <Lock className="w-5 h-5 text-white" />
+      </div>
+    )}
+    {resource.isPaid && (
+      <Badge className="absolute top-2 right-2 text-xs px-2 py-0.5">
+        <Star className="w-3 h-3 mr-1 fill-current" />
+        Partner
+      </Badge>
+    )}
+    {resource.isPremium && (
+      <Badge className="absolute top-2 left-2 bg-accent text-accent-foreground hover:bg-accent/80 text-xs px-2 py-0.5">
+        <Crown className="w-3 h-3 mr-1 fill-current" />
+        Premium
+      </Badge>
+    )}
+  </>
+);
+
+interface ResourceCardProps {
+  resource: Resource;
+  category: Category;
+  isPmaMember: boolean;
+  showCategory?: boolean;
+  onOpen: (resource: Resource, categoryId: string, e?: React.MouseEvent) => Promise<void>;
+}
+
+const ResourceCard = ({ resource, category, isPmaMember, showCategory, onOpen }: ResourceCardProps) => {
+  const isGuide = isInAppGuide(resource);
+  const ListTag = isGuide ? "ol" : "ul";
+
+  return (
+    <Card
+      id={resourceAnchorId(resource.title)}
+      className={`h-full flex flex-col overflow-hidden bg-card border-border scroll-mt-24 ${resource.isPremium && !isPmaMember ? "ring-1 ring-accent/40" : ""}`}
+    >
+      <div className="relative w-full aspect-video overflow-hidden bg-muted">
+        <ResourceImage resource={resource} isPmaMember={isPmaMember} />
+        <ResourceBadges resource={resource} isPmaMember={isPmaMember} />
+      </div>
+      <CardContent className="flex flex-col flex-1 p-5">
+        {showCategory && (
+          <div className="flex items-center gap-2 mb-2">
+            <div className={`w-5 h-5 rounded bg-gradient-to-r ${category.color} flex items-center justify-center text-white`}>
+              <div className="scale-[0.6]">{category.icon}</div>
+            </div>
+            <span className="text-xs text-muted-foreground">{category.title}</span>
+          </div>
+        )}
+        <h3 className="text-lg font-semibold leading-snug text-card-foreground mb-2">{resource.title}</h3>
+        <p className="text-sm leading-relaxed text-muted-foreground mb-4">{resource.description}</p>
+
+        {resource.tips && (
+          <div className="mb-5">
+            <h4 className="text-sm font-semibold text-foreground mb-2">{isGuide ? "How to do it" : "Tips"}</h4>
+            <ListTag className={`${isGuide ? "list-decimal" : "list-disc"} pl-5 space-y-1.5`}>
+              {resource.tips.map((tip, tipIdx) => (
+                <li key={tipIdx} className="text-sm leading-relaxed text-foreground/90">
+                  {tip}
+                </li>
+              ))}
+            </ListTag>
+          </div>
+        )}
+
+        {!isGuide && (
+          <Button asChild className="mt-auto w-full">
+            <a
+              href={resource.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`Open ${resource.title}`}
+              onClick={(e) => void onOpen(resource, category.id, e)}
+            >
+              Open
+              <ExternalLink className="w-4 h-4 ml-2" />
+            </a>
+          </Button>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 
 const ResourcesPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [topResources, setTopResources] = useState<Array<{ resource: Resource; category: Category; clicks: number }>>(
-    [],
-  );
+  const [focusedResource, setFocusedResource] = useState<string | null>(null);
   const { user, profile, isBlocked, loading: authLoading } = useAuth();
   const isPmaMember = !!profile?.is_pma_member && !isBlocked;
   const [selectedPaidResource, setSelectedPaidResource] = useState<{ title: string; url: string } | null>(null);
   const [selectedPremiumResource, setSelectedPremiumResource] = useState<{ title: string; url: string } | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loadingData, setLoadingData] = useState(true);
-
   useEffect(() => {
+    if (focusedResource) {
+      document.getElementById(resourceAnchorId(focusedResource))?.scrollIntoView({ behavior: "smooth", block: "center" });
+      setFocusedResource(null);
+      return;
+    }
     window.scrollTo({ top: 0, behavior: "smooth" });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCategory, searchQuery]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    void loadResourcesData();
   }, []);
 
   useEffect(() => {
     const resourceParam = searchParams.get("resource");
-    if (resourceParam && categories.length > 0) {
-      let matchedResource: Resource | undefined;
+    if (!resourceParam) return;
 
-      for (const cat of categories) {
-        matchedResource = cat.resources?.find(r => r.title === resourceParam);
-        if (matchedResource) break;
-
-        if (cat.subcategories) {
-          for (const sub of cat.subcategories) {
-            matchedResource = sub.resources.find(r => r.title === resourceParam);
-            if (matchedResource) break;
-          }
-        }
-        if (matchedResource) break;
-      }
-
-      if (matchedResource?.isPaid) {
-        setSelectedPaidResource({ title: matchedResource.title, url: matchedResource.url });
-      }
-      setSearchParams({});
+    const matchedResource = CATEGORIES.flatMap((cat) => cat.resources).find((r) => r.title === resourceParam);
+    if (matchedResource?.isPaid) {
+      setSelectedPaidResource({ title: matchedResource.title, url: matchedResource.url });
     }
-  }, [searchParams, categories, setSearchParams]);
-
-  const loadResourcesData = async () => {
-    setLoadingData(true);
-
-    const [categoriesResult, resourcesResult] = await Promise.all([
-      supabase
-        .from("resource_categories")
-        .select("*")
-        .order("display_order", { ascending: true }),
-      supabase
-        .from("resources")
-        .select("*")
-        .order("display_order", { ascending: true }),
-    ]);
-
-    if (categoriesResult.error) {
-      console.error("Error loading categories", categoriesResult.error);
-      setLoadingData(false);
-      return;
-    }
-
-    if (resourcesResult.error) {
-      console.error("Error loading resources", resourcesResult.error);
-      setLoadingData(false);
-      return;
-    }
-
-    const dbCategories: DbResourceCategory[] = (categoriesResult.data as any) ?? [];
-    const dbResources: DbResource[] = (resourcesResult.data as any) ?? [];
-
-    const transformedCategories: Category[] = dbCategories.map((dbCat) => {
-      const categoryResources = dbResources.filter((r) => r.category_id === dbCat.id);
-
-      const subcategoryNames = [...new Set(
-        categoryResources
-          .filter((r) => r.subcategory)
-          .map((r) => r.subcategory!)
-      )];
-
-      const hasSubcategories = subcategoryNames.length > 0;
-
-      const mapResource = (r: DbResource): Resource => ({
-        title: r.title,
-        description: r.description,
-        url: r.url,
-        image: r.image_url,
-        tips: r.tips && r.tips.length > 0 ? r.tips : undefined,
-        isPaid: r.is_paid || undefined,
-        isPremium: r.is_premium || undefined,
-        isFeatured: r.is_featured || undefined,
-      });
-
-      if (hasSubcategories) {
-        const subcategories: Subcategory[] = subcategoryNames.map((subName) => ({
-          id: subName.toLowerCase().replace(/\s+/g, "-"),
-          title: subName,
-          resources: categoryResources
-            .filter((r) => r.subcategory === subName)
-            .map(mapResource),
-        }));
-
-        const directResources = categoryResources
-          .filter((r) => !r.subcategory)
-          .map(mapResource);
-
-        return {
-          id: dbCat.slug,
-          title: dbCat.title,
-          description: dbCat.description,
-          icon: ICON_MAP[dbCat.icon] ?? <FileText className="w-6 h-6" />,
-          color: dbCat.color,
-          subcategories,
-          resources: directResources.length > 0 ? directResources : undefined,
-        };
-      } else {
-        return {
-          id: dbCat.slug,
-          title: dbCat.title,
-          description: dbCat.description,
-          icon: ICON_MAP[dbCat.icon] ?? <FileText className="w-6 h-6" />,
-          color: dbCat.color,
-          resources: categoryResources.map(mapResource),
-        };
-      }
-    });
-
-    setCategories(transformedCategories);
-
-    const finalResources: Array<{ resource: Resource; category: Category; clicks: number }> = [];
-
-    transformedCategories.forEach((category) => {
-      category.resources?.forEach((resource) => {
-        if (resource.isFeatured) {
-          finalResources.push({ resource, category, clicks: 0 });
-        }
-      });
-      category.subcategories?.forEach((subcategory) => {
-        subcategory.resources.forEach((resource) => {
-          if (resource.isFeatured) {
-            finalResources.push({ resource, category, clicks: 0 });
-          }
-        });
-      });
-    });
-
-    setTopResources(finalResources);
-    setLoadingData(false);
-  };
+    setSearchParams({});
+  }, [searchParams, setSearchParams]);
 
   const trackResourceClick = async (resource: Resource, categoryId: string, e?: React.MouseEvent) => {
     if (resource.isPaid) {
@@ -294,59 +291,47 @@ const ResourcesPage = () => {
     });
   };
 
+  const openResource = (resource: Resource, category: Category) => {
+    if (resource.isPaid) {
+      setSelectedPaidResource({ title: resource.title, url: resource.url });
+    } else if (resource.isPremium && !isPmaMember) {
+      setSelectedPremiumResource({ title: resource.title, url: resource.url });
+    } else if (isInAppGuide(resource)) {
+      setFocusedResource(resource.title);
+      setSelectedCategory(category.id);
+    } else {
+      void trackResourceClick(resource, category.id);
+      window.open(resource.url, "_blank", "noopener,noreferrer");
+    }
+  };
+
+  const openResourceByTitle = (title: string) => {
+    for (const category of CATEGORIES) {
+      const resource = category.resources.find((r) => r.title === title);
+      if (resource) {
+        openResource(resource, category);
+        return;
+      }
+    }
+  };
+
+  const query = searchQuery.toLowerCase();
   const searchResults = searchQuery
-    ? categories.flatMap((category) => {
-      const results: Array<{ resource: Resource; category: Category }> = [];
-
-      category.resources?.forEach((resource) => {
-        if (
-          resource.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          resource.description.toLowerCase().includes(searchQuery.toLowerCase())
-        ) {
-          results.push({ resource, category });
-        }
-      });
-
-      category.subcategories?.forEach((subcategory) => {
-        subcategory.resources.forEach((resource) => {
-          if (
-            resource.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            resource.description.toLowerCase().includes(searchQuery.toLowerCase())
-          ) {
-            results.push({ resource, category });
-          }
-        });
-      });
-
-      return results;
-    })
+    ? CATEGORIES.flatMap((category) =>
+        category.resources
+          .filter(
+            (resource) =>
+              resource.title.toLowerCase().includes(query) || resource.description.toLowerCase().includes(query),
+          )
+          .map((resource) => ({ resource, category })),
+      )
     : [];
 
-  const filteredCategories = categories.filter((category) => {
-    if (!searchQuery) return true;
-    const query = searchQuery.toLowerCase();
+  const nonEmptyCategories = CATEGORIES.filter((category) => category.resources.length > 0);
 
-    const titleMatch = category.title.toLowerCase().includes(query);
-    const descMatch = category.description.toLowerCase().includes(query);
+  const selectedCategoryData = selectedCategory ? CATEGORIES.find((c) => c.id === selectedCategory) : null;
 
-    const resourceMatch = category.resources?.some(
-      (resource) =>
-        resource.title.toLowerCase().includes(query) || resource.description.toLowerCase().includes(query),
-    ) || false;
-
-    const subcategoryMatch = category.subcategories?.some((subcategory) =>
-      subcategory.resources.some(
-        (resource) =>
-          resource.title.toLowerCase().includes(query) || resource.description.toLowerCase().includes(query),
-      ),
-    ) || false;
-
-    return titleMatch || descMatch || resourceMatch || subcategoryMatch;
-  });
-
-  const selectedCategoryData = selectedCategory ? categories.find((c) => c.id === selectedCategory) : null;
-
-  if (loadingData || authLoading) {
+  if (authLoading) {
     return (
       <div className="min-h-screen pt-24 pb-20 bg-background text-foreground">
         <div className="container mx-auto px-4 md:px-6">
@@ -362,15 +347,13 @@ const ResourcesPage = () => {
     return (
       <LockedResourcesView
         isLoggedIn={!!user}
-        categories={categories.map((category) => ({
+        categories={nonEmptyCategories.map((category) => ({
           id: category.id,
           title: category.title,
           description: category.description,
           icon: category.icon,
           color: category.color,
-          resourceCount:
-            (category.resources?.length ?? 0) +
-            (category.subcategories?.reduce((acc, sub) => acc + sub.resources.length, 0) ?? 0),
+          resourceCount: category.resources.length,
         }))}
       />
     );
@@ -383,7 +366,7 @@ const ResourcesPage = () => {
           <div className="w-full max-w-3xl mx-auto text-center mb-8 px-2 md:px-0">
             <h1 className="text-3xl md:text-4xl font-bold mb-4 break-words">
               PM{" "}
-              <span className="text-gradient bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent break-words">
+              <span className="text-gradient bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent break-words">
                 Content Library
               </span>
             </h1>
@@ -406,10 +389,14 @@ const ResourcesPage = () => {
           </div>
         </AnimatedSection>
 
+        {!selectedCategory && !searchQuery && (
+          <ApmPlaybook onSelectCategory={setSelectedCategory} onOpenResource={openResourceByTitle} />
+        )}
+
         {!selectedCategory && !searchQuery && <PresidencyConnect />}
 
         {/* Most Useful Resources Carousel */}
-        {!selectedCategory && !searchQuery && topResources.length > 0 && (
+        {!selectedCategory && !searchQuery && FEATURED_RESOURCES.length > 0 && (
           <AnimatedSection animation="fade-in">
             <div className="max-w-6xl mx-auto mb-12">
               <div className="flex items-center gap-2 mb-4">
@@ -419,61 +406,32 @@ const ResourcesPage = () => {
               <div className="overflow-hidden">
               <Carousel className="w-full" opts={{ loop: true }}>
                 <CarouselContent className="-ml-2 md:-ml-4">
-                  {topResources.map(({ resource, category }, idx) => (
-                    <CarouselItem key={idx} className="pl-2 md:pl-4 basis-4/5 sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5">
+                  {FEATURED_RESOURCES.map(({ resource, category }, idx) => (
+                    <CarouselItem key={idx} className="pl-2 md:pl-4 basis-4/5 sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
                       <Card
-                        className={`h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer ${resource.isPremium && !isPmaMember ? 'ring-1 ring-amber-500/30' : ''}`}
-                        onClick={(e) => {
-                          if (resource.isPaid) {
-                            e.preventDefault();
-                            setSelectedPaidResource({ title: resource.title, url: resource.url });
-                          } else if (resource.isPremium && !isPmaMember) {
-                            e.preventDefault();
-                            setSelectedPremiumResource({ title: resource.title, url: resource.url });
-                          } else {
-                            trackResourceClick(resource, category.id);
-                            window.open(resource.url, '_blank', 'noopener,noreferrer');
-                          }
-                        }}
+                        className={`h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer ${resource.isPremium && !isPmaMember ? 'ring-1 ring-accent/40' : ''}`}
+                        onClick={() => openResource(resource, category)}
                       >
-                        <CardContent className="p-2">
-                          <div className="flex items-center gap-1 mb-1.5">
+                        <CardContent className="p-3">
+                          <div className="flex items-center gap-1.5 mb-2">
                             <div
-                              className={`w-4 h-4 rounded bg-gradient-to-r ${category.color} flex items-center justify-center text-white`}
+                              className={`w-5 h-5 shrink-0 rounded bg-gradient-to-r ${category.color} flex items-center justify-center text-white`}
                             >
-                              <div className="scale-75">{category.icon}</div>
+                              <div className="scale-[0.6]">{category.icon}</div>
                             </div>
-                            <span className="text-[8px] text-muted-foreground line-clamp-1">{category.title}</span>
+                            <span className="text-xs text-muted-foreground line-clamp-1">{category.title}</span>
                           </div>
 
-                          <div className="mb-1.5">
-                            <div className="w-full aspect-video sm:aspect-square rounded-md overflow-hidden bg-muted mb-1.5 relative">
-                              <ResourceImage resource={resource} isPmaMember={isPmaMember} />
-                              {resource.isPremium && !isPmaMember && (
-                                <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                                  <Lock className="w-4 h-4 text-white" />
-                                </div>
-                              )}
-                              {resource.isPaid && (
-                                <Badge className="absolute top-1 right-1 bg-gradient-to-r from-primary to-blue-500 text-white text-[7px] px-1 py-0">
-                                  <Star className="w-2 h-2 mr-0.5 fill-current" />
-                                  Partner
-                                </Badge>
-                              )}
-                              {resource.isPremium && (
-                                <Badge className="absolute top-1 left-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[7px] px-1 py-0">
-                                  <Crown className="w-2 h-2 mr-0.5 fill-current" />
-                                  Premium
-                                </Badge>
-                              )}
-                            </div>
-                            <h3 className="text-[10px] font-semibold mb-0.5 text-card-foreground line-clamp-2">
-                              {resource.title}
-                            </h3>
-                            <p className="text-[9px] text-muted-foreground line-clamp-2">
-                              {resource.description}
-                            </p>
+                          <div className="w-full aspect-video rounded-md overflow-hidden bg-muted mb-2 relative">
+                            <ResourceImage resource={resource} isPmaMember={isPmaMember} />
+                            <ResourceBadges resource={resource} isPmaMember={isPmaMember} />
                           </div>
+                          <h3 className="text-sm font-semibold leading-snug mb-1 text-card-foreground line-clamp-2">
+                            {resource.title}
+                          </h3>
+                          <p className="text-xs leading-relaxed text-muted-foreground line-clamp-3">
+                            {resource.description}
+                          </p>
                         </CardContent>
                       </Card>
                     </CarouselItem>
@@ -510,154 +468,18 @@ const ResourcesPage = () => {
                   <p className="text-lg text-muted-foreground">{selectedCategoryData.description}</p>
                 </div>
 
-                {selectedCategoryData.subcategories ? (
-                  <div className="flex flex-col md:flex-row gap-8">
-                    {/* Sticky Sidebar for Desktop / Top Menu for Mobile */}
-                    <div className="md:w-64 shrink-0">
-                      <div className="sticky top-24 space-y-2 bg-card/50 backdrop-blur-sm p-4 rounded-xl border border-border">
-                        <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Categories</h3>
-                        <div className="flex overflow-x-auto md:flex-col gap-2 no-scrollbar pb-2 md:pb-0">
-                          {selectedCategoryData.subcategories.map((sub, idx) => (
-                            <a
-                              key={idx}
-                              href={`#sub-${sub.id}`}
-                              className="block whitespace-nowrap px-3 py-2 text-sm text-muted-foreground hover:text-primary hover:bg-muted/50 rounded-md transition-colors"
-                            >
-                              {sub.title}
-                            </a>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Main Content Areas */}
-                    <div className="flex-1 space-y-12">
-                      {selectedCategoryData.subcategories.map((subcategory, subIdx) => (
-                        <div key={subIdx} id={`sub-${subcategory.id}`} className="scroll-mt-32">
-                          <h3 className="text-2xl font-bold mb-6 pb-2 border-b border-border text-foreground/90">{subcategory.title}</h3>
-                          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
-                            {subcategory.resources.map((resource, idx) => (
-                              <AnimatedSection key={idx} animation="slide-up" delay={idx * 50}>
-                                <Card
-                                  className={`h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer ${resource.isPremium && !isPmaMember ? 'ring-1 ring-amber-500/30' : ''}`}
-                                  onClick={(e) => {
-                                    if (resource.isPaid) {
-                                      e.preventDefault();
-                                      setSelectedPaidResource({ title: resource.title, url: resource.url });
-                                    } else if (resource.isPremium && !isPmaMember) {
-                                      e.preventDefault();
-                                      setSelectedPremiumResource({ title: resource.title, url: resource.url });
-                                    } else {
-                                      trackResourceClick(resource, selectedCategoryData.id);
-                                      window.open(resource.url, '_blank', 'noopener,noreferrer');
-                                    }
-                                  }}
-                                >
-                                  <CardContent className="p-3">
-                                    <div className="mb-2">
-                                      <div className="w-full aspect-square rounded-md overflow-hidden bg-muted mb-2 relative">
-                                        <ResourceImage resource={resource} isPmaMember={isPmaMember} />
-                                        {resource.isPremium && !isPmaMember && (
-                                          <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                                            <Lock className="w-5 h-5 text-white" />
-                                          </div>
-                                        )}
-                                        {resource.isPaid && (
-                                          <Badge className="absolute top-1 right-1 bg-gradient-to-r from-primary to-blue-500 text-white text-[9px] px-1.5 py-0.5">
-                                            <Star className="w-2.5 h-2.5 mr-1 fill-current" />
-                                            Partner
-                                          </Badge>
-                                        )}
-                                        {resource.isPremium && (
-                                          <Badge className="absolute top-1 left-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[9px] px-1.5 py-0.5">
-                                            <Crown className="w-2.5 h-2.5 mr-1 fill-current" />
-                                            Premium
-                                          </Badge>
-                                        )}
-                                      </div>
-                                      <h3 className="text-xs sm:text-sm font-semibold mb-1 text-card-foreground line-clamp-2 leading-tight">
-                                        {resource.title}
-                                      </h3>
-                                      <p className="text-[10px] sm:text-xs text-muted-foreground line-clamp-2 leading-relaxed">{resource.description}</p>
-                                    </div>
-                                  </CardContent>
-                                </Card>
-                              </AnimatedSection>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  // Regular grid view for other categories
-                  <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2.5">
-                    {selectedCategoryData.resources?.map((resource, idx) => (
-                      <AnimatedSection key={idx} animation="slide-up" delay={idx * 100}>
-                        <Card
-                          className={`h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer ${resource.isPremium && !isPmaMember ? 'ring-1 ring-amber-500/30' : ''}`}
-                          onClick={(e) => {
-                            if (resource.isPaid) {
-                              e.preventDefault();
-                              setSelectedPaidResource({ title: resource.title, url: resource.url });
-                            } else if (resource.isPremium && !isPmaMember) {
-                              e.preventDefault();
-                              setSelectedPremiumResource({ title: resource.title, url: resource.url });
-                            } else {
-                              selectedCategoryData && trackResourceClick(resource, selectedCategoryData.id);
-                              window.open(resource.url, '_blank', 'noopener,noreferrer');
-                            }
-                          }}
-                        >
-                          <CardContent className="p-2">
-                            <div className="mb-1.5">
-                              <div className="w-full aspect-square rounded-md overflow-hidden bg-muted mb-1.5 relative">
-                                <ResourceImage resource={resource} isPmaMember={isPmaMember} />
-                                {resource.isPremium && !isPmaMember && (
-                                  <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                                    <Lock className="w-4 h-4 text-white" />
-                                  </div>
-                                )}
-                                {resource.isPaid && (
-                                  <Badge className="absolute top-1 right-1 bg-gradient-to-r from-primary to-blue-500 text-white text-[7px] px-1 py-0">
-                                    <Star className="w-2 h-2 mr-0.5 fill-current" />
-                                    Partner
-                                  </Badge>
-                                )}
-                                {resource.isPremium && (
-                                  <Badge className="absolute top-1 left-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[7px] px-1 py-0">
-                                    <Crown className="w-2 h-2 mr-0.5 fill-current" />
-                                    Premium
-                                  </Badge>
-                                )}
-                              </div>
-                              <h3 className="text-[10px] font-semibold mb-0.5 text-card-foreground line-clamp-2">
-                                {resource.title}
-                              </h3>
-                              <p className="text-[9px] text-muted-foreground line-clamp-2">{resource.description}</p>
-                            </div>
-
-                            {resource.tips && (
-                              <div className="mb-1.5 p-1.5 bg-muted/50 rounded-md">
-                                <h4 className="text-[9px] font-semibold mb-0.5 text-foreground">Tips:</h4>
-                                <ul className="list-disc list-inside space-y-0.5">
-                                  {resource.tips.slice(0, 1).map((tip, tipIdx) => (
-                                    <li
-                                      key={tipIdx}
-                                      className="text-[8px] leading-tight text-muted-foreground line-clamp-1"
-                                    >
-                                      {tip}
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            )}
-                          </CardContent>
-                        </Card>
-                      </AnimatedSection>
-                    ))}
-                  </div>
-                )}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                  {selectedCategoryData.resources.map((resource, idx) => (
+                    <AnimatedSection key={`${selectedCategoryData.id}-${resource.title}`} animation="slide-up" delay={idx * 50} className="h-full">
+                      <ResourceCard
+                        resource={resource}
+                        category={selectedCategoryData}
+                        isPmaMember={isPmaMember}
+                        onOpen={trackResourceClick}
+                      />
+                    </AnimatedSection>
+                  ))}
+                </div>
               </AnimatedSection>
             )}
           </div>
@@ -667,75 +489,16 @@ const ResourcesPage = () => {
             <p className="text-sm text-muted-foreground mb-6">
               Found {searchResults.length} result{searchResults.length !== 1 ? "s" : ""}
             </p>
-            <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2.5">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {searchResults.map(({ resource, category }, idx) => (
-                <AnimatedSection key={idx} animation="slide-up" delay={idx * 50}>
-                  <Card
-                    className={`h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer ${resource.isPremium && !isPmaMember ? 'ring-1 ring-amber-500/30' : ''}`}
-                    onClick={(e) => {
-                      if (resource.isPaid) {
-                        e.preventDefault();
-                        setSelectedPaidResource({ title: resource.title, url: resource.url });
-                      } else if (resource.isPremium && !isPmaMember) {
-                        e.preventDefault();
-                        setSelectedPremiumResource({ title: resource.title, url: resource.url });
-                      } else {
-                        trackResourceClick(resource, category.id);
-                        window.open(resource.url, '_blank', 'noopener,noreferrer');
-                      }
-                    }}
-                  >
-                    <CardContent className="p-2">
-                      <div className="flex items-center gap-1 mb-1.5">
-                        <div
-                          className={`w-4 h-4 rounded bg-gradient-to-r ${category.color} flex items-center justify-center text-white`}
-                        >
-                          <div className="scale-75">{category.icon}</div>
-                        </div>
-                        <span className="text-[8px] text-muted-foreground line-clamp-1">{category.title}</span>
-                      </div>
-
-                      <div className="mb-1.5">
-                        <div className="w-full aspect-square rounded-md overflow-hidden bg-muted mb-1.5 relative">
-                          <ResourceImage resource={resource} isPmaMember={isPmaMember} />
-                          {resource.isPremium && !isPmaMember && (
-                            <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                              <Lock className="w-4 h-4 text-white" />
-                            </div>
-                          )}
-                          {resource.isPaid && (
-                            <Badge className="absolute top-1 right-1 bg-gradient-to-r from-primary to-blue-500 text-white text-[7px] px-1 py-0">
-                              <Star className="w-2 h-2 mr-0.5 fill-current" />
-                              Partner
-                            </Badge>
-                          )}
-                          {resource.isPremium && (
-                            <Badge className="absolute top-1 left-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[7px] px-1 py-0">
-                              <Crown className="w-2 h-2 mr-0.5 fill-current" />
-                              Premium
-                            </Badge>
-                          )}
-                        </div>
-                        <h3 className="text-[10px] font-semibold mb-0.5 text-card-foreground line-clamp-2">
-                          {resource.title}
-                        </h3>
-                        <p className="text-[9px] text-muted-foreground line-clamp-2">{resource.description}</p>
-                      </div>
-
-                      {resource.tips && (
-                        <div className="mb-1.5 p-1.5 bg-muted/50 rounded-md">
-                          <h4 className="text-[9px] font-semibold mb-0.5 text-foreground">Tips:</h4>
-                          <ul className="list-disc list-inside space-y-0.5">
-                            {resource.tips.slice(0, 1).map((tip, tipIdx) => (
-                              <li key={tipIdx} className="text-[8px] leading-tight text-muted-foreground line-clamp-1">
-                                {tip}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
+                <AnimatedSection key={`${category.id}-${resource.title}`} animation="slide-up" delay={idx * 50} className="h-full">
+                  <ResourceCard
+                    resource={resource}
+                    category={category}
+                    isPmaMember={isPmaMember}
+                    showCategory
+                    onOpen={trackResourceClick}
+                  />
                 </AnimatedSection>
               ))}
             </div>
@@ -748,7 +511,7 @@ const ResourcesPage = () => {
         ) : (
           // Category Grid View
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {filteredCategories.map((category, idx) => (
+            {nonEmptyCategories.map((category, idx) => (
               <AnimatedSection key={category.id} animation="slide-up" delay={idx * 100}>
                 <Card
                   className="h-full bg-card/80 backdrop-blur-sm border-border hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer group"
@@ -766,9 +529,7 @@ const ResourcesPage = () => {
                     <p className="text-sm text-muted-foreground mb-4 line-clamp-2 break-words">{category.description}</p>
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-muted-foreground">
-                        {category.resources?.length ||
-                          category.subcategories?.reduce((acc, sub) => acc + sub.resources.length, 0) ||
-                          0} resources
+                        {category.resources.length} resources
                       </span>
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
