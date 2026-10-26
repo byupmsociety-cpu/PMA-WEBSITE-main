@@ -3,7 +3,7 @@
 -- Note: Scores are converted from float to integer, and duplicates are handled via upsert
 
 INSERT INTO public.leaderboard_scores (name, email, score)
-VALUES
+SELECT DISTINCT ON (email) name, email, score FROM (VALUES
   ('Mitch Widdison', 'mitchwidd@gmail.com', 2),
   ('Tanner Christian', 'tannerchristian0@gmail.com', 19),
   ('Silas Jeppson', 'silas.jeppsonc21@gmail.com', 24),
@@ -213,7 +213,8 @@ VALUES
   ('Logan Warner', 'lw432@byu.edu', 16),
   ('Aidan Sprickerhoff', 'sprickea@gmail.com', 19),
   ('blake cardi', 'napoleon@gmail.com', 21),
-  ('Audrey Vankooten', 'vankootenaudrey@gmail.com', 18)
+  ('Audrey Vankooten', 'vankootenaudrey@gmail.com', 18)) AS v(name, email, score)
+ORDER BY email, score DESC
 ON CONFLICT (email) DO UPDATE SET
   name = EXCLUDED.name,
   score = GREATEST(leaderboard_scores.score, EXCLUDED.score);

@@ -11,7 +11,7 @@ export interface Officer {
   bio?: string;
 }
 
-const TEAM_IMAGES = "https://hiqekmodfipcyvztghnj.supabase.co/storage/v1/object/public/team-images";
+const TEAM_IMAGES = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/team-images`;
 
 export const PRESIDENCY: Officer[] = [
   {
