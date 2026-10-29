@@ -5,7 +5,13 @@ import { VIDEO_LIBRARY, type InterviewGuide, type LibraryVideo, type VideoTopic 
 
 const ALL = "all";
 
-const TOTAL_VIDEOS = VIDEO_LIBRARY.reduce((sum, topic) => sum + topic.videos.length, 0);
+// Course videos are unlisted; hidden until we decide to share them with members.
+const TOPICS = VIDEO_LIBRARY.map((topic) => ({
+  ...topic,
+  videos: topic.videos.filter((video) => !video.fromCourse),
+})).filter((topic) => topic.videos.length > 0);
+
+const TOTAL_VIDEOS = TOPICS.reduce((sum, topic) => sum + topic.videos.length, 0);
 
 const VideoTile = ({ video }: { video: LibraryVideo }) => (
   <a
@@ -110,10 +116,10 @@ const VideoLibrary = () => {
 
   const chips = [
     { slug: ALL, title: "All", count: TOTAL_VIDEOS },
-    ...VIDEO_LIBRARY.map((topic) => ({ slug: topic.slug, title: topic.title, count: topic.videos.length })),
+    ...TOPICS.map((topic) => ({ slug: topic.slug, title: topic.title, count: topic.videos.length })),
   ];
 
-  const visibleTopics = selected === ALL ? VIDEO_LIBRARY : VIDEO_LIBRARY.filter((topic) => topic.slug === selected);
+  const visibleTopics = selected === ALL ? TOPICS : TOPICS.filter((topic) => topic.slug === selected);
 
   return (
     <section aria-labelledby="video-library-title">
