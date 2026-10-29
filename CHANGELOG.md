@@ -8,6 +8,7 @@ Notable changes to the BYU PMA website. Newest first.
 - **Practice Interviews** section on the Resources page, right under the APM Playbook. Has 55 public videos from Aced (formerly Exponent) in 8 topics, with "Start here" picks first.
 - **Interview guides** for six round types (Product Sense, Product Strategy, Analytical and Execution, Estimation, Leadership and Drive, Technical). Each covers what the round tests, where it shows up, how to approach it, what works, and what hurts. Written by PMA from public information.
 - The APM Playbook's Interviews step links to Practice Interviews.
+- **Portfolio Factory** (BYU IS Careers' portfolio website guide) added to Build with AI and linked from the APM Playbook's Experience step.
 - **Resources feedback card** at the bottom of Resources: a 1 to 5 rating plus an optional "How can we be more helpful?" comment. Visitors don't need to sign in. Officers see responses at `/admin/feedback`.
 
 ### Changed

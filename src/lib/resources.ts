@@ -222,6 +222,17 @@ export const RESOURCE_CATEGORIES: ResourceCategory[] = [
           "Pair it with Cursor: plan in Claude Code, polish in the editor.",
         ],
       },
+      {
+        title: "Portfolio Factory",
+        description:
+          "BYU IS Careers' guide to building a portfolio website. Once you've shipped a project, give it a home recruiters can click through.",
+        url: "https://iscareers.byu.edu/portfolio-factory",
+        tips: [
+          "Start with the Quick Start and get a simple site live before polishing it.",
+          "For each project, show the problem, what you built, and the result. That's the PM story recruiters look for.",
+          "Put the link on your resume and LinkedIn.",
+        ],
+      },
     ],
   },
 ];

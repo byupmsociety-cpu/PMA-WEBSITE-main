@@ -70,7 +70,10 @@ export const PLAYBOOK_STEPS: PlaybookStep[] = [
       },
     ],
     callout: "Your process is the portfolio, not just the outcome.",
-    links: [{ kind: "category", slug: "ai-tools", label: "Build with AI" }],
+    links: [
+      { kind: "category", slug: "ai-tools", label: "Build with AI" },
+      { kind: "resource", title: "Portfolio Factory", label: "Portfolio Factory" },
+    ],
   },
   {
     id: "resume",
