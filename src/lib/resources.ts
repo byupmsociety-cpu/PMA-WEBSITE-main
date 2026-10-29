@@ -92,7 +92,7 @@ export const RESOURCE_CATEGORIES: ResourceCategory[] = [
   {
     slug: "mock-interviews",
     title: "Mock Interview Videos",
-    description: "Watch real PM mocks for each question type before you do your own",
+    description: "Five starter mocks plus a library of 94 PM interview videos, grouped by interview type",
     icon: "Video",
     color: "from-primary to-secondary",
     resources: [

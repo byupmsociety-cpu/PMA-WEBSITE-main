@@ -14,6 +14,7 @@ import PaidResourceModal from "@/components/PaidResourceModal";
 import PremiumResourceModal from "@/components/PremiumResourceModal";
 import PresidencyConnect from "@/components/PresidencyConnect";
 import ApmPlaybook from "@/components/resources/ApmPlaybook";
+import VideoLibrary from "@/components/resources/VideoLibrary";
 import { RESOURCE_CATEGORIES, type ResourceIcon } from "@/lib/resources";
 
 interface Resource {
@@ -468,6 +469,9 @@ const ResourcesPage = () => {
                   <p className="text-lg text-muted-foreground">{selectedCategoryData.description}</p>
                 </div>
 
+                {selectedCategoryData.id === "mock-interviews" && (
+                  <h3 className="text-2xl font-bold text-foreground mb-6">Start here</h3>
+                )}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                   {selectedCategoryData.resources.map((resource, idx) => (
                     <AnimatedSection key={`${selectedCategoryData.id}-${resource.title}`} animation="slide-up" delay={idx * 50} className="h-full">
@@ -481,6 +485,12 @@ const ResourcesPage = () => {
                   ))}
                 </div>
               </AnimatedSection>
+            )}
+
+            {selectedCategoryData?.id === "mock-interviews" && (
+              <div className="mt-16 border-t border-border pt-12">
+                <VideoLibrary />
+              </div>
             )}
           </div>
         ) : searchQuery && searchResults.length > 0 ? (
