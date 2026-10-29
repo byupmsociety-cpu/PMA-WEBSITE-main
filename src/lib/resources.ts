@@ -90,65 +90,6 @@ export const RESOURCE_CATEGORIES: ResourceCategory[] = [
     ],
   },
   {
-    slug: "mock-interviews",
-    title: "Mock Interview Videos",
-    description: "Five starter mocks plus a library of PM interview videos, grouped by interview type",
-    icon: "Video",
-    color: "from-primary to-secondary",
-    resources: [
-      {
-        title: "Google PM Mock: Improve Headspace",
-        description:
-          "Product sense. A Google and Coinbase PM walks through the classic structure: clarify, pick users, find pain points, propose solutions. From the Aced (formerly Exponent) channel.",
-        url: "https://www.youtube.com/watch?v=BNuRsv_42jc",
-        tips: [
-          "Pause after the question and outline your own answer before watching.",
-          "Compare how the candidate picks one user segment instead of designing for everyone.",
-        ],
-      },
-      {
-        title: "Meta Product Sense Mock: Design a Fitness App",
-        description:
-          "Product design. The newest mock on this list (2024), by an ex Google PM, following the flow Meta expects: mission, segments, pain points, solutions, metrics.",
-        url: "https://www.youtube.com/watch?v=oGqz-TMQNR4",
-        tips: [
-          "Note how the mission statement shapes every later decision.",
-          "Practice the risks follow up at the end. Interviewers almost always ask it.",
-        ],
-      },
-      {
-        title: "Airbnb PM Mock: Increase Bookings",
-        description:
-          "Product strategy and growth. The most watched mock here, covering mission, metrics, users, features, and go to market. From the Aced (formerly Exponent) channel.",
-        url: "https://www.youtube.com/watch?v=OUyjQOj83Uw",
-        tips: [
-          "Pause after the question and write down your top three growth levers first.",
-          "Watch how the candidate ties every feature back to one north star metric.",
-        ],
-      },
-      {
-        title: "Meta Execution Mock: YouTube Goals and Decline",
-        description:
-          "Metrics and execution. Covers both halves of Meta's execution round: defining success metrics and diagnosing a drop. From the Aced (formerly Exponent) channel.",
-        url: "https://www.youtube.com/watch?v=3Qx9cVRJ06I",
-        tips: [
-          "Before the candidate answers, list internal and external causes for the decline yourself.",
-          "Notice how they rule out data and tracking issues before anything else.",
-        ],
-      },
-      {
-        title: "Google Estimation Mock: Paint Market",
-        description:
-          "Estimation in about 12 minutes, ending with follow up questions and a debrief. From the Aced (formerly Exponent) channel.",
-        url: "https://www.youtube.com/watch?v=geeyxZ53lvM",
-        tips: [
-          "Do the estimate yourself first, then compare your assumptions with the candidate's.",
-          "Copy the habit of sanity checking the final number out loud.",
-        ],
-      },
-    ],
-  },
-  {
     slug: "job-search",
     title: "APM Job Postings",
     description: "Track when APM programs and PM internships open so you apply on day one",

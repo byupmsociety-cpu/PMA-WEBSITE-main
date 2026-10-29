@@ -27,9 +27,11 @@ import { ArrowLeft, MessageSquare } from "lucide-react";
 
 interface FeedbackItem {
   id: string;
-  user_id: string;
+  user_id: string | null;
   type: string;
   message: string;
+  rating: number | null;
+  page: string | null;
   status: string;
   created_at: string;
   profiles: {
@@ -43,6 +45,7 @@ const TYPE_COLORS: Record<string, "default" | "secondary" | "destructive" | "out
   feature_request: "default",
   general: "secondary",
   help: "outline",
+  rating: "secondary",
 };
 
 
@@ -177,7 +180,7 @@ const AdminFeedbackPage = () => {
                       </TableCell>
                       <TableCell>
                         <div className="font-medium">
-                          {item.profiles?.full_name || "Unknown"}
+                          {item.profiles?.full_name || (item.user_id ? "Unknown" : "Anonymous")}
                         </div>
                         <div className="text-xs text-muted-foreground">
                           {item.profiles?.email}
@@ -187,9 +190,15 @@ const AdminFeedbackPage = () => {
                         <Badge variant={TYPE_COLORS[item.type] || "default"}>
                           {item.type.replace("_", " ").toUpperCase()}
                         </Badge>
+                        {item.rating !== null && (
+                          <div className="mt-1 text-sm font-semibold">{item.rating} / 5</div>
+                        )}
+                        {item.page && <div className="text-xs text-muted-foreground">{item.page}</div>}
                       </TableCell>
                       <TableCell className="max-w-[400px]">
-                        <p className="whitespace-pre-wrap text-sm">{item.message}</p>
+                        <p className="whitespace-pre-wrap text-sm">
+                          {item.message || <span className="text-muted-foreground">No comment</span>}
+                        </p>
                       </TableCell>
                       <TableCell>
                         <Select

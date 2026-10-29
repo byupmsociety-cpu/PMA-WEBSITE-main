@@ -484,25 +484,31 @@ export type Database = {
       user_feedback: {
         Row: {
           id: string
-          user_id: string
+          user_id: string | null
           type: string
           message: string
+          rating: number | null
+          page: string | null
           status: string
           created_at: string
         }
         Insert: {
           id?: string
-          user_id: string
+          user_id?: string | null
           type: string
           message: string
+          rating?: number | null
+          page?: string | null
           status?: string
           created_at?: string
         }
         Update: {
           id?: string
-          user_id?: string
+          user_id?: string | null
           type?: string
           message?: string
+          rating?: number | null
+          page?: string | null
           status?: string
           created_at?: string
         }

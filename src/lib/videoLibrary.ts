@@ -3,6 +3,7 @@ export interface LibraryVideo {
   title: string;
   minutes: number;
   fromCourse?: boolean;
+  startHere?: boolean;
 }
 
 export interface InterviewGuide {
@@ -67,6 +68,8 @@ export const VIDEO_LIBRARY: VideoTopic[] = [
       ],
     },
     videos: [
+      { youtubeId: "BNuRsv_42jc", title: "Google PM Mock: Improve Headspace", minutes: 25, startHere: true },
+      { youtubeId: "oGqz-TMQNR4", title: "Meta Product Sense Mock: Design a Fitness App", minutes: 29, startHere: true },
       { youtubeId: "s4BtFrDZL5Q", title: "Introduction to Product Sense Questions", minutes: 2, fromCourse: true },
       { youtubeId: "Gj9uioQ6pP8", title: "The Favorite Product Question", minutes: 4, fromCourse: true },
       { youtubeId: "LklG8VFZoCc", title: "Picking Your Favorite Product", minutes: 5, fromCourse: true },
@@ -122,6 +125,7 @@ export const VIDEO_LIBRARY: VideoTopic[] = [
       ],
     },
     videos: [
+      { youtubeId: "OUyjQOj83Uw", title: "Airbnb PM Mock: Increase Bookings", minutes: 31, startHere: true },
       { youtubeId: "I8DYYpeLMWA", title: "Introduction to Product Strategy", minutes: 1, fromCourse: true },
       { youtubeId: "NiwhhZc2488", title: "Mock: Increase Airbnb Bookings", minutes: 32, fromCourse: true },
       { youtubeId: "gOynEbcTbRs", title: "Mock: Double Grammarly's Paid Subscribers", minutes: 43, fromCourse: true },
@@ -164,6 +168,7 @@ export const VIDEO_LIBRARY: VideoTopic[] = [
       ],
     },
     videos: [
+      { youtubeId: "3Qx9cVRJ06I", title: "Meta Execution Mock: YouTube Goals and Decline", minutes: 28, startHere: true },
       { youtubeId: "Gu8v_4CRJLY", title: "Introduction to Analytical and Execution Questions", minutes: 1, fromCourse: true },
       { youtubeId: "mM73xLRKjEc", title: "Mock: Set Facebook Marketplace Goals", minutes: 24, fromCourse: true },
       { youtubeId: "QyjzRryv9Ns", title: "Mock: Diagnose a Nike Conversion Decline", minutes: 25, fromCourse: true },
@@ -212,6 +217,7 @@ export const VIDEO_LIBRARY: VideoTopic[] = [
       ],
     },
     videos: [
+      { youtubeId: "geeyxZ53lvM", title: "Google Estimation Mock: Paint Market", minutes: 14, startHere: true },
       { youtubeId: "UAjHAzNPilU", title: "Google PM Mock: Estimate Pixel Phone Storage", minutes: 48 },
       { youtubeId: "XPmtaPHnca8", title: "Uber PM Mock: Estimate Drivers in SF", minutes: 14 },
       { youtubeId: "o_vG-CtqbGI", title: "PM Mock: Estimate Bandwidth for Students", minutes: 26 },

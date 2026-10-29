@@ -21,7 +21,8 @@ export const WHAT_SETS_YOU_APART = [
 
 export type PlaybookLink =
   | { kind: "category"; slug: string; label: string }
-  | { kind: "resource"; title: string; label: string };
+  | { kind: "resource"; title: string; label: string }
+  | { kind: "section"; id: string; label: string };
 
 export interface PlaybookList {
   heading: string;
@@ -146,7 +147,7 @@ export const PLAYBOOK_STEPS: PlaybookStep[] = [
     callout: "Interviewing is a muscle to train, not a script to memorize.",
     links: [
       { kind: "category", slug: "resume-interview", label: "PM Interview Prep" },
-      { kind: "category", slug: "mock-interviews", label: "Mock Interview Videos" },
+      { kind: "section", id: "practice-interviews", label: "Practice Interviews" },
     ],
   },
 ];

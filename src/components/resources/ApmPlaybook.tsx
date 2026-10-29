@@ -249,6 +249,7 @@ const ApmPlaybook = ({ onSelectCategory, onOpenResource }: ApmPlaybookProps) => 
 
   const openLink = (link: PlaybookLink) => {
     if (link.kind === "category") onSelectCategory(link.slug);
+    else if (link.kind === "section") document.getElementById(link.id)?.scrollIntoView({ behavior: "smooth" });
     else onOpenResource(link.title);
   };
 
