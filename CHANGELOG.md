@@ -2,6 +2,11 @@
 
 Notable changes to the BYU PMA website. Newest first.
 
+## 2026-11-10
+
+### Added
+- **Case competition submissions** at `/submit`: teams from the AI PM Case Competition submit their team name, members, track, problem and a link to their work. No sign in needed. Entries go to the `case_submissions` table, which only admins can read (view them in the Supabase table editor).
+
 ## 2026-10-29
 
 ### Added

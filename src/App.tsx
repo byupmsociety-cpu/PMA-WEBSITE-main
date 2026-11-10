@@ -12,6 +12,7 @@ import TeamPage from "./pages/TeamPage";
 import ResourcesPage from "./pages/ResourcesPage";
 import EventsPage from "./pages/EventsPage";
 import ContactPage from "./pages/ContactPage";
+import SubmitPage from "./pages/SubmitPage";
 import StudentsPage from "./pages/StudentsPage";
 import CompaniesPage from "./pages/CompaniesPage";
 import NotFound from "./pages/NotFound";
@@ -59,6 +60,7 @@ const App = () => (
                 <Route path="/hackathon/share" element={<HackathonSharePage />} />
                 <Route path="/hackathon/faq" element={<HackathonFAQPage />} />
                 <Route path="/contact" element={<ContactPage />} />
+                <Route path="/submit" element={<SubmitPage />} />
                 <Route path="/students" element={<StudentsPage />} />
                 <Route path="/companies" element={<CompaniesPage />} />
                 <Route path="/discover" element={<Navigate to="/students" replace />} />

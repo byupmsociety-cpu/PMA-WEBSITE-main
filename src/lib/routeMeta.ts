@@ -41,6 +41,10 @@ export const ROUTE_META: Record<string, { title: string; description: string }> 
     title: "Contact | BYU PMA",
     description: "Get in touch with the BYU Product Management Association.",
   },
+  "/submit": {
+    title: "Submit Case Work | BYU PMA",
+    description: "Submit your team's work from the BYU PMA AI PM Case Competition.",
+  },
   "/students": {
     title: "For Students | BYU PMA",
     description: "What product management is, which majors and classes lead there, and answers to common student questions.",
