@@ -121,7 +121,7 @@ const SubmitPage = () => {
                   required
                   maxLength={500}
                   inputMode="url"
-                  placeholder="Pull request, prototype, Claude artifact, or doc"
+                  placeholder="Shared chat, doc, artifact, prototype, or PR"
                   value={form.workUrl}
                   onChange={update("workUrl")}
                 />
@@ -130,7 +130,7 @@ const SubmitPage = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="notes">
-                  Anything else? <span className="font-normal text-muted-foreground">(optional)</span>
+                  Spec and success metric, or a second link <span className="font-normal text-muted-foreground">(optional)</span>
                 </Label>
                 <Textarea id="notes" maxLength={2000} rows={3} value={form.notes} onChange={update("notes")} />
               </div>
