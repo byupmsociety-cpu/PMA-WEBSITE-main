@@ -2,6 +2,12 @@
 
 Notable changes to the BYU PMA website. Newest first.
 
+## 2026-11-11
+
+### Added
+- **Case interview page** at `/events/case-interview` for Case Interview: Build the Fix with AI. A heading, short intro, Nate's note about the event and a "Start the case" button to the case site (https://pma-case-competition.vercel.app/case), which has the full brief and instructions. Linked from the top of the Events page. `/case-competition` redirects to it.
+- **Homepage banner** under the navigation linking to the case interview page for tonight's activity. Remove after the event.
+
 ## 2026-11-10
 
 ### Added

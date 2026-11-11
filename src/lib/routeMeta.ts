@@ -29,6 +29,11 @@ export const ROUTE_META: Record<string, { title: string; description: string }> 
     title: "Ask a Question | BYU PMA",
     description: "Submit a question for the live BYU PMA Q&A.",
   },
+  "/events/case-interview": {
+    title: "Case Interview: Build the Fix with AI | BYU PMA",
+    description:
+      "Tonight's BYU PMA case: you're the PM for the PMA website and engagement is slipping. Find out why with data, interviews and AI, then ship a fix.",
+  },
   "/events": {
     title: "Events | BYU PMA",
     description: "Upcoming events, workshops, and meetings from the BYU Product Management Association.",
