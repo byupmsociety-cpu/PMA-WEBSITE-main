@@ -43,7 +43,7 @@ export const ROUTE_META: Record<string, { title: string; description: string }> 
   },
   "/submit": {
     title: "Submit Case Work | BYU PMA",
-    description: "Submit your team's work from the BYU PMA AI PM Case Competition.",
+    description: "Submit your team's work from the BYU PMA Case Interview: Build the Fix with AI.",
   },
   "/students": {
     title: "For Students | BYU PMA",

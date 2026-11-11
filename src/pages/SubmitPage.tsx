@@ -38,7 +38,7 @@ const SubmitPage = () => {
         <div className="max-w-2xl mx-auto">
           <h1 className="text-3xl md:text-4xl font-bold">Submit your case work</h1>
           <p className="mt-3 text-muted-foreground">
-            AI PM Case Competition. One submission per team. Officers look through every entry, and the best changes get merged into this site.
+            Case Interview: Build the Fix with AI. One submission per team. Officers look through every entry, and the best changes get merged into this site.
           </p>
 
           {status === "sent" ? (
