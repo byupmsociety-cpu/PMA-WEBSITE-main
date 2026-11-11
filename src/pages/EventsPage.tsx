@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { MessageSquare } from 'lucide-react';
+import { ArrowRight, MessageSquare } from 'lucide-react';
 import AnimatedSection from '@/components/AnimatedSection';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -232,6 +232,14 @@ const EventsPage = () => {
                 <MessageSquare className="w-4 h-4 ml-1" />
               </Link>
             </Button>
+            <div className="mt-3">
+              <Button asChild size="lg" variant="outline" className="h-auto min-h-11 whitespace-normal py-2">
+                <Link to="/events/case-interview">
+                  Tonight's case: Build the Fix with AI
+                  <ArrowRight className="w-4 h-4 ml-1" />
+                </Link>
+              </Button>
+            </div>
           </div>
         </AnimatedSection>
 

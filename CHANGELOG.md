@@ -2,6 +2,11 @@
 
 Notable changes to the BYU PMA website. Newest first.
 
+## 2026-11-11
+
+### Added
+- **Case interview page** at `/events/case-interview` for Case Interview: Build the Fix with AI. Explains the case, how the hour runs, team format, what teams ship, the three tracks and setup, with a "Start the case" button to the case site (https://pma-case-competition.vercel.app/case). Linked from the top of the Events page. `/case-competition` redirects to it.
+
 ## 2026-11-10
 
 ### Added
