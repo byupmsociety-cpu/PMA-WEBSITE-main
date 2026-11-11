@@ -38,14 +38,14 @@ const SubmitPage = () => {
         <div className="max-w-2xl mx-auto">
           <h1 className="text-3xl md:text-4xl font-bold">Submit your case work</h1>
           <p className="mt-3 text-muted-foreground">
-            AI PM Case Competition. One submission per team. Every submission is reviewed, even if your team doesn't present.
+            AI PM Case Competition. One submission per team. Officers look through every entry, and the best changes get merged into this site.
           </p>
 
           {status === "sent" ? (
             <div role="status" className="mt-10 rounded-xl border border-border bg-card p-6 md:p-8">
               <h2 className="text-xl font-bold text-card-foreground">Submitted. Nice work.</h2>
               <p className="mt-2 text-muted-foreground">
-                Officers will review every entry. Winning features ship to the live PMA site with your names on them.
+                If your change gets merged into the live PMA site, your names go on it. Add this project to your resume either way.
               </p>
               <Button
                 variant="outline"
