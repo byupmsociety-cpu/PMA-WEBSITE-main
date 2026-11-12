@@ -46,6 +46,8 @@ interface UsePrepStateArgs {
   isLoggedIn: boolean;
   onOpenPaid: (resource: { title: string; url: string }) => void;
   onOpenAuth: () => void;
+  /** False while auth is loading; scroll targets wait until the page has rendered. */
+  ready: boolean;
 }
 
 const TABS: PrepTab[] = ["plan", "library", "people"];
@@ -58,7 +60,7 @@ const readPlan = (): SavedPlan | null => {
   return { ...raw, done: Array.isArray(raw.done) ? raw.done : [] };
 };
 
-export const usePrepState = ({ isMember, isLoggedIn, onOpenPaid, onOpenAuth }: UsePrepStateArgs) => {
+export const usePrepState = ({ isMember, isLoggedIn, onOpenPaid, onOpenAuth, ready }: UsePrepStateArgs) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
   const navigate = useNavigate();
@@ -105,8 +107,16 @@ export const usePrepState = ({ isMember, isLoggedIn, onOpenPaid, onOpenAuth }: U
 
   /* ---------- Scrolling after navigation ---------- */
   const scrollTarget = useRef<string | null>(null);
+  const handledHash = useRef("");
+  const firstLoad = useRef(true);
   useEffect(() => {
-    const target = scrollTarget.current ?? (location.hash ? location.hash.slice(1) : null);
+    if (!ready) return;
+    const freshHash = location.hash && location.hash !== handledHash.current ? location.hash.slice(1) : null;
+    handledHash.current = location.hash;
+    // A direct load of ?topic= or ?playbook= lands on that section.
+    const loadTarget = firstLoad.current ? (topic ? "practice-interviews" : playbook ? "apm-playbook" : null) : null;
+    firstLoad.current = false;
+    const target = scrollTarget.current ?? freshHash ?? loadTarget;
     scrollTarget.current = null;
     if (!target) return;
     const timer = window.setTimeout(() => {
@@ -117,7 +127,7 @@ export const usePrepState = ({ isMember, isLoggedIn, onOpenPaid, onOpenAuth }: U
       } else document.getElementById(target)?.scrollIntoView({ block: "start" });
     }, 60);
     return () => window.clearTimeout(timer);
-  }, [location.key, location.hash]);
+  }, [location.key, location.hash, ready, topic, playbook]);
 
   const go = useCallback(
     (params: Record<string, string | null | undefined>, opts: { replace?: boolean; scroll?: string; hash?: string } = {}) => {
