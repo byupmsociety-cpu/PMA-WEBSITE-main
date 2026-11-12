@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowLeft, ArrowRight, ChevronRight, Download, ExternalLink } from "lucide-react";
 import AnimatedSection from "@/components/AnimatedSection";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,7 @@ import { RESOURCE_CATEGORIES } from "@/lib/resources";
 interface ApmPlaybookProps {
   onSelectCategory: (slug: string) => void;
   onOpenResource: (title: string) => void;
+  initialStep?: string;
 }
 
 const isExternalResource = (title: string) =>
@@ -243,8 +244,13 @@ const StepDetail = ({ stepId }: { stepId: string }) => {
   }
 };
 
-const ApmPlaybook = ({ onSelectCategory, onOpenResource }: ApmPlaybookProps) => {
-  const [activeStep, setActiveStep] = useState(PLAYBOOK_STEPS[0].id);
+const ApmPlaybook = ({ onSelectCategory, onOpenResource, initialStep }: ApmPlaybookProps) => {
+  const startStep = PLAYBOOK_STEPS.some((step) => step.id === initialStep) ? (initialStep as string) : PLAYBOOK_STEPS[0].id;
+  const [activeStep, setActiveStep] = useState(startStep);
+
+  useEffect(() => {
+    setActiveStep(startStep);
+  }, [startStep]);
   const activeIndex = PLAYBOOK_STEPS.findIndex((step) => step.id === activeStep);
 
   const openLink = (link: PlaybookLink) => {
@@ -255,7 +261,7 @@ const ApmPlaybook = ({ onSelectCategory, onOpenResource }: ApmPlaybookProps) => 
 
   return (
     <AnimatedSection animation="fade-in">
-      <section aria-labelledby="apm-playbook-title" className="max-w-6xl mx-auto mb-12">
+      <section id="apm-playbook" aria-labelledby="apm-playbook-title" className="max-w-6xl mx-auto mb-12 scroll-mt-24">
         <div className="rounded-xl border border-border bg-card overflow-hidden">
           <div className="p-5 md:p-8">
             <h2 id="apm-playbook-title" className="text-2xl md:text-3xl font-extrabold text-card-foreground">

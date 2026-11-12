@@ -5,8 +5,21 @@ Notable changes to the BYU PMA website. Newest first.
 ## 2026-11-11
 
 ### Added
+- **PM Internship Prep on `/resources`.** The page is now a guided prep program with three tabs: My plan, Library and People. Two start questions (where you are, what you have done) build a dated plan on a 2 year, 1 year or 60 day track. My plan shows This week (two checklist items from your earliest unfinished steps plus one officer touchpoint), progress by stage, and the whole plan by month or week. A 60 day plan can count back from an interview date, with a 7 day sprint. Each of the 33 steps has its own page (`?step=<id>`) with a goal, time, checklist, picked videos, the round guide, practice prompts, Go deeper links and an officer or peer block.
+- **Library search** that covers steps, interview guides, videos, the APM Playbook and resources, with aliases ("case interview" finds the product sense round) and typo fixes. It never hides the category cards, Practice Interviews or the Playbook.
+- **People tab and Ask an officer sheet**: coffee chat, resume review and mock interview requests with routed officers, an editable email preview, Open in email and Copy. Book a time lights up when an officer adds `bookingUrl` in `src/lib/officers.ts`.
+- Practice Interviews opens each round with its picked videos first, and videos can be marked watched.
 - **Case interview page** at `/events/case-interview` for Case Interview: Build the Fix with AI. A heading, short intro, Nate's note about the event and a "Start the case" button to the case site (https://pma-case-competition.vercel.app/case), which has the full brief and instructions. Linked from the top of the Events page. `/case-competition` redirects to it.
 - **Homepage banner** under the navigation linking to the case interview page for tonight's activity. Remove after the event.
+
+### Changed
+- Non members now see the whole plan, every checklist, the first step of their plan and search on `/resources`, with a join panel that explains how approval works. Videos, the APM Playbook, guides and resource links stay members only. Coffee chats with officers are open to anyone.
+- Footer links: PM Case Prep, Interview Prep and Resume Guides now deep link into the prep page. `/resources` is titled PM Internship Prep.
+- The Most Useful Resources carousel is replaced by quick links in the Library.
+
+### Notes
+- Prep progress (plan, checkmarks, watched videos, officer asks) is saved in localStorage on each device. There are no new tables.
+- Course videos (`fromCourse: true`) are still never shown.
 
 ## 2026-11-10
 
