@@ -2,11 +2,9 @@ import { useState, useEffect } from "react";
 import AnimatedSection from "@/components/AnimatedSection";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Briefcase, Cpu, ArrowLeft, Search, TrendingUp, Star, BookOpen, Users, Lock, Crown, Video, Play, ExternalLink } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ArrowLeft, Search, TrendingUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { Badge } from "@/components/ui/badge";
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import LockedResourcesView from "@/components/LockedResourcesView";
@@ -16,228 +14,18 @@ import PresidencyConnect from "@/components/PresidencyConnect";
 import ApmPlaybook from "@/components/resources/ApmPlaybook";
 import PracticeInterviews from "@/components/resources/PracticeInterviews";
 import ResourcesFeedback from "@/components/resources/ResourcesFeedback";
-import { RESOURCE_CATEGORIES, type ResourceIcon } from "@/lib/resources";
-
-interface Resource {
-  title: string;
-  description: string;
-  url: string;
-  image: string;
-  tips?: string[];
-  isPaid?: boolean;
-  isPremium?: boolean;
-  isFeatured?: boolean;
-}
-
-interface Category {
-  id: string;
-  title: string;
-  description: string;
-  icon: React.ReactNode;
-  color: string;
-  resources: Resource[];
-}
-
-const ICON_MAP: Record<ResourceIcon, React.ReactNode> = {
-  BookOpen: <BookOpen className="w-6 h-6" />,
-  Video: <Video className="w-6 h-6" />,
-  Briefcase: <Briefcase className="w-6 h-6" />,
-  Users: <Users className="w-6 h-6" />,
-  Cpu: <Cpu className="w-6 h-6" />,
-};
-
-const CATEGORIES: Category[] = RESOURCE_CATEGORIES.map((category) => ({
-  id: category.slug,
-  title: category.title,
-  description: category.description,
-  icon: ICON_MAP[category.icon],
-  color: category.color,
-  resources: category.resources.map((resource) => ({
-    title: resource.title,
-    description: resource.description,
-    url: resource.url,
-    image: resource.imageUrl ?? "",
-    tips: resource.tips.length > 0 ? resource.tips : undefined,
-    isPaid: resource.isPaid,
-    isFeatured: resource.isFeatured,
-  })),
-}));
+import ResourceCard, { ResourceBadges, ResourceImage } from "@/components/resources/ResourceCard";
+import {
+  CATEGORIES,
+  isInAppGuide,
+  resourceAnchorId,
+  type Category,
+  type Resource,
+} from "@/lib/resourceCatalog";
 
 const FEATURED_RESOURCES = CATEGORIES.flatMap((category) =>
   category.resources.filter((resource) => resource.isFeatured).map((resource) => ({ resource, category })),
 );
-
-const resourceAnchorId = (title: string) => `resource-${title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
-
-const isInAppGuide = (resource: Resource) => {
-  const url = resource.url?.trim() ?? "";
-  return url === "" || url === "#";
-};
-
-const getDomain = (urlString: string) => {
-  try {
-    return new URL(urlString).hostname.replace(/^www\./, "");
-  } catch {
-    return null;
-  }
-};
-
-const getYouTubeId = (urlString: string) => {
-  try {
-    const url = new URL(urlString);
-    const host = url.hostname.replace(/^(www|m)\./, "");
-    if (host === "youtu.be") return url.pathname.split("/")[1] || null;
-    if (host === "youtube.com" && url.pathname === "/watch") return url.searchParams.get("v");
-    return null;
-  } catch {
-    return null;
-  }
-};
-
-type ImageSource = { src: string; kind: "cover" | "video" | "favicon" };
-
-const ResourceImage = ({ resource, isPmaMember }: { resource: Resource; isPmaMember: boolean }) => {
-  const [sourceIndex, setSourceIndex] = useState(0);
-
-  const sources: ImageSource[] = [];
-  if (resource.image && (resource.image.startsWith("http") || resource.image.startsWith("/assets/"))) {
-    sources.push({ src: resource.image, kind: "cover" });
-  }
-  const youTubeId = getYouTubeId(resource.url);
-  if (youTubeId) {
-    sources.push({ src: `https://img.youtube.com/vi/${youTubeId}/hqdefault.jpg`, kind: "video" });
-  }
-  const domain = getDomain(resource.url);
-  if (domain) {
-    sources.push({ src: `https://www.google.com/s2/favicons?domain=${domain}&sz=128`, kind: "favicon" });
-  }
-
-  const current = sources[sourceIndex];
-  const premiumOpacity = resource.isPremium && !isPmaMember ? "opacity-60" : "";
-  const handleError = () => setSourceIndex((i) => i + 1);
-
-  if (!current) {
-    return (
-      <div className={`w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-primary/5 text-primary/40 font-bold ${premiumOpacity}`}>
-        <span className="text-4xl">{resource.title.charAt(0)}</span>
-      </div>
-    );
-  }
-
-  if (current.kind === "favicon") {
-    return (
-      <div className={`w-full h-full flex items-center justify-center bg-white dark:bg-muted p-6 ${premiumOpacity}`}>
-        <img src={current.src} alt={resource.title} loading="lazy" className="w-16 h-16 object-contain" onError={handleError} />
-      </div>
-    );
-  }
-
-  return (
-    <div className="relative w-full h-full">
-      <img
-        src={current.src}
-        alt={resource.title}
-        loading="lazy"
-        className={`w-full h-full object-cover ${premiumOpacity}`}
-        onError={handleError}
-      />
-      {current.kind === "video" && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-12 h-12 rounded-full bg-black/60 flex items-center justify-center">
-            <Play className="w-5 h-5 text-white fill-current ml-0.5" />
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-const ResourceBadges = ({ resource, isPmaMember }: { resource: Resource; isPmaMember: boolean }) => (
-  <>
-    {resource.isPremium && !isPmaMember && (
-      <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-        <Lock className="w-5 h-5 text-white" />
-      </div>
-    )}
-    {resource.isPaid && (
-      <Badge className="absolute top-2 right-2 text-xs px-2 py-0.5">
-        <Star className="w-3 h-3 mr-1 fill-current" />
-        Partner
-      </Badge>
-    )}
-    {resource.isPremium && (
-      <Badge className="absolute top-2 left-2 bg-accent text-accent-foreground hover:bg-accent/80 text-xs px-2 py-0.5">
-        <Crown className="w-3 h-3 mr-1 fill-current" />
-        Premium
-      </Badge>
-    )}
-  </>
-);
-
-interface ResourceCardProps {
-  resource: Resource;
-  category: Category;
-  isPmaMember: boolean;
-  showCategory?: boolean;
-  onOpen: (resource: Resource, categoryId: string, e?: React.MouseEvent) => Promise<void>;
-}
-
-const ResourceCard = ({ resource, category, isPmaMember, showCategory, onOpen }: ResourceCardProps) => {
-  const isGuide = isInAppGuide(resource);
-  const ListTag = isGuide ? "ol" : "ul";
-
-  return (
-    <Card
-      id={resourceAnchorId(resource.title)}
-      className={`h-full flex flex-col overflow-hidden bg-card border-border scroll-mt-24 ${resource.isPremium && !isPmaMember ? "ring-1 ring-accent/40" : ""}`}
-    >
-      <div className="relative w-full aspect-video overflow-hidden bg-muted">
-        <ResourceImage resource={resource} isPmaMember={isPmaMember} />
-        <ResourceBadges resource={resource} isPmaMember={isPmaMember} />
-      </div>
-      <CardContent className="flex flex-col flex-1 p-5">
-        {showCategory && (
-          <div className="flex items-center gap-2 mb-2">
-            <div className={`w-5 h-5 rounded bg-gradient-to-r ${category.color} flex items-center justify-center text-white`}>
-              <div className="scale-[0.6]">{category.icon}</div>
-            </div>
-            <span className="text-xs text-muted-foreground">{category.title}</span>
-          </div>
-        )}
-        <h3 className="text-lg font-semibold leading-snug text-card-foreground mb-2">{resource.title}</h3>
-        <p className="text-sm leading-relaxed text-muted-foreground mb-4">{resource.description}</p>
-
-        {resource.tips && (
-          <div className="mb-5">
-            <h4 className="text-sm font-semibold text-foreground mb-2">{isGuide ? "How to do it" : "Tips"}</h4>
-            <ListTag className={`${isGuide ? "list-decimal" : "list-disc"} pl-5 space-y-1.5`}>
-              {resource.tips.map((tip, tipIdx) => (
-                <li key={tipIdx} className="text-sm leading-relaxed text-foreground/90">
-                  {tip}
-                </li>
-              ))}
-            </ListTag>
-          </div>
-        )}
-
-        {!isGuide && (
-          <Button asChild className="mt-auto w-full">
-            <a
-              href={resource.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={`Open ${resource.title}`}
-              onClick={(e) => void onOpen(resource, category.id, e)}
-            >
-              Open
-              <ExternalLink className="w-4 h-4 ml-2" />
-            </a>
-          </Button>
-        )}
-      </CardContent>
-    </Card>
-  );
-};
 
 const ResourcesPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -353,7 +141,7 @@ const ResourcesPage = () => {
           id: category.id,
           title: category.title,
           description: category.description,
-          icon: category.icon,
+          icon: <category.Icon className="w-6 h-6" />,
           color: category.color,
           resourceCount: category.resources.length,
         }))}
@@ -421,7 +209,9 @@ const ResourcesPage = () => {
                             <div
                               className={`w-5 h-5 shrink-0 rounded bg-gradient-to-r ${category.color} flex items-center justify-center text-white`}
                             >
-                              <div className="scale-[0.6]">{category.icon}</div>
+                              <div className="scale-[0.6]">
+                                <category.Icon className="w-6 h-6" />
+                              </div>
                             </div>
                             <span className="text-xs text-muted-foreground line-clamp-1">{category.title}</span>
                           </div>
@@ -466,7 +256,7 @@ const ResourcesPage = () => {
                   <div
                     className={`inline-flex items-center gap-3 bg-gradient-to-r ${selectedCategoryData.color} p-4 rounded-lg text-white mb-4`}
                   >
-                    {selectedCategoryData.icon}
+                    <selectedCategoryData.Icon className="w-6 h-6" />
                     <h2 className="text-2xl font-bold">{selectedCategoryData.title}</h2>
                   </div>
                   <p className="text-lg text-muted-foreground">{selectedCategoryData.description}</p>
@@ -525,7 +315,7 @@ const ResourcesPage = () => {
                     <div
                       className={`w-12 h-12 rounded-lg bg-gradient-to-r ${category.color} flex items-center justify-center mb-4 text-white group-hover:scale-110 transition-transform`}
                     >
-                      {category.icon}
+                      <category.Icon className="w-6 h-6" />
                     </div>
                     <h3 className="text-lg font-semibold mb-2 text-card-foreground group-hover:text-primary transition-colors truncate">
                       {category.title}
