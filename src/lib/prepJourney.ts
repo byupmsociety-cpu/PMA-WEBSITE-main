@@ -128,8 +128,8 @@ export const PEER_OPTIONS: { title: string; note: string }[] = [
 
 /** Approval copy. No timing promises: approval is manual and we do not publish a number. */
 export const APPROVAL_COPY = {
-  short: "An officer approves new members by hand. If it has been more than a week, email the club.",
-  queued: "A student officer matches your payment to your account by hand. If it has been more than a week, email the club with your name and the email you used.",
+  approve: "An officer approves new members by hand.",
+  wait: "If it has been more than a week, email the club.",
   clubEmail: "byupmsociety@gmail.com",
   joinUrl: "https://clubs.byu.edu/link/club/18295873486206095",
 };

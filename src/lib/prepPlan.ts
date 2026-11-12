@@ -296,6 +296,13 @@ export const doneCount = (checks: Checks, id: string) => stepChecks(checks, id).
 export const freeStep = (plan: SavedPlan | null) => (plan ? TRACK_BY_ID[plan.track].phases[0].steps[0] : null);
 export const isStepLocked = (id: string, plan: SavedPlan | null, isMember: boolean) => !isMember && id !== freeStep(plan);
 
+/** Picked videos for round steps, otherwise the step's own video links. */
+export const stepVideoIds = (id: string) => {
+  const step = STEP_BY_ID[id];
+  if (step.roundPicks) return step.roundPicks.flatMap((r) => PICKS_BY_TOPIC[r]?.videos.map((v) => v.youtubeId) ?? []);
+  return step.links.flatMap((l) => (l.kind === "video" ? [l.youtubeId] : []));
+};
+
 export const hasOfficerTouch = (id: string) => STEP_BY_ID[id]?.touchpoint?.where === "presidency";
 
 export const routeFor = (stepId: string | null | undefined, kind: SessionKind): string[] =>
