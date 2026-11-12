@@ -39,6 +39,7 @@ import PublicLayout from "./components/layout/PublicLayout";
 import MeetingPresentationPage from "./pages/MeetingPresentationPage";
 import AskPage from "./pages/AskPage";
 import CaseInterviewPage from "./pages/CaseInterviewPage";
+import CaseAnswerKeyPage from "./pages/CaseAnswerKeyPage";
 
 const queryClient = new QueryClient();
 
@@ -71,6 +72,7 @@ const App = () => (
                 <Route path="/meeting" element={<MeetingPresentationPage />} />
                 <Route path="/events/ask" element={<AskPage />} />
                 <Route path="/events/case-interview" element={<CaseInterviewPage />} />
+                <Route path="/events/case-interview/answer-key" element={<CaseAnswerKeyPage />} />
                 <Route path="/case-competition" element={<Navigate to="/events/case-interview" replace />} />
                 <Route path="/events" element={<EventsPage />} />
                 {/* Members-only: ResourcesPage gates itself on is_pma_member */}
