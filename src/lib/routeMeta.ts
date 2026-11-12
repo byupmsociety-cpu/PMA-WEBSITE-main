@@ -39,8 +39,9 @@ export const ROUTE_META: Record<string, { title: string; description: string }> 
     description: "Upcoming events, workshops, and meetings from the BYU Product Management Association.",
   },
   "/resources": {
-    title: "Resources | BYU PMA",
-    description: "Product management resources, guides, and tools from BYU PMA.",
+    title: "PM Internship Prep | BYU PMA",
+    description:
+      "A week by week plan to land a PM internship, with interview prep, a resource library and PMA officers who help.",
   },
   "/contact": {
     title: "Contact | BYU PMA",

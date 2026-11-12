@@ -49,9 +49,9 @@ const Footer = () => {
           <div>
             <h4 className="text-foreground font-semibold mb-4">Resources</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link to="/resources" className="text-muted-foreground hover:text-primary dark:hover:text-white transition-colors">PM Case Prep</Link></li>
-              <li><Link to="/resources" className="text-muted-foreground hover:text-primary dark:hover:text-white transition-colors">Resume Guides</Link></li>
-              <li><Link to="/resources" className="text-muted-foreground hover:text-primary dark:hover:text-white transition-colors">Interview Prep</Link></li>
+              <li><Link to="/resources?view=library&q=case+interview" className="text-muted-foreground hover:text-primary dark:hover:text-white transition-colors">PM Case Prep</Link></li>
+              <li><Link to="/resources?step=story-resume" className="text-muted-foreground hover:text-primary dark:hover:text-white transition-colors">Resume Guides</Link></li>
+              <li><Link to="/resources#practice-interviews" className="text-muted-foreground hover:text-primary dark:hover:text-white transition-colors">Interview Prep</Link></li>
               <li><Link to="/resources" className="text-muted-foreground hover:text-primary dark:hover:text-white transition-colors">Figma Templates</Link></li>
             </ul>
           </div>
