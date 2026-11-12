@@ -111,10 +111,14 @@ interface ResourceCardProps {
   isPmaMember: boolean;
   showCategory?: boolean;
   onOpen: (resource: Resource, categoryId: string, e?: React.MouseEvent) => Promise<void>;
+  /** Members only: show the title and description, hide tips, and lock the Open button. Paid perks stay open. */
+  locked?: boolean;
+  onLocked?: () => void;
 }
 
-const ResourceCard = ({ resource, category, isPmaMember, showCategory, onOpen }: ResourceCardProps) => {
+const ResourceCard = ({ resource, category, isPmaMember, showCategory, onOpen, locked, onLocked }: ResourceCardProps) => {
   const isGuide = isInAppGuide(resource);
+  const isLocked = !!locked && !resource.isPaid;
   const ListTag = isGuide ? "ol" : "ul";
 
   return (
@@ -140,7 +144,7 @@ const ResourceCard = ({ resource, category, isPmaMember, showCategory, onOpen }:
         <h3 className="text-lg font-semibold leading-snug text-card-foreground mb-2">{resource.title}</h3>
         <p className="text-sm leading-relaxed text-muted-foreground mb-4">{resource.description}</p>
 
-        {resource.tips && (
+        {resource.tips && !isLocked && (
           <div className="mb-5">
             <h4 className="text-sm font-semibold text-foreground mb-2">{isGuide ? "How to do it" : "Tips"}</h4>
             <ListTag className={`${isGuide ? "list-decimal" : "list-disc"} pl-5 space-y-1.5`}>
@@ -153,7 +157,14 @@ const ResourceCard = ({ resource, category, isPmaMember, showCategory, onOpen }:
           </div>
         )}
 
-        {!isGuide && (
+        {isLocked && (
+          <Button variant="outline" className="mt-auto w-full" onClick={onLocked}>
+            <Lock className="w-4 h-4 mr-2" aria-hidden="true" />
+            Members only
+          </Button>
+        )}
+
+        {!isGuide && !isLocked && (
           <Button asChild className="mt-auto w-full">
             <a
               href={resource.url}
