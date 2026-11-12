@@ -299,8 +299,9 @@ export const usePrepState = ({ isMember, isLoggedIn, onOpenPaid, onOpenAuth }: U
   );
 
   /* ---------- Resources ---------- */
+  /** Opens a resource with today's rules. `free` opens it for non members (the plan's free step). */
   const openResource = useCallback(
-    (title: string) => {
+    (title: string, opts: { free?: boolean } = {}) => {
       const found = findResource(title);
       if (!found) return;
       const { resource, category } = found;
@@ -308,7 +309,7 @@ export const usePrepState = ({ isMember, isLoggedIn, onOpenPaid, onOpenAuth }: U
         onOpenPaid({ title: resource.title, url: resource.url });
         return;
       }
-      if (!isMember) {
+      if (!isMember && !opts.free) {
         goJoin();
         return;
       }
@@ -316,7 +317,7 @@ export const usePrepState = ({ isMember, isLoggedIn, onOpenPaid, onOpenAuth }: U
         goLibrary({ cat: category.id }, { scroll: resourceAnchorId(resource.title) });
         return;
       }
-      void supabase.from("resource_clicks").insert({ resource_title: resource.title, category_id: category.id });
+      if (isMember) void supabase.from("resource_clicks").insert({ resource_title: resource.title, category_id: category.id });
       window.open(resource.url, "_blank", "noopener,noreferrer");
     },
     [isMember, onOpenPaid, goJoin, goLibrary],

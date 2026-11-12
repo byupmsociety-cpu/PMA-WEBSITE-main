@@ -13,6 +13,7 @@ import {
   type SessionKind,
   type TrackId,
 } from "@/lib/prepJourney";
+import { VIDEO_LIBRARY, type LibraryVideo } from "@/lib/videoLibrary";
 
 export type PlanRound = Exclude<RoundTopic, "basics">;
 export type Checks = Record<string, boolean[]>;
@@ -69,6 +70,16 @@ export const TRACK_BY_ID: Record<TrackId, JourneyTrack> = Object.fromEntries(
 export const PICKS_BY_TOPIC: Partial<Record<RoundTopic, RoundPick>> = Object.fromEntries(
   PREP_JOURNEY.roundPicks.map((p) => [p.topic, p]),
 );
+/** Visible videos only. Course lessons (fromCourse) are never surfaced. */
+export const VIDEO_BY_ID = new Map<string, LibraryVideo & { topic: string }>(
+  VIDEO_LIBRARY.flatMap((t) =>
+    t.videos.filter((v) => !v.fromCourse).map((v) => [v.youtubeId, { ...v, topic: t.slug }] as const),
+  ),
+);
+export const VISIBLE_TOPICS = VIDEO_LIBRARY.map((t) => ({ ...t, videos: t.videos.filter((v) => !v.fromCourse) })).filter(
+  (t) => t.videos.length > 0,
+);
+
 export const TRACK_ORDER: TrackId[] = ["two-year", "one-year", "sixty-day"];
 
 export const ROUND_OPTIONS: { value: PlanRound; label: string }[] = [
@@ -299,8 +310,10 @@ export const isStepLocked = (id: string, plan: SavedPlan | null, isMember: boole
 /** Picked videos for round steps, otherwise the step's own video links. */
 export const stepVideoIds = (id: string) => {
   const step = STEP_BY_ID[id];
-  if (step.roundPicks) return step.roundPicks.flatMap((r) => PICKS_BY_TOPIC[r]?.videos.map((v) => v.youtubeId) ?? []);
-  return step.links.flatMap((l) => (l.kind === "video" ? [l.youtubeId] : []));
+  const ids = step.roundPicks
+    ? step.roundPicks.flatMap((r) => PICKS_BY_TOPIC[r]?.videos.map((v) => v.youtubeId) ?? [])
+    : step.links.flatMap((l) => (l.kind === "video" ? [l.youtubeId] : []));
+  return ids.filter((id) => VIDEO_BY_ID.has(id));
 };
 
 export const hasOfficerTouch = (id: string) => STEP_BY_ID[id]?.touchpoint?.where === "presidency";
