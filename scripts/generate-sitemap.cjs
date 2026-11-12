@@ -15,6 +15,7 @@ const routes = [
   "/hackathon/share",
   "/hackathon/faq",
   "/events",
+  "/events/case-interview/answer-key",
   "/resources",
   "/contact",
   "/students",

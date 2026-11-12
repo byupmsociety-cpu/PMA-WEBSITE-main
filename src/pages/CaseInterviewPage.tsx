@@ -1,4 +1,5 @@
-import { ExternalLink } from "lucide-react";
+import { ArrowRight, ExternalLink } from "lucide-react";
+import { Link } from "react-router-dom";
 import AnimatedSection from "@/components/AnimatedSection";
 import { Button } from "@/components/ui/button";
 
@@ -13,14 +14,14 @@ const CaseInterviewPage = () => (
       <AnimatedSection animation="slide-up">
         <div className="max-w-2xl mx-auto text-center mb-10">
           <p className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-4">
-            Tonight · Wednesday, Nov 11
+            Wednesday, Nov 11, 2026
           </p>
           <h1 className="text-4xl md:text-5xl font-bold mb-6">
             Case Interview: <span className="text-gradient">Build the Fix with AI</span>
           </h1>
           <p className="text-lg text-muted-foreground">
-            Welcome! Tonight you'll work through a real AI case interview with your team. Everything you need, from the
-            brief to the data and instructions, is on the case site.
+            Teams worked through a real AI case interview together. The brief, data and instructions are still on the
+            case site, and the answer key shows how to think it through.
           </p>
         </div>
       </AnimatedSection>
@@ -71,6 +72,12 @@ const CaseInterviewPage = () => (
           <p className="mt-4 text-sm text-muted-foreground">
             Opens the case version of the PMA site, with the full brief and instructions.
           </p>
+          <Button asChild size="lg" variant="outline" className="mt-6">
+            <Link to="/events/case-interview/answer-key">
+              Read the answer key
+              <ArrowRight className="w-4 h-4 ml-1" />
+            </Link>
+          </Button>
         </div>
       </AnimatedSection>
     </div>

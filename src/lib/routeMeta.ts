@@ -32,7 +32,12 @@ export const ROUTE_META: Record<string, { title: string; description: string }> 
   "/events/case-interview": {
     title: "Case Interview: Build the Fix with AI | BYU PMA",
     description:
-      "Tonight's BYU PMA case: you're the PM for the PMA website and engagement is slipping. Find out why with data, interviews and AI, then ship a fix.",
+      "The BYU PMA case: you're the PM for the PMA website and engagement is slipping. Find out why with data, interviews and AI, then ship a fix.",
+  },
+  "/events/case-interview/answer-key": {
+    title: "Case Answer Key: How to Think Through a Product Case | BYU PMA",
+    description:
+      "A step by step guide to thinking through any product case, worked through on the BYU PMA case where weekly active members on Resources fell from 41 to 23.",
   },
   "/events": {
     title: "Events | BYU PMA",

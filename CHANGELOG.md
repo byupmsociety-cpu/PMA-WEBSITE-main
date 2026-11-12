@@ -2,6 +2,14 @@
 
 Notable changes to the BYU PMA website. Newest first.
 
+## 2026-11-12
+
+### Added
+- **Case answer key** at `/events/case-interview/answer-key`: "How to Think Through a Product Case," a general guide to working any product case, with Case Interview: Build the Fix with AI as the worked example. Covers 7 stages (goal, questions to ask, what happened in this case, what to watch out for), other real problems in the data, common pitfalls, frameworks worth knowing and sources. Content lives in `src/lib/caseAnswerKey.ts`.
+
+### Changed
+- The case interview page reads in past tense now that the event is over, and links to the answer key with a "Read the answer key" button.
+
 ## 2026-11-11
 
 ### Added
