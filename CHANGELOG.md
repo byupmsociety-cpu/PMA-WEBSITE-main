@@ -2,6 +2,15 @@
 
 Notable changes to the BYU PMA website. Newest first.
 
+## 2026-11-13
+
+### Changed
+- **Paid member access** synced from the BYU Clubs export (35 paid; 2 new emails added to the approved list).
+- **Auth emails** now go through Resend (`noreply@danielwait.com`, up to 100 an hour) instead of Supabase's built-in mailer (about 2 an hour). Auth `site_url` is now `https://product.byu.edu` and it's an allowed redirect.
+
+### Added
+- `docs/paid-member-sync.md`: how to sync paid members, announce access and manage the auth email setup.
+
 ## 2026-11-11
 
 ### Added
